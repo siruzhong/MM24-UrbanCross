@@ -1,0 +1,2269 @@
+2024-02-28 17:24:15.220312: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F AVX512_VNNI FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2024-02-28 17:24:15.407582: I tensorflow/core/util/port.cc:104] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2024-02-28 17:24:17.674128: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /hpc2ssd/softwares/cuda/cuda-12.0/lib64:/opt/slurm/lib
+2024-02-28 17:24:17.674338: W tensorflow/compiler/xla/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /hpc2ssd/softwares/cuda/cuda-12.0/lib64:/opt/slurm/lib
+2024-02-28 17:24:17.674381: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+/hpc2hdd/home/xhao390/.local/lib/python3.7/site-packages/torchvision/io/image.py:13: UserWarning: Failed to load image Python extension: /hpc2hdd/home/xhao390/.local/lib/python3.7/site-packages/torchvision/image.so: undefined symbol: _ZN2at4_ops19empty_memory_format4callEN3c108ArrayRefIlEENS2_8optionalINS2_10ScalarTypeEEENS5_INS2_6LayoutEEENS5_INS2_6DeviceEEENS5_IbEENS5_INS2_12MemoryFormatEEE
+  warn(f"Failed to load image Python extension: {e}")
+2024-02-28 17:24:27,964 Loading vectors from .vector_cache/glove.840B.300d.txt.pt
+2024-02-28 17:24:34,424 Epoch [0][0/172]	Time 2.807	Loss 3998.4453	
+2024-02-28 17:24:38,761 Epoch [0][10/172]	Time 0.462	Loss 3683.4558	
+2024-02-28 17:24:42,928 Epoch [0][20/172]	Time 0.402	Loss 3220.985	
+2024-02-28 17:24:46,979 Epoch [0][30/172]	Time 0.402	Loss 2469.7847	
+2024-02-28 17:24:50,927 Epoch [0][40/172]	Time 0.392	Loss 2122.13	
+2024-02-28 17:24:54,914 Epoch [0][50/172]	Time 0.399	Loss 1942.4348	
+2024-02-28 17:24:58,935 Epoch [0][60/172]	Time 0.405	Loss 1611.6084	
+2024-02-28 17:25:02,983 Epoch [0][70/172]	Time 0.384	Loss 1379.3562	
+2024-02-28 17:25:06,998 Epoch [0][80/172]	Time 0.395	Loss 1418.0267	
+2024-02-28 17:25:11,236 Epoch [0][90/172]	Time 0.432	Loss 1173.1842	
+2024-02-28 17:25:15,419 Epoch [0][100/172]	Time 0.430	Loss 1193.5938	
+2024-02-28 17:25:19,557 Epoch [0][110/172]	Time 0.455	Loss 1145.2349	
+2024-02-28 17:25:23,826 Epoch [0][120/172]	Time 0.396	Loss 946.3744	
+2024-02-28 17:25:27,947 Epoch [0][130/172]	Time 0.387	Loss 1145.3523	
+2024-02-28 17:25:32,166 Epoch [0][140/172]	Time 0.465	Loss 921.59595	
+2024-02-28 17:25:36,326 Epoch [0][150/172]	Time 0.400	Loss 782.7702	
+2024-02-28 17:25:40,410 Epoch [0][160/172]	Time 0.391	Loss 1181.8463	
+2024-02-28 17:25:44,625 Epoch [0][170/172]	Time 0.397	Loss 811.6699	
+2024-02-28 17:26:10,115 Epoch [1][0/172]	Time 0.390	Loss 885.6096	
+2024-02-28 17:26:13,987 Epoch [1][10/172]	Time 0.387	Loss 935.7381	
+2024-02-28 17:26:17,849 Epoch [1][20/172]	Time 0.387	Loss 929.4287	
+2024-02-28 17:26:21,603 Epoch [1][30/172]	Time 0.367	Loss 890.431	
+2024-02-28 17:26:25,487 Epoch [1][40/172]	Time 0.383	Loss 827.32227	
+2024-02-28 17:26:29,404 Epoch [1][50/172]	Time 0.398	Loss 875.692	
+2024-02-28 17:26:33,393 Epoch [1][60/172]	Time 0.399	Loss 507.5941	
+2024-02-28 17:26:37,316 Epoch [1][70/172]	Time 0.390	Loss 740.30676	
+2024-02-28 17:26:41,269 Epoch [1][80/172]	Time 0.407	Loss 713.0731	
+2024-02-28 17:26:45,233 Epoch [1][90/172]	Time 0.386	Loss 799.637	
+2024-02-28 17:26:49,126 Epoch [1][100/172]	Time 0.390	Loss 656.06714	
+2024-02-28 17:26:53,124 Epoch [1][110/172]	Time 0.396	Loss 650.5115	
+2024-02-28 17:26:57,051 Epoch [1][120/172]	Time 0.426	Loss 719.6924	
+2024-02-28 17:27:00,933 Epoch [1][130/172]	Time 0.388	Loss 624.2251	
+2024-02-28 17:27:04,845 Epoch [1][140/172]	Time 0.382	Loss 650.1351	
+2024-02-28 17:27:08,769 Epoch [1][150/172]	Time 0.385	Loss 682.56885	
+2024-02-28 17:27:12,675 Epoch [1][160/172]	Time 0.392	Loss 514.1765	
+2024-02-28 17:27:16,576 Epoch [1][170/172]	Time 0.390	Loss 692.12384	
+2024-02-28 17:27:42,905 Epoch [2][0/172]	Time 0.391	Loss 595.86633	
+2024-02-28 17:27:46,740 Epoch [2][10/172]	Time 0.383	Loss 459.667	
+2024-02-28 17:27:50,579 Epoch [2][20/172]	Time 0.381	Loss 568.833	
+2024-02-28 17:27:54,401 Epoch [2][30/172]	Time 0.380	Loss 609.5244	
+2024-02-28 17:27:58,200 Epoch [2][40/172]	Time 0.386	Loss 794.75134	
+2024-02-28 17:28:01,994 Epoch [2][50/172]	Time 0.379	Loss 796.51294	
+2024-02-28 17:28:05,800 Epoch [2][60/172]	Time 0.381	Loss 441.00696	
+2024-02-28 17:28:09,609 Epoch [2][70/172]	Time 0.380	Loss 548.53937	
+2024-02-28 17:28:13,419 Epoch [2][80/172]	Time 0.381	Loss 772.2367	
+2024-02-28 17:28:17,226 Epoch [2][90/172]	Time 0.379	Loss 596.2052	
+2024-02-28 17:28:21,010 Epoch [2][100/172]	Time 0.382	Loss 649.76624	
+2024-02-28 17:28:24,794 Epoch [2][110/172]	Time 0.380	Loss 572.3082	
+2024-02-28 17:28:28,843 Epoch [2][120/172]	Time 0.473	Loss 639.7974	
+2024-02-28 17:28:33,206 Epoch [2][130/172]	Time 0.418	Loss 434.69974	
+2024-02-28 17:28:37,779 Epoch [2][140/172]	Time 0.492	Loss 666.12244	
+2024-02-28 17:28:41,839 Epoch [2][150/172]	Time 0.382	Loss 614.60913	
+2024-02-28 17:28:45,800 Epoch [2][160/172]	Time 0.388	Loss 421.63205	
+2024-02-28 17:28:49,850 Epoch [2][170/172]	Time 0.378	Loss 618.3627	
+2024-02-28 17:29:15,753 Epoch [3][0/172]	Time 0.387	Loss 432.172	
+2024-02-28 17:29:20,130 Epoch [3][10/172]	Time 0.389	Loss 417.2249	
+2024-02-28 17:29:24,066 Epoch [3][20/172]	Time 0.399	Loss 541.3366	
+2024-02-28 17:29:27,979 Epoch [3][30/172]	Time 0.384	Loss 524.6481	
+2024-02-28 17:29:31,904 Epoch [3][40/172]	Time 0.421	Loss 477.87173	
+2024-02-28 17:29:35,900 Epoch [3][50/172]	Time 0.401	Loss 434.02838	
+2024-02-28 17:29:39,794 Epoch [3][60/172]	Time 0.386	Loss 433.6051	
+2024-02-28 17:29:43,768 Epoch [3][70/172]	Time 0.384	Loss 480.5271	
+2024-02-28 17:29:47,633 Epoch [3][80/172]	Time 0.383	Loss 370.7988	
+2024-02-28 17:29:51,502 Epoch [3][90/172]	Time 0.377	Loss 385.13678	
+2024-02-28 17:29:56,261 Epoch [3][100/172]	Time 0.580	Loss 380.24945	
+2024-02-28 17:30:01,986 Epoch [3][110/172]	Time 0.511	Loss 314.71167	
+2024-02-28 17:30:07,188 Epoch [3][120/172]	Time 0.574	Loss 574.97003	
+2024-02-28 17:30:12,201 Epoch [3][130/172]	Time 0.471	Loss 406.7183	
+2024-02-28 17:30:16,706 Epoch [3][140/172]	Time 0.463	Loss 491.04904	
+2024-02-28 17:30:21,153 Epoch [3][150/172]	Time 0.467	Loss 535.7637	
+2024-02-28 17:30:25,319 Epoch [3][160/172]	Time 0.403	Loss 510.40994	
+2024-02-28 17:30:29,383 Epoch [3][170/172]	Time 0.432	Loss 471.4464	
+2024-02-28 17:30:56,961 Epoch [4][0/172]	Time 0.389	Loss 446.3015	
+2024-02-28 17:31:00,989 Epoch [4][10/172]	Time 0.396	Loss 424.31317	
+2024-02-28 17:31:04,994 Epoch [4][20/172]	Time 0.401	Loss 395.50284	
+2024-02-28 17:31:08,879 Epoch [4][30/172]	Time 0.382	Loss 363.80264	
+2024-02-28 17:31:12,758 Epoch [4][40/172]	Time 0.381	Loss 414.52722	
+2024-02-28 17:31:16,670 Epoch [4][50/172]	Time 0.396	Loss 429.14038	
+2024-02-28 17:31:20,632 Epoch [4][60/172]	Time 0.385	Loss 421.13672	
+2024-02-28 17:31:24,492 Epoch [4][70/172]	Time 0.385	Loss 507.2268	
+2024-02-28 17:31:28,345 Epoch [4][80/172]	Time 0.386	Loss 305.68494	
+2024-02-28 17:31:32,327 Epoch [4][90/172]	Time 0.393	Loss 405.26666	
+2024-02-28 17:31:36,209 Epoch [4][100/172]	Time 0.386	Loss 314.40765	
+2024-02-28 17:31:40,071 Epoch [4][110/172]	Time 0.384	Loss 420.58624	
+2024-02-28 17:31:43,910 Epoch [4][120/172]	Time 0.385	Loss 501.1875	
+2024-02-28 17:31:47,819 Epoch [4][130/172]	Time 0.386	Loss 422.69687	
+2024-02-28 17:31:51,654 Epoch [4][140/172]	Time 0.385	Loss 362.31198	
+2024-02-28 17:31:55,492 Epoch [4][150/172]	Time 0.384	Loss 353.46722	
+2024-02-28 17:31:59,340 Epoch [4][160/172]	Time 0.385	Loss 403.9242	
+2024-02-28 17:32:03,195 Epoch [4][170/172]	Time 0.388	Loss 465.18713	
+2024-02-28 17:32:29,203 Epoch [5][0/172]	Time 0.383	Loss 368.84494	
+2024-02-28 17:32:33,070 Epoch [5][10/172]	Time 0.388	Loss 233.08179	
+2024-02-28 17:32:36,948 Epoch [5][20/172]	Time 0.386	Loss 438.0979	
+2024-02-28 17:32:40,856 Epoch [5][30/172]	Time 0.390	Loss 326.65683	
+2024-02-28 17:32:44,734 Epoch [5][40/172]	Time 0.389	Loss 305.2249	
+2024-02-28 17:32:48,605 Epoch [5][50/172]	Time 0.383	Loss 406.30457	
+2024-02-28 17:32:52,526 Epoch [5][60/172]	Time 0.382	Loss 234.87347	
+2024-02-28 17:32:56,393 Epoch [5][70/172]	Time 0.390	Loss 405.185	
+2024-02-28 17:33:00,258 Epoch [5][80/172]	Time 0.392	Loss 287.80643	
+2024-02-28 17:33:04,134 Epoch [5][90/172]	Time 0.390	Loss 380.7246	
+2024-02-28 17:33:08,014 Epoch [5][100/172]	Time 0.383	Loss 304.2229	
+2024-02-28 17:33:11,894 Epoch [5][110/172]	Time 0.390	Loss 298.62265	
+2024-02-28 17:33:15,747 Epoch [5][120/172]	Time 0.383	Loss 327.12143	
+2024-02-28 17:33:19,636 Epoch [5][130/172]	Time 0.386	Loss 380.8877	
+2024-02-28 17:33:23,557 Epoch [5][140/172]	Time 0.392	Loss 318.93823	
+2024-02-28 17:33:27,427 Epoch [5][150/172]	Time 0.382	Loss 421.4821	
+2024-02-28 17:33:31,297 Epoch [5][160/172]	Time 0.385	Loss 300.21118	
+2024-02-28 17:33:35,210 Epoch [5][170/172]	Time 0.387	Loss 296.03592	
+2024-02-28 17:34:00,745 Epoch [6][0/172]	Time 0.383	Loss 323.97107	
+2024-02-28 17:34:04,601 Epoch [6][10/172]	Time 0.383	Loss 280.87076	
+2024-02-28 17:34:08,457 Epoch [6][20/172]	Time 0.383	Loss 390.592	
+2024-02-28 17:34:12,317 Epoch [6][30/172]	Time 0.383	Loss 312.96826	
+2024-02-28 17:34:16,175 Epoch [6][40/172]	Time 0.389	Loss 234.91245	
+2024-02-28 17:34:20,025 Epoch [6][50/172]	Time 0.379	Loss 307.95636	
+2024-02-28 17:34:23,938 Epoch [6][60/172]	Time 0.390	Loss 257.36337	
+2024-02-28 17:34:27,837 Epoch [6][70/172]	Time 0.384	Loss 441.6581	
+2024-02-28 17:34:31,684 Epoch [6][80/172]	Time 0.388	Loss 370.24988	
+2024-02-28 17:34:35,548 Epoch [6][90/172]	Time 0.385	Loss 327.2874	
+2024-02-28 17:34:39,388 Epoch [6][100/172]	Time 0.389	Loss 359.3297	
+2024-02-28 17:34:43,240 Epoch [6][110/172]	Time 0.393	Loss 310.81934	
+2024-02-28 17:34:47,097 Epoch [6][120/172]	Time 0.383	Loss 269.4402	
+2024-02-28 17:34:50,945 Epoch [6][130/172]	Time 0.383	Loss 406.54047	
+2024-02-28 17:34:54,887 Epoch [6][140/172]	Time 0.391	Loss 370.1547	
+2024-02-28 17:34:58,721 Epoch [6][150/172]	Time 0.382	Loss 399.27246	
+2024-02-28 17:35:02,571 Epoch [6][160/172]	Time 0.381	Loss 282.99765	
+2024-02-28 17:35:06,457 Epoch [6][170/172]	Time 0.378	Loss 352.17847	
+2024-02-28 17:35:31,862 Epoch [7][0/172]	Time 0.386	Loss 264.1407	
+2024-02-28 17:35:35,711 Epoch [7][10/172]	Time 0.385	Loss 386.91333	
+2024-02-28 17:35:39,570 Epoch [7][20/172]	Time 0.386	Loss 311.42822	
+2024-02-28 17:35:43,428 Epoch [7][30/172]	Time 0.381	Loss 309.22736	
+2024-02-28 17:35:47,275 Epoch [7][40/172]	Time 0.383	Loss 329.93396	
+2024-02-28 17:35:51,127 Epoch [7][50/172]	Time 0.388	Loss 313.18396	
+2024-02-28 17:35:54,952 Epoch [7][60/172]	Time 0.379	Loss 239.81241	
+2024-02-28 17:35:58,782 Epoch [7][70/172]	Time 0.381	Loss 215.97018	
+2024-02-28 17:36:02,682 Epoch [7][80/172]	Time 0.385	Loss 255.16226	
+2024-02-28 17:36:06,539 Epoch [7][90/172]	Time 0.390	Loss 313.12997	
+2024-02-28 17:36:10,935 Epoch [7][100/172]	Time 0.893	Loss 387.40497	
+2024-02-28 17:36:14,785 Epoch [7][110/172]	Time 0.383	Loss 277.85013	
+2024-02-28 17:36:19,583 Epoch [7][120/172]	Time 0.384	Loss 379.85852	
+2024-02-28 17:36:23,669 Epoch [7][130/172]	Time 0.383	Loss 244.91512	
+2024-02-28 17:36:29,002 Epoch [7][140/172]	Time 0.517	Loss 240.14499	
+2024-02-28 17:36:34,319 Epoch [7][150/172]	Time 0.438	Loss 367.9884	
+2024-02-28 17:36:39,714 Epoch [7][160/172]	Time 0.467	Loss 302.1814	
+2024-02-28 17:36:46,162 Epoch [7][170/172]	Time 0.730	Loss 289.01974	
+-------------------------
+# Hyper Parameters setting
+experiment_name: SWAN
+model_name: SWAN
+data_name: rsitmd
+data_path: ./data/rsitmd_precomp/
+image_path: ./rs_data/rsitmd/images/
+vocab_path: ./vocab/rsitmd_splits_vocab.json
+resnet_ckpt: ./aid_28-rsp-resnet-50-ckpt.pth
+resume: False
+fix_data: False
+step_sample: False
+epochs: 50
+eval_step: 1
+test_step: 0
+batch_size: 100
+batch_size_val: 100
+shard_size: 256
+workers: 0
+k_fold_nums: 1
+k_fold_current_num: 0
+embed_dim: 512
+margin: 0.2
+max_violation: False
+grad_clip: 0.0
+seed: 0
+il_measure: False
+word_dim: 300
+use_bidirectional_rnn: True
+is_finetune: False
+num_layers: 1
+gpuid: 0
+distributed: False
+init_method: tcp://localhost:18888
+rank: 0
+world_size: 2
+use_mix_precision: False
+logger_name: logs/
+ckpt_save_path: checkpoint/
+print_freq: 10
+lr: 0.0002
+lr_update_epoch: 20
+lr_decay_param: 0.7
+sk_1: 2
+sk_2: 3
+cross_attn: t2i
+agg_func: LogSumExp
+lambda_lse: 6.0
+lambda_softmax: 9.0
+raw_feature_norm: softmax
+-------------------------
+
+Start 1th fold, total 1 flod
+Generate random samples to ./data/rsitmd_precomp/ complete.
+Copy random samples and Cal data info to checkpoint/rsitmd/SWAN/ complete.
+len of train_loader is 172, len of val_loader is 43
+=> using bidirectional rnn:True
+Words: 1330/1349 found in vocabulary; 19 words missing
+Total Params:  40462342
+Total Requires_grad Params:  16892840
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.27 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [1/50] epochs
+Now val score:
+i2t => r1i:2.21 r5i:10.01 r10i:18.28 medri:46.00 meanri:145.03
+t2i => r1t:2.72 r5t:13.13 r10t:22.96 medrt:27.00 meanrt:67.32
+mR:11.55
+Best val score:
+i2t => r1i:2.21 r5i:10.01 r10i:18.28 medri:46.00 meanri:145.03
+t2i => r1t:2.72 r5t:13.13 r10t:22.96 medrt:27.00 meanrt:67.32
+mR:11.55
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.95 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [2/50] epochs
+Now val score:
+i2t => r1i:4.07 r5i:12.34 r10i:21.42 medri:38.00 meanri:112.86
+t2i => r1t:3.28 r5t:13.90 r10t:27.03 medrt:23.00 meanrt:60.63
+mR:13.67
+Best val score:
+i2t => r1i:4.07 r5i:12.34 r10i:21.42 medri:38.00 meanri:112.86
+t2i => r1t:3.28 r5t:13.90 r10t:27.03 medrt:23.00 meanrt:60.63
+mR:13.67
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.70 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [3/50] epochs
+Now val score:
+i2t => r1i:5.01 r5i:15.60 r10i:23.28 medri:34.00 meanri:100.48
+t2i => r1t:4.59 r5t:17.32 r10t:31.39 medrt:19.00 meanrt:50.67
+mR:16.20
+Best val score:
+i2t => r1i:5.01 r5i:15.60 r10i:23.28 medri:34.00 meanri:100.48
+t2i => r1t:4.59 r5t:17.32 r10t:31.39 medrt:19.00 meanrt:50.67
+mR:16.20
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 26.32 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [4/50] epochs
+Now val score:
+i2t => r1i:4.54 r5i:13.39 r10i:23.63 medri:33.00 meanri:92.32
+t2i => r1t:4.47 r5t:18.30 r10t:33.22 medrt:18.00 meanrt:49.17
+mR:16.26
+Best val score:
+i2t => r1i:4.54 r5i:13.39 r10i:23.63 medri:33.00 meanri:92.32
+t2i => r1t:4.47 r5t:18.30 r10t:33.22 medrt:18.00 meanrt:49.17
+mR:16.26
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.80 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [5/50] epochs
+Now val score:
+i2t => r1i:5.24 r5i:15.95 r10i:23.63 medri:32.00 meanri:90.31
+t2i => r1t:4.87 r5t:20.93 r10t:34.81 medrt:17.00 meanrt:49.39
+mR:17.57
+Best val score:
+i2t => r1i:5.24 r5i:15.95 r10i:23.63 medri:32.00 meanri:90.31
+t2i => r1t:4.87 r5t:20.93 r10t:34.81 medrt:17.00 meanrt:49.39
+mR:17.57
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.33 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [6/50] epochs
+Now val score:
+i2t => r1i:5.70 r5i:15.48 r10i:25.03 medri:31.00 meanri:91.20
+t2i => r1t:4.91 r5t:20.33 r10t:35.25 medrt:17.00 meanrt:50.03
+mR:17.78
+Best val score:
+i2t => r1i:5.70 r5i:15.48 r10i:25.03 medri:31.00 meanri:91.20
+t2i => r1t:4.91 r5t:20.33 r10t:35.25 medrt:17.00 meanrt:50.03
+mR:17.78
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.34 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [7/50] epochs
+Now val score:
+i2t => r1i:6.05 r5i:15.60 r10i:23.28 medri:32.00 meanri:96.92
+t2i => r1t:5.26 r5t:20.14 r10t:34.88 medrt:17.00 meanrt:49.80
+mR:17.54
+Best val score:
+i2t => r1i:5.70 r5i:15.48 r10i:25.03 medri:31.00 meanri:91.20
+t2i => r1t:4.91 r5t:20.33 r10t:35.25 medrt:17.00 meanrt:50.03
+mR:17.78
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]2024-02-28 17:37:13,037 Epoch [8][0/172]	Time 0.410	Loss 305.37924	
+2024-02-28 17:37:17,786 Epoch [8][10/172]	Time 0.434	Loss 268.62604	
+2024-02-28 17:37:22,305 Epoch [8][20/172]	Time 0.427	Loss 215.94052	
+2024-02-28 17:37:26,924 Epoch [8][30/172]	Time 0.388	Loss 298.98517	
+2024-02-28 17:37:32,944 Epoch [8][40/172]	Time 0.384	Loss 255.32864	
+2024-02-28 17:37:37,208 Epoch [8][50/172]	Time 0.382	Loss 318.94998	
+2024-02-28 17:37:42,477 Epoch [8][60/172]	Time 0.388	Loss 225.1145	
+2024-02-28 17:37:47,016 Epoch [8][70/172]	Time 0.408	Loss 221.03467	
+2024-02-28 17:37:51,343 Epoch [8][80/172]	Time 0.394	Loss 259.01236	
+2024-02-28 17:37:56,421 Epoch [8][90/172]	Time 0.389	Loss 257.4954	
+2024-02-28 17:38:00,499 Epoch [8][100/172]	Time 0.382	Loss 309.288	
+2024-02-28 17:38:04,622 Epoch [8][110/172]	Time 0.389	Loss 308.13467	
+2024-02-28 17:38:09,743 Epoch [8][120/172]	Time 1.566	Loss 281.53848	
+2024-02-28 17:38:13,615 Epoch [8][130/172]	Time 0.385	Loss 315.03162	
+2024-02-28 17:38:18,490 Epoch [8][140/172]	Time 0.407	Loss 302.30392	
+2024-02-28 17:38:22,348 Epoch [8][150/172]	Time 0.389	Loss 309.69766	
+2024-02-28 17:38:26,620 Epoch [8][160/172]	Time 0.526	Loss 295.15982	
+2024-02-28 17:38:30,443 Epoch [8][170/172]	Time 0.386	Loss 218.95758	
+2024-02-28 17:38:56,075 Epoch [9][0/172]	Time 0.392	Loss 274.64484	
+2024-02-28 17:39:01,026 Epoch [9][10/172]	Time 0.387	Loss 275.2262	
+2024-02-28 17:39:04,914 Epoch [9][20/172]	Time 0.387	Loss 208.38367	
+2024-02-28 17:39:09,956 Epoch [9][30/172]	Time 0.390	Loss 244.44125	
+2024-02-28 17:39:15,033 Epoch [9][40/172]	Time 0.393	Loss 239.94821	
+2024-02-28 17:39:19,435 Epoch [9][50/172]	Time 0.611	Loss 285.68216	
+2024-02-28 17:39:23,360 Epoch [9][60/172]	Time 0.387	Loss 239.73222	
+2024-02-28 17:39:27,499 Epoch [9][70/172]	Time 0.385	Loss 262.99365	
+2024-02-28 17:39:32,152 Epoch [9][80/172]	Time 0.383	Loss 260.3401	
+2024-02-28 17:39:36,404 Epoch [9][90/172]	Time 0.384	Loss 244.52094	
+2024-02-28 17:39:40,657 Epoch [9][100/172]	Time 0.758	Loss 215.11496	
+2024-02-28 17:39:44,535 Epoch [9][110/172]	Time 0.386	Loss 164.64784	
+2024-02-28 17:39:49,036 Epoch [9][120/172]	Time 0.382	Loss 244.80498	
+2024-02-28 17:39:55,014 Epoch [9][130/172]	Time 0.388	Loss 196.92496	
+2024-02-28 17:39:59,341 Epoch [9][140/172]	Time 0.386	Loss 251.43399	
+2024-02-28 17:40:03,242 Epoch [9][150/172]	Time 0.395	Loss 253.53316	
+2024-02-28 17:40:08,523 Epoch [9][160/172]	Time 0.386	Loss 235.47809	
+2024-02-28 17:40:12,493 Epoch [9][170/172]	Time 0.386	Loss 268.54517	
+2024-02-28 17:40:38,674 Epoch [10][0/172]	Time 0.385	Loss 222.09421	
+2024-02-28 17:40:43,625 Epoch [10][10/172]	Time 0.382	Loss 217.90683	
+2024-02-28 17:40:49,579 Epoch [10][20/172]	Time 0.391	Loss 250.07782	
+2024-02-28 17:40:54,721 Epoch [10][30/172]	Time 0.384	Loss 179.62787	
+2024-02-28 17:40:58,532 Epoch [10][40/172]	Time 0.357	Loss 206.3125	
+2024-02-28 17:41:02,593 Epoch [10][50/172]	Time 0.381	Loss 218.79813	
+2024-02-28 17:41:07,894 Epoch [10][60/172]	Time 0.386	Loss 209.12643	
+2024-02-28 17:41:12,828 Epoch [10][70/172]	Time 1.315	Loss 194.72952	
+2024-02-28 17:41:17,245 Epoch [10][80/172]	Time 0.952	Loss 259.39206	
+2024-02-28 17:41:21,276 Epoch [10][90/172]	Time 0.383	Loss 229.64336	
+2024-02-28 17:41:26,773 Epoch [10][100/172]	Time 0.396	Loss 267.42358	
+2024-02-28 17:41:31,483 Epoch [10][110/172]	Time 0.381	Loss 273.06348	
+2024-02-28 17:41:36,449 Epoch [10][120/172]	Time 0.399	Loss 211.22989	
+2024-02-28 17:41:40,308 Epoch [10][130/172]	Time 0.369	Loss 194.14862	
+2024-02-28 17:41:47,918 Epoch [10][140/172]	Time 0.394	Loss 233.42563	
+2024-02-28 17:41:52,647 Epoch [10][150/172]	Time 1.205	Loss 216.44693	
+2024-02-28 17:41:56,681 Epoch [10][160/172]	Time 0.383	Loss 178.7445	
+2024-02-28 17:42:00,703 Epoch [10][170/172]	Time 0.385	Loss 227.63303	
+2024-02-28 17:42:26,482 Epoch [11][0/172]	Time 0.389	Loss 261.45483	
+2024-02-28 17:42:31,130 Epoch [11][10/172]	Time 0.392	Loss 183.6901	
+2024-02-28 17:42:35,305 Epoch [11][20/172]	Time 0.366	Loss 233.42108	
+2024-02-28 17:42:39,153 Epoch [11][30/172]	Time 0.383	Loss 213.34671	
+2024-02-28 17:42:44,603 Epoch [11][40/172]	Time 0.398	Loss 186.48651	
+2024-02-28 17:42:49,460 Epoch [11][50/172]	Time 0.388	Loss 254.689	
+2024-02-28 17:42:53,565 Epoch [11][60/172]	Time 0.385	Loss 247.76779	
+2024-02-28 17:42:57,923 Epoch [11][70/172]	Time 0.390	Loss 170.86887	
+2024-02-28 17:43:01,801 Epoch [11][80/172]	Time 0.387	Loss 180.76161	
+2024-02-28 17:43:05,819 Epoch [11][90/172]	Time 0.589	Loss 185.5173	
+2024-02-28 17:43:09,695 Epoch [11][100/172]	Time 0.379	Loss 185.69977	
+2024-02-28 17:43:14,151 Epoch [11][110/172]	Time 0.362	Loss 243.74887	
+2024-02-28 17:43:19,102 Epoch [11][120/172]	Time 0.386	Loss 242.93631	
+2024-02-28 17:43:24,241 Epoch [11][130/172]	Time 1.676	Loss 201.65706	
+2024-02-28 17:43:29,728 Epoch [11][140/172]	Time 2.005	Loss 235.59097	
+2024-02-28 17:43:34,732 Epoch [11][150/172]	Time 0.578	Loss 221.89194	
+2024-02-28 17:43:40,999 Epoch [11][160/172]	Time 0.387	Loss 210.17584	
+2024-02-28 17:43:44,946 Epoch [11][170/172]	Time 0.545	Loss 216.89157	
+2024-02-28 17:44:10,773 Epoch [12][0/172]	Time 0.634	Loss 236.97131	
+2024-02-28 17:44:18,340 Epoch [12][10/172]	Time 0.897	Loss 207.10681	
+2024-02-28 17:44:24,790 Epoch [12][20/172]	Time 0.733	Loss 192.04541	
+2024-02-28 17:44:30,437 Epoch [12][30/172]	Time 0.443	Loss 202.3392	
+2024-02-28 17:44:35,678 Epoch [12][40/172]	Time 0.518	Loss 218.46573	
+2024-02-28 17:44:42,813 Epoch [12][50/172]	Time 0.501	Loss 178.13077	
+2024-02-28 17:44:48,008 Epoch [12][60/172]	Time 1.071	Loss 240.60403	
+2024-02-28 17:44:53,169 Epoch [12][70/172]	Time 0.436	Loss 187.55563	
+2024-02-28 17:44:57,330 Epoch [12][80/172]	Time 0.417	Loss 194.22565	
+2024-02-28 17:45:02,528 Epoch [12][90/172]	Time 0.436	Loss 246.08362	
+2024-02-28 17:45:07,021 Epoch [12][100/172]	Time 0.598	Loss 207.49057	
+2024-02-28 17:45:10,893 Epoch [12][110/172]	Time 0.385	Loss 195.53537	
+2024-02-28 17:45:14,903 Epoch [12][120/172]	Time 0.390	Loss 205.77393	
+2024-02-28 17:45:20,306 Epoch [12][130/172]	Time 0.387	Loss 190.37042	
+2024-02-28 17:45:24,537 Epoch [12][140/172]	Time 0.386	Loss 205.3569	
+2024-02-28 17:45:28,699 Epoch [12][150/172]	Time 0.360	Loss 206.84116	
+2024-02-28 17:45:33,146 Epoch [12][160/172]	Time 0.385	Loss 203.1058	
+2024-02-28 17:45:37,012 Epoch [12][170/172]	Time 0.384	Loss 265.3099	
+2024-02-28 17:46:06,472 Epoch [13][0/172]	Time 0.713	Loss 166.27881	
+2024-02-28 17:46:13,803 Epoch [13][10/172]	Time 0.616	Loss 157.20177	
+2024-02-28 17:46:21,150 Epoch [13][20/172]	Time 0.583	Loss 214.69649	
+2024-02-28 17:46:26,839 Epoch [13][30/172]	Time 0.422	Loss 229.57945	
+2024-02-28 17:46:32,714 Epoch [13][40/172]	Time 0.519	Loss 158.5004	
+2024-02-28 17:46:37,554 Epoch [13][50/172]	Time 0.382	Loss 207.71986	
+2024-02-28 17:46:42,643 Epoch [13][60/172]	Time 0.382	Loss 189.48514	
+2024-02-28 17:46:47,202 Epoch [13][70/172]	Time 0.397	Loss 204.69803	
+2024-02-28 17:46:51,229 Epoch [13][80/172]	Time 0.389	Loss 205.69656	
+2024-02-28 17:46:55,436 Epoch [13][90/172]	Time 0.384	Loss 185.0997	
+2024-02-28 17:46:59,488 Epoch [13][100/172]	Time 0.402	Loss 150.0323	
+2024-02-28 17:47:04,989 Epoch [13][110/172]	Time 0.402	Loss 186.32758	
+2024-02-28 17:47:10,971 Epoch [13][120/172]	Time 0.384	Loss 175.12952	
+2024-02-28 17:47:17,409 Epoch [13][130/172]	Time 0.384	Loss 167.16759	
+2024-02-28 17:47:22,069 Epoch [13][140/172]	Time 0.388	Loss 179.97038	
+2024-02-28 17:47:25,999 Epoch [13][150/172]	Time 0.384	Loss 204.46393	
+2024-02-28 17:47:30,923 Epoch [13][160/172]	Time 1.167	Loss 197.76117	
+2024-02-28 17:47:34,806 Epoch [13][170/172]	Time 0.389	Loss 324.82922	
+2024-02-28 17:48:01,303 Epoch [14][0/172]	Time 0.363	Loss 171.15692	
+2024-02-28 17:48:05,770 Epoch [14][10/172]	Time 0.391	Loss 218.27666	
+2024-02-28 17:48:10,681 Epoch [14][20/172]	Time 0.385	Loss 132.76816	
+2024-02-28 17:48:14,972 Epoch [14][30/172]	Time 0.383	Loss 161.66519	
+2024-02-28 17:48:18,838 Epoch [14][40/172]	Time 0.391	Loss 156.55656	
+2024-02-28 17:48:23,031 Epoch [14][50/172]	Time 0.385	Loss 160.28273	
+2024-02-28 17:48:28,033 Epoch [14][60/172]	Time 0.385	Loss 160.16963	
+2024-02-28 17:48:33,205 Epoch [14][70/172]	Time 0.397	Loss 176.39372	
+2024-02-28 17:48:38,833 Epoch [14][80/172]	Time 0.386	Loss 187.18039	
+2024-02-28 17:48:43,167 Epoch [14][90/172]	Time 0.383	Loss 137.00266	
+2024-02-28 17:48:47,089 Epoch [14][100/172]	Time 0.395	Loss 141.78256	
+2024-02-28 17:48:50,992 Epoch [14][110/172]	Time 0.381	Loss 195.37576	
+2024-02-28 17:48:54,917 Epoch [14][120/172]	Time 0.388	Loss 197.07996	
+2024-02-28 17:49:00,975 Epoch [14][130/172]	Time 0.382	Loss 149.69751	
+2024-02-28 17:49:04,911 Epoch [14][140/172]	Time 0.382	Loss 149.17824	
+2024-02-28 17:49:09,783 Epoch [14][150/172]	Time 0.383	Loss 221.67297	
+2024-02-28 17:49:14,108 Epoch [14][160/172]	Time 0.391	Loss 153.4205	
+2024-02-28 17:49:19,054 Epoch [14][170/172]	Time 0.392	Loss 170.16544	
+2024-02-28 17:49:45,130 Epoch [15][0/172]	Time 0.383	Loss 200.29878	
+2024-02-28 17:49:49,016 Epoch [15][10/172]	Time 0.387	Loss 159.06812	
+2024-02-28 17:49:53,721 Epoch [15][20/172]	Time 0.385	Loss 219.68634	
+2024-02-28 17:49:57,657 Epoch [15][30/172]	Time 0.396	Loss 150.27914	
+2024-02-28 17:50:02,076 Epoch [15][40/172]	Time 0.391	Loss 170.5743	
+2024-02-28 17:50:06,694 Epoch [15][50/172]	Time 1.111	Loss 150.74348	
+2024-02-28 17:50:10,570 Epoch [15][60/172]	Time 0.384	Loss 165.61311	
+2024-02-28 17:50:15,608 Epoch [15][70/172]	Time 0.386	Loss 138.63474	
+2024-02-28 17:50:20,456 Epoch [15][80/172]	Time 0.383	Loss 164.1384	
+2024-02-28 17:50:25,631 Epoch [15][90/172]	Time 1.692	Loss 183.54439	
+2024-02-28 17:50:31,954 Epoch [15][100/172]	Time 1.417	Loss 152.24135	
+2024-02-28 17:50:36,316 Epoch [15][110/172]	Time 0.385	Loss 205.36392	
+2024-02-28 17:50:40,211 Epoch [15][120/172]	Time 0.388	Loss 171.2016	
+2024-02-28 17:50:46,360 Epoch [15][130/172]	Time 0.386	Loss 165.31241	
+2024-02-28 17:50:50,258 Epoch [15][140/172]	Time 0.385	Loss 157.3086	
+2024-02-28 17:50:54,783 Epoch [15][150/172]	Time 0.395	Loss 178.91432	
+2024-02-28 17:50:59,319 Epoch [15][160/172]	Time 0.388	Loss 211.27368	
+2024-02-28 17:51:03,902 Epoch [15][170/172]	Time 0.387	Loss 145.7263	
+
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 25.56 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [8/50] epochs
+Now val score:
+i2t => r1i:4.77 r5i:16.53 r10i:25.49 medri:30.00 meanri:92.52
+t2i => r1t:4.66 r5t:20.75 r10t:35.83 medrt:17.00 meanrt:48.31
+mR:18.01
+Best val score:
+i2t => r1i:4.77 r5i:16.53 r10i:25.49 medri:30.00 meanri:92.52
+t2i => r1t:4.66 r5t:20.75 r10t:35.83 medrt:17.00 meanrt:48.31
+mR:18.01
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.19 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [9/50] epochs
+Now val score:
+i2t => r1i:4.77 r5i:16.88 r10i:25.61 medri:28.00 meanri:91.49
+t2i => r1t:5.17 r5t:20.98 r10t:35.86 medrt:16.00 meanrt:47.98
+mR:18.21
+Best val score:
+i2t => r1i:4.77 r5i:16.88 r10i:25.61 medri:28.00 meanri:91.49
+t2i => r1t:5.17 r5t:20.98 r10t:35.86 medrt:16.00 meanrt:47.98
+mR:18.21
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.73 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [10/50] epochs
+Now val score:
+i2t => r1i:7.22 r5i:17.23 r10i:25.84 medri:31.00 meanri:94.11
+t2i => r1t:5.17 r5t:20.47 r10t:35.97 medrt:16.00 meanrt:47.86
+mR:18.65
+Best val score:
+i2t => r1i:7.22 r5i:17.23 r10i:25.84 medri:31.00 meanri:94.11
+t2i => r1t:5.17 r5t:20.47 r10t:35.97 medrt:16.00 meanrt:47.86
+mR:18.65
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.58 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [11/50] epochs
+Now val score:
+i2t => r1i:7.10 r5i:17.00 r10i:26.66 medri:30.00 meanri:86.25
+t2i => r1t:5.96 r5t:21.26 r10t:36.39 medrt:16.00 meanrt:46.59
+mR:19.06
+Best val score:
+i2t => r1i:7.10 r5i:17.00 r10i:26.66 medri:30.00 meanri:86.25
+t2i => r1t:5.96 r5t:21.26 r10t:36.39 medrt:16.00 meanrt:46.59
+mR:19.06
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.40 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [12/50] epochs
+Now val score:
+i2t => r1i:6.17 r5i:14.67 r10i:23.98 medri:31.00 meanri:85.56
+t2i => r1t:5.08 r5t:20.54 r10t:35.95 medrt:16.00 meanrt:48.17
+mR:17.73
+Best val score:
+i2t => r1i:7.10 r5i:17.00 r10i:26.66 medri:30.00 meanri:86.25
+t2i => r1t:5.96 r5t:21.26 r10t:36.39 medrt:16.00 meanrt:46.59
+mR:19.06
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 27.67 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [13/50] epochs
+Now val score:
+i2t => r1i:6.52 r5i:18.39 r10i:26.89 medri:28.00 meanri:90.91
+t2i => r1t:5.24 r5t:21.65 r10t:37.86 medrt:16.00 meanrt:48.02
+mR:19.43
+Best val score:
+i2t => r1i:6.52 r5i:18.39 r10i:26.89 medri:28.00 meanri:90.91
+t2i => r1t:5.24 r5t:21.65 r10t:37.86 medrt:16.00 meanrt:48.02
+mR:19.43
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 25.37 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [14/50] epochs
+Now val score:
+i2t => r1i:6.52 r5i:16.07 r10i:24.80 medri:30.00 meanri:90.26
+t2i => r1t:5.33 r5t:21.47 r10t:36.90 medrt:16.00 meanrt:46.93
+mR:18.51
+Best val score:
+i2t => r1i:6.52 r5i:18.39 r10i:26.89 medri:28.00 meanri:90.91
+t2i => r1t:5.24 r5t:21.65 r10t:37.86 medrt:16.00 meanrt:48.02
+mR:19.43
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.61 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [15/50] epochs
+Now val score:
+i2t => r1i:6.29 r5i:17.23 r10i:26.19 medri:28.00 meanri:87.69
+t2i => r1t:5.91 r5t:22.12 r10t:36.93 medrt:15.00 meanrt:45.72
+mR:19.11
+Best val score:
+i2t => r1i:6.52 r5i:18.39 r10i:26.89 medri:28.00 meanri:90.91
+t2i => r1t:5.24 r5t:21.65 r10t:37.86 medrt:16.00 meanrt:48.02
+mR:19.43
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.44 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [16/50] epochs
+Now val score:
+i2t => r1i:6.40 r5i:16.41 r10i:27.12 medri:27.00 meanri:82.43
+t2i => r1t:5.31 r5t:21.54 r10t:38.00 medrt:16.00 meanrt:45.83
+mR:19.132024-02-28 17:51:29,399 Epoch [16][0/172]	Time 0.382	Loss 148.89395	
+2024-02-28 17:51:34,422 Epoch [16][10/172]	Time 0.592	Loss 141.10107	
+2024-02-28 17:51:38,390 Epoch [16][20/172]	Time 0.390	Loss 142.13737	
+2024-02-28 17:51:43,296 Epoch [16][30/172]	Time 0.387	Loss 147.74567	
+2024-02-28 17:51:48,594 Epoch [16][40/172]	Time 0.388	Loss 139.03261	
+2024-02-28 17:51:53,056 Epoch [16][50/172]	Time 0.390	Loss 174.88751	
+2024-02-28 17:51:57,377 Epoch [16][60/172]	Time 0.384	Loss 173.76334	
+2024-02-28 17:52:01,336 Epoch [16][70/172]	Time 0.394	Loss 143.67934	
+2024-02-28 17:52:05,210 Epoch [16][80/172]	Time 0.390	Loss 156.00287	
+2024-02-28 17:52:09,103 Epoch [16][90/172]	Time 0.384	Loss 218.89539	
+2024-02-28 17:52:12,995 Epoch [16][100/172]	Time 0.389	Loss 149.30975	
+2024-02-28 17:52:16,840 Epoch [16][110/172]	Time 0.390	Loss 165.8389	
+2024-02-28 17:52:20,720 Epoch [16][120/172]	Time 0.393	Loss 158.57977	
+2024-02-28 17:52:25,535 Epoch [16][130/172]	Time 0.388	Loss 149.67151	
+2024-02-28 17:52:30,782 Epoch [16][140/172]	Time 0.387	Loss 147.0972	
+2024-02-28 17:52:34,682 Epoch [16][150/172]	Time 0.384	Loss 184.267	
+2024-02-28 17:52:39,026 Epoch [16][160/172]	Time 0.390	Loss 123.543365	
+2024-02-28 17:52:42,980 Epoch [16][170/172]	Time 0.391	Loss 158.75491	
+2024-02-28 17:53:10,434 Epoch [17][0/172]	Time 0.386	Loss 159.2566	
+2024-02-28 17:53:15,502 Epoch [17][10/172]	Time 0.382	Loss 122.595116	
+2024-02-28 17:53:23,939 Epoch [17][20/172]	Time 2.498	Loss 139.67981	
+2024-02-28 17:53:28,242 Epoch [17][30/172]	Time 0.391	Loss 120.812485	
+2024-02-28 17:53:32,277 Epoch [17][40/172]	Time 0.384	Loss 152.26883	
+2024-02-28 17:53:38,344 Epoch [17][50/172]	Time 0.398	Loss 159.31593	
+2024-02-28 17:53:43,511 Epoch [17][60/172]	Time 0.388	Loss 117.65762	
+2024-02-28 17:53:47,596 Epoch [17][70/172]	Time 0.390	Loss 169.74573	
+2024-02-28 17:53:53,297 Epoch [17][80/172]	Time 0.388	Loss 130.90558	
+2024-02-28 17:53:57,172 Epoch [17][90/172]	Time 0.382	Loss 164.55899	
+2024-02-28 17:54:01,410 Epoch [17][100/172]	Time 0.387	Loss 138.03374	
+2024-02-28 17:54:07,207 Epoch [17][110/172]	Time 0.389	Loss 142.98235	
+2024-02-28 17:54:12,319 Epoch [17][120/172]	Time 0.388	Loss 169.81784	
+2024-02-28 17:54:16,234 Epoch [17][130/172]	Time 0.389	Loss 152.2771	
+2024-02-28 17:54:21,575 Epoch [17][140/172]	Time 0.384	Loss 127.44942	
+2024-02-28 17:54:25,414 Epoch [17][150/172]	Time 0.382	Loss 136.03418	
+2024-02-28 17:54:29,474 Epoch [17][160/172]	Time 0.379	Loss 155.51572	
+2024-02-28 17:54:33,932 Epoch [17][170/172]	Time 0.356	Loss 145.47018	
+2024-02-28 17:55:01,450 Epoch [18][0/172]	Time 0.467	Loss 130.40538	
+2024-02-28 17:55:06,405 Epoch [18][10/172]	Time 0.434	Loss 134.53403	
+2024-02-28 17:55:11,367 Epoch [18][20/172]	Time 0.366	Loss 149.82664	
+2024-02-28 17:55:16,177 Epoch [18][30/172]	Time 0.385	Loss 126.00396	
+2024-02-28 17:55:20,392 Epoch [18][40/172]	Time 0.401	Loss 175.1941	
+2024-02-28 17:55:25,650 Epoch [18][50/172]	Time 0.404	Loss 148.76025	
+2024-02-28 17:55:29,695 Epoch [18][60/172]	Time 0.386	Loss 174.60913	
+2024-02-28 17:55:34,825 Epoch [18][70/172]	Time 0.386	Loss 135.58118	
+2024-02-28 17:55:38,476 Epoch [18][80/172]	Time 0.358	Loss 137.40636	
+2024-02-28 17:55:44,044 Epoch [18][90/172]	Time 0.356	Loss 147.56444	
+2024-02-28 17:55:48,910 Epoch [18][100/172]	Time 0.358	Loss 124.76999	
+2024-02-28 17:55:53,270 Epoch [18][110/172]	Time 0.357	Loss 151.16791	
+2024-02-28 17:55:56,856 Epoch [18][120/172]	Time 0.358	Loss 125.68387	
+2024-02-28 17:56:03,818 Epoch [18][130/172]	Time 0.357	Loss 129.83026	
+2024-02-28 17:56:07,924 Epoch [18][140/172]	Time 0.363	Loss 145.30399	
+2024-02-28 17:56:11,575 Epoch [18][150/172]	Time 0.428	Loss 209.95822	
+2024-02-28 17:56:16,115 Epoch [18][160/172]	Time 0.968	Loss 157.9856	
+2024-02-28 17:56:20,213 Epoch [18][170/172]	Time 0.359	Loss 128.7151	
+2024-02-28 17:56:45,539 Epoch [19][0/172]	Time 0.360	Loss 147.83936	
+2024-02-28 17:56:49,147 Epoch [19][10/172]	Time 0.365	Loss 113.679634	
+2024-02-28 17:56:55,621 Epoch [19][20/172]	Time 0.370	Loss 160.57187	
+2024-02-28 17:57:00,432 Epoch [19][30/172]	Time 0.362	Loss 139.51811	
+2024-02-28 17:57:04,045 Epoch [19][40/172]	Time 0.362	Loss 129.73709	
+2024-02-28 17:57:07,649 Epoch [19][50/172]	Time 0.357	Loss 143.01268	
+2024-02-28 17:57:13,465 Epoch [19][60/172]	Time 0.361	Loss 120.50223	
+2024-02-28 17:57:19,911 Epoch [19][70/172]	Time 3.216	Loss 167.9141	
+2024-02-28 17:57:24,705 Epoch [19][80/172]	Time 0.358	Loss 116.862625	
+2024-02-28 17:57:28,919 Epoch [19][90/172]	Time 0.387	Loss 113.34944	
+2024-02-28 17:57:32,774 Epoch [19][100/172]	Time 0.383	Loss 138.92488	
+2024-02-28 17:57:37,211 Epoch [19][110/172]	Time 0.381	Loss 117.12676	
+2024-02-28 17:57:41,098 Epoch [19][120/172]	Time 0.398	Loss 117.01158	
+2024-02-28 17:57:45,750 Epoch [19][130/172]	Time 1.139	Loss 117.66966	
+2024-02-28 17:57:49,914 Epoch [19][140/172]	Time 0.678	Loss 118.71611	
+2024-02-28 17:57:56,153 Epoch [19][150/172]	Time 0.389	Loss 120.35697	
+2024-02-28 17:58:00,326 Epoch [19][160/172]	Time 0.593	Loss 140.33173	
+2024-02-28 17:58:04,217 Epoch [19][170/172]	Time 0.394	Loss 128.19046	
+2024-02-28 17:58:31,723 Epoch [20][0/172]	Time 0.386	Loss 119.58636	
+2024-02-28 17:58:35,539 Epoch [20][10/172]	Time 0.382	Loss 127.418625	
+2024-02-28 17:58:41,194 Epoch [20][20/172]	Time 0.386	Loss 132.2797	
+2024-02-28 17:58:48,284 Epoch [20][30/172]	Time 0.389	Loss 129.15265	
+2024-02-28 17:58:52,161 Epoch [20][40/172]	Time 0.387	Loss 116.602264	
+2024-02-28 17:58:58,502 Epoch [20][50/172]	Time 0.387	Loss 124.91053	
+2024-02-28 17:59:03,830 Epoch [20][60/172]	Time 0.381	Loss 114.023346	
+2024-02-28 17:59:09,732 Epoch [20][70/172]	Time 2.409	Loss 116.94868	
+2024-02-28 17:59:14,860 Epoch [20][80/172]	Time 0.386	Loss 109.67566	
+2024-02-28 17:59:18,750 Epoch [20][90/172]	Time 0.390	Loss 138.90504	
+2024-02-28 17:59:23,514 Epoch [20][100/172]	Time 0.388	Loss 103.494675	
+2024-02-28 17:59:27,471 Epoch [20][110/172]	Time 0.392	Loss 107.73008	
+2024-02-28 17:59:32,337 Epoch [20][120/172]	Time 0.388	Loss 104.54296	
+2024-02-28 17:59:36,565 Epoch [20][130/172]	Time 0.404	Loss 101.551796	
+2024-02-28 17:59:41,260 Epoch [20][140/172]	Time 0.896	Loss 110.53618	
+2024-02-28 17:59:45,250 Epoch [20][150/172]	Time 0.402	Loss 105.67335	
+2024-02-28 17:59:50,321 Epoch [20][160/172]	Time 0.384	Loss 130.58601	
+2024-02-28 17:59:55,047 Epoch [20][170/172]	Time 0.396	Loss 143.03293	
+2024-02-28 18:00:20,652 Epoch [21][0/172]	Time 0.364	Loss 122.67547	
+2024-02-28 18:00:26,719 Epoch [21][10/172]	Time 0.392	Loss 125.18426	
+2024-02-28 18:00:30,879 Epoch [21][20/172]	Time 0.402	Loss 103.227646	
+2024-02-28 18:00:35,717 Epoch [21][30/172]	Time 0.386	Loss 137.9949	
+2024-02-28 18:00:40,499 Epoch [21][40/172]	Time 0.394	Loss 123.357635	
+2024-02-28 18:00:45,479 Epoch [21][50/172]	Time 0.388	Loss 130.31926	
+2024-02-28 18:00:49,335 Epoch [21][60/172]	Time 0.389	Loss 122.62889	
+2024-02-28 18:00:55,225 Epoch [21][70/172]	Time 0.389	Loss 148.18515	
+2024-02-28 18:00:59,375 Epoch [21][80/172]	Time 0.391	Loss 151.47714	
+2024-02-28 18:01:03,649 Epoch [21][90/172]	Time 0.385	Loss 98.38631	
+2024-02-28 18:01:07,689 Epoch [21][100/172]	Time 0.386	Loss 92.458595	
+2024-02-28 18:01:13,782 Epoch [21][110/172]	Time 0.385	Loss 96.007355	
+2024-02-28 18:01:17,683 Epoch [21][120/172]	Time 0.391	Loss 102.92571	
+2024-02-28 18:01:22,179 Epoch [21][130/172]	Time 0.386	Loss 91.55547	
+2024-02-28 18:01:26,154 Epoch [21][140/172]	Time 0.388	Loss 133.77083	
+2024-02-28 18:01:30,029 Epoch [21][150/172]	Time 0.384	Loss 99.26714	
+2024-02-28 18:01:34,209 Epoch [21][160/172]	Time 0.394	Loss 103.68165	
+2024-02-28 18:01:38,089 Epoch [21][170/172]	Time 0.389	Loss 114.09517	
+2024-02-28 18:02:04,383 Epoch [22][0/172]	Time 0.581	Loss 124.22539	
+2024-02-28 18:02:10,767 Epoch [22][10/172]	Time 0.604	Loss 98.72831	
+2024-02-28 18:02:18,651 Epoch [22][20/172]	Time 1.270	Loss 111.37953	
+2024-02-28 18:02:26,024 Epoch [22][30/172]	Time 1.788	Loss 105.224884	
+2024-02-28 18:02:31,282 Epoch [22][40/172]	Time 0.454	Loss 106.66366	
+2024-02-28 18:02:36,401 Epoch [22][50/172]	Time 0.485	Loss 128.01225	
+2024-02-28 18:02:41,124 Epoch [22][60/172]	Time 0.381	Loss 142.17361	
+2024-02-28 18:02:47,183 Epoch [22][70/172]	Time 0.387	Loss 101.43333	
+2024-02-28 18:02:52,534 Epoch [22][80/172]	Time 0.699	Loss 114.52954	
+2024-02-28 18:02:56,748 Epoch [22][90/172]	Time 0.449	Loss 96.13443	
+2024-02-28 18:03:00,994 Epoch [22][100/172]	Time 0.427	Loss 131.95508	
+2024-02-28 18:03:09,323 Epoch [22][110/172]	Time 0.387	Loss 94.75771	
+2024-02-28 18:03:14,916 Epoch [22][120/172]	Time 0.391	Loss 112.975845	
+2024-02-28 18:03:20,299 Epoch [22][130/172]	Time 0.384	Loss 123.20857	
+2024-02-28 18:03:24,315 Epoch [22][140/172]	Time 0.492	Loss 119.77386	
+2024-02-28 18:03:28,228 Epoch [22][150/172]	Time 0.385	Loss 119.038994	
+2024-02-28 18:03:34,108 Epoch [22][160/172]	Time 0.392	Loss 97.55089	
+2024-02-28 18:03:38,279 Epoch [22][170/172]	Time 0.384	Loss 108.87176	
+2024-02-28 18:04:06,243 Epoch [23][0/172]	Time 0.383	Loss 142.69714	
+2024-02-28 18:04:11,722 Epoch [23][10/172]	Time 0.515	Loss 124.16775	
+2024-02-28 18:04:15,604 Epoch [23][20/172]	Time 0.384	Loss 111.55678	
+2024-02-28 18:04:19,754 Epoch [23][30/172]	Time 0.406	Loss 87.40602	
+2024-02-28 18:04:24,790 Epoch [23][40/172]	Time 0.390	Loss 97.39918	
+2024-02-28 18:04:28,669 Epoch [23][50/172]	Time 0.386	Loss 91.19783	
+2024-02-28 18:04:32,818 Epoch [23][60/172]	Time 0.589	Loss 113.64971	
+2024-02-28 18:04:36,672 Epoch [23][70/172]	Time 0.384	Loss 94.326904	
+2024-02-28 18:04:43,787 Epoch [23][80/172]	Time 0.390	Loss 137.9268	
+2024-02-28 18:04:47,747 Epoch [23][90/172]	Time 0.440	Loss 110.70079	
+2024-02-28 18:04:52,108 Epoch [23][100/172]	Time 0.392	Loss 109.87605	
+2024-02-28 18:04:56,021 Epoch [23][110/172]	Time 0.385	Loss 120.86529	
+2024-02-28 18:05:02,256 Epoch [23][120/172]	Time 0.380	Loss 104.552025	
+2024-02-28 18:05:07,413 Epoch [23][130/172]	Time 0.393	Loss 115.06465	
+2024-02-28 18:05:11,315 Epoch [23][140/172]	Time 0.394	Loss 128.28603	
+2024-02-28 18:05:19,484 Epoch [23][150/172]	Time 0.398	Loss 134.81065	
+2024-02-28 18:05:24,069 Epoch [23][160/172]	Time 1.083	Loss 93.13526	
+2024-02-28 18:05:28,267 Epoch [23][170/172]	Time 0.386	Loss 119.254486	
+2024-02-28 18:05:54,235 Epoch [24][0/172]	Time 0.386	Loss 101.17769	
+2024-02-28 18:05:58,666 Epoch [24][10/172]	Time 0.391	Loss 112.70978	
+2024-02-28 18:06:04,110 Epoch [24][20/172]	Time 0.391	Loss 98.37831	
+2024-02-28 18:06:09,876 Epoch [24][30/172]	Time 0.363	Loss 96.62865	
+2024-02-28 18:06:13,774 Epoch [24][40/172]	Time 0.359	Loss 100.609055	
+2024-02-28 18:06:17,414 Epoch [24][50/172]	Time 0.403	Loss 97.56381	
+2024-02-28 18:06:22,436 Epoch [24][60/172]	Time 0.359	Loss 106.372856	
+2024-02-28 18:06:26,368 Epoch [24][70/172]	Time 0.365	Loss 102.48994	
+2024-02-28 18:06:30,303 Epoch [24][80/172]	Time 0.361	Loss 118.41919	
+2024-02-28 18:06:33,912 Epoch [24][90/172]	Time 0.360	Loss 85.07889	
+2024-02-28 18:06:40,139 Epoch [24][100/172]	Time 0.356	Loss 109.15375	
+2024-02-28 18:06:45,624 Epoch [24][110/172]	Time 0.355	Loss 144.92006	
+2024-02-28 18:06:51,199 Epoch [24][120/172]	Time 0.366	Loss 98.11921	
+2024-02-28 18:06:54,957 Epoch [24][130/172]	Time 0.359	Loss 117.75108	
+2024-02-28 18:06:59,008 Epoch [24][140/172]	Time 0.361	Loss 121.186966	
+2024-02-28 18:07:05,598 Epoch [24][150/172]	Time 0.361	Loss 135.76479	
+2024-02-28 18:07:09,195 Epoch [24][160/172]	Time 0.357	Loss 114.84702	
+2024-02-28 18:07:14,562 Epoch [24][170/172]	Time 0.355	Loss 90.21461	
+
+Best val score:
+i2t => r1i:6.52 r5i:18.39 r10i:26.89 medri:28.00 meanri:90.91
+t2i => r1t:5.24 r5t:21.65 r10t:37.86 medrt:16.00 meanrt:48.02
+mR:19.43
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.39 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [17/50] epochs
+Now val score:
+i2t => r1i:6.64 r5i:17.00 r10i:26.43 medri:27.00 meanri:96.74
+t2i => r1t:5.87 r5t:21.35 r10t:36.41 medrt:16.00 meanrt:49.56
+mR:18.95
+Best val score:
+i2t => r1i:6.52 r5i:18.39 r10i:26.89 medri:28.00 meanri:90.91
+t2i => r1t:5.24 r5t:21.65 r10t:37.86 medrt:16.00 meanrt:48.02
+mR:19.43
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.17 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [18/50] epochs
+Now val score:
+i2t => r1i:7.33 r5i:17.46 r10i:26.89 medri:28.00 meanri:96.54
+t2i => r1t:5.61 r5t:20.79 r10t:36.74 medrt:16.00 meanrt:50.02
+mR:19.14
+Best val score:
+i2t => r1i:6.52 r5i:18.39 r10i:26.89 medri:28.00 meanri:90.91
+t2i => r1t:5.24 r5t:21.65 r10t:37.86 medrt:16.00 meanrt:48.02
+mR:19.43
+=================================================================
+
+Current lr: 0.0002
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.30 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [19/50] epochs
+Now val score:
+i2t => r1i:7.22 r5i:17.11 r10i:26.54 medri:28.00 meanri:92.67
+t2i => r1t:5.77 r5t:21.70 r10t:36.18 medrt:15.00 meanrt:46.88
+mR:19.09
+Best val score:
+i2t => r1i:6.52 r5i:18.39 r10i:26.89 medri:28.00 meanri:90.91
+t2i => r1t:5.24 r5t:21.65 r10t:37.86 medrt:16.00 meanrt:48.02
+mR:19.43
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.71 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [20/50] epochs
+Now val score:
+i2t => r1i:7.80 r5i:18.63 r10i:27.24 medri:27.00 meanri:93.03
+t2i => r1t:6.80 r5t:22.49 r10t:37.63 medrt:15.00 meanrt:48.57
+mR:20.10
+Best val score:
+i2t => r1i:7.80 r5i:18.63 r10i:27.24 medri:27.00 meanri:93.03
+t2i => r1t:6.80 r5t:22.49 r10t:37.63 medrt:15.00 meanrt:48.57
+mR:20.10
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.43 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [21/50] epochs
+Now val score:
+i2t => r1i:7.68 r5i:20.37 r10i:28.87 medri:27.00 meanri:92.06
+t2i => r1t:6.05 r5t:22.00 r10t:37.60 medrt:15.00 meanrt:47.89
+mR:20.43
+Best val score:
+i2t => r1i:7.68 r5i:20.37 r10i:28.87 medri:27.00 meanri:92.06
+t2i => r1t:6.05 r5t:22.00 r10t:37.60 medrt:15.00 meanrt:47.89
+mR:20.43
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.29 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [22/50] epochs
+Now val score:
+i2t => r1i:6.98 r5i:19.79 r10i:29.45 medri:27.00 meanri:97.61
+t2i => r1t:6.47 r5t:22.91 r10t:38.39 medrt:15.00 meanrt:49.02
+mR:20.67
+Best val score:
+i2t => r1i:6.98 r5i:19.79 r10i:29.45 medri:27.00 meanri:97.61
+t2i => r1t:6.47 r5t:22.91 r10t:38.39 medrt:15.00 meanrt:49.02
+mR:20.67
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 26.71 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [23/50] epochs
+Now val score:
+i2t => r1i:6.29 r5i:18.39 r10i:30.03 medri:28.00 meanri:96.36
+t2i => r1t:6.17 r5t:22.58 r10t:38.67 medrt:15.00 meanrt:49.14
+mR:20.36
+Best val score:
+i2t => r1i:6.98 r5i:19.79 r10i:29.45 medri:27.00 meanri:97.61
+t2i => r1t:6.47 r5t:22.91 r10t:38.39 medrt:15.00 meanrt:49.02
+mR:20.67
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.71 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [24/50] epochs
+Now val score:
+i2t => r1i:6.64 r5i:18.04 r10i:28.64 medri:27.00 meanri:97.50
+t2i => r1t:5.52 r5t:22.40 r10t:37.95 medrt:15.00 meanrt:49.23
+mR:19.86
+Best val score:
+i2t => r1i:6.98 r5i:19.79 r10i:29.45 medri:27.00 meanri:97.61
+t2i => r1t:6.47 r5t:22.91 r10t:38.39 medrt:15.00 meanrt:49.02
+mR:20.67
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.102024-02-28 18:07:39,617 Epoch [25][0/172]	Time 0.362	Loss 116.30769	
+2024-02-28 18:07:43,996 Epoch [25][10/172]	Time 0.364	Loss 102.93006	
+2024-02-28 18:07:51,613 Epoch [25][20/172]	Time 4.366	Loss 108.65709	
+2024-02-28 18:07:55,674 Epoch [25][30/172]	Time 0.363	Loss 143.40918	
+2024-02-28 18:08:00,048 Epoch [25][40/172]	Time 0.356	Loss 109.65614	
+2024-02-28 18:08:03,647 Epoch [25][50/172]	Time 0.360	Loss 100.76817	
+2024-02-28 18:08:07,248 Epoch [25][60/172]	Time 0.357	Loss 86.28534	
+2024-02-28 18:08:11,966 Epoch [25][70/172]	Time 0.364	Loss 107.11006	
+2024-02-28 18:08:16,431 Epoch [25][80/172]	Time 0.385	Loss 136.30688	
+2024-02-28 18:08:21,657 Epoch [25][90/172]	Time 0.389	Loss 107.93063	
+2024-02-28 18:08:25,670 Epoch [25][100/172]	Time 0.390	Loss 101.55338	
+2024-02-28 18:08:31,360 Epoch [25][110/172]	Time 0.405	Loss 104.90645	
+2024-02-28 18:08:36,994 Epoch [25][120/172]	Time 0.397	Loss 82.091385	
+2024-02-28 18:08:40,840 Epoch [25][130/172]	Time 0.384	Loss 85.4227	
+2024-02-28 18:08:44,741 Epoch [25][140/172]	Time 0.386	Loss 117.91766	
+2024-02-28 18:08:49,324 Epoch [25][150/172]	Time 0.388	Loss 115.221664	
+2024-02-28 18:08:53,509 Epoch [25][160/172]	Time 0.362	Loss 105.4896	
+2024-02-28 18:09:00,388 Epoch [25][170/172]	Time 0.390	Loss 107.587555	
+2024-02-28 18:09:25,354 Epoch [26][0/172]	Time 0.364	Loss 109.32639	
+2024-02-28 18:09:31,933 Epoch [26][10/172]	Time 0.901	Loss 110.21699	
+2024-02-28 18:09:36,974 Epoch [26][20/172]	Time 1.280	Loss 100.60538	
+2024-02-28 18:09:40,935 Epoch [26][30/172]	Time 0.402	Loss 84.39348	
+2024-02-28 18:09:45,044 Epoch [26][40/172]	Time 0.382	Loss 104.822754	
+2024-02-28 18:09:49,791 Epoch [26][50/172]	Time 0.384	Loss 119.29689	
+2024-02-28 18:09:55,635 Epoch [26][60/172]	Time 2.003	Loss 87.61813	
+2024-02-28 18:09:59,540 Epoch [26][70/172]	Time 0.393	Loss 98.57022	
+2024-02-28 18:10:03,426 Epoch [26][80/172]	Time 0.371	Loss 87.46402	
+2024-02-28 18:10:09,712 Epoch [26][90/172]	Time 0.401	Loss 106.53442	
+2024-02-28 18:10:15,286 Epoch [26][100/172]	Time 0.620	Loss 114.105606	
+2024-02-28 18:10:19,160 Epoch [26][110/172]	Time 0.395	Loss 85.33481	
+2024-02-28 18:10:24,509 Epoch [26][120/172]	Time 0.386	Loss 92.86519	
+2024-02-28 18:10:29,290 Epoch [26][130/172]	Time 0.388	Loss 92.41312	
+2024-02-28 18:10:33,263 Epoch [26][140/172]	Time 0.398	Loss 113.8538	
+2024-02-28 18:10:38,248 Epoch [26][150/172]	Time 0.803	Loss 92.7144	
+2024-02-28 18:10:42,771 Epoch [26][160/172]	Time 0.449	Loss 94.3134	
+2024-02-28 18:10:47,488 Epoch [26][170/172]	Time 0.508	Loss 92.15049	
+2024-02-28 18:11:13,818 Epoch [27][0/172]	Time 0.475	Loss 99.58849	
+2024-02-28 18:11:19,100 Epoch [27][10/172]	Time 0.387	Loss 98.67781	
+2024-02-28 18:11:23,809 Epoch [27][20/172]	Time 0.384	Loss 83.44687	
+2024-02-28 18:11:28,028 Epoch [27][30/172]	Time 0.388	Loss 100.47816	
+2024-02-28 18:11:32,417 Epoch [27][40/172]	Time 0.388	Loss 85.98659	
+2024-02-28 18:11:36,829 Epoch [27][50/172]	Time 0.382	Loss 75.15934	
+2024-02-28 18:11:40,877 Epoch [27][60/172]	Time 0.387	Loss 98.91226	
+2024-02-28 18:11:45,422 Epoch [27][70/172]	Time 0.368	Loss 91.96304	
+2024-02-28 18:11:50,949 Epoch [27][80/172]	Time 0.381	Loss 88.66717	
+2024-02-28 18:11:56,008 Epoch [27][90/172]	Time 0.384	Loss 113.63809	
+2024-02-28 18:11:59,852 Epoch [27][100/172]	Time 0.380	Loss 108.799576	
+2024-02-28 18:12:04,979 Epoch [27][110/172]	Time 0.386	Loss 109.95057	
+2024-02-28 18:12:09,636 Epoch [27][120/172]	Time 0.384	Loss 92.094574	
+2024-02-28 18:12:16,217 Epoch [27][130/172]	Time 0.392	Loss 93.152985	
+2024-02-28 18:12:20,069 Epoch [27][140/172]	Time 0.386	Loss 121.789474	
+2024-02-28 18:12:24,022 Epoch [27][150/172]	Time 0.389	Loss 86.24115	
+2024-02-28 18:12:28,677 Epoch [27][160/172]	Time 0.382	Loss 108.90535	
+2024-02-28 18:12:32,932 Epoch [27][170/172]	Time 0.389	Loss 119.856995	
+2024-02-28 18:12:58,790 Epoch [28][0/172]	Time 0.386	Loss 95.24457	
+2024-02-28 18:13:02,868 Epoch [28][10/172]	Time 0.393	Loss 104.477844	
+2024-02-28 18:13:06,787 Epoch [28][20/172]	Time 0.383	Loss 88.59329	
+2024-02-28 18:13:11,115 Epoch [28][30/172]	Time 0.385	Loss 108.62459	
+2024-02-28 18:13:16,634 Epoch [28][40/172]	Time 0.391	Loss 98.271194	
+2024-02-28 18:13:21,539 Epoch [28][50/172]	Time 1.437	Loss 93.43616	
+2024-02-28 18:13:25,497 Epoch [28][60/172]	Time 0.383	Loss 92.60831	
+2024-02-28 18:13:29,508 Epoch [28][70/172]	Time 0.384	Loss 94.092545	
+2024-02-28 18:13:34,724 Epoch [28][80/172]	Time 0.382	Loss 93.93588	
+2024-02-28 18:13:40,157 Epoch [28][90/172]	Time 1.639	Loss 94.91264	
+2024-02-28 18:13:44,460 Epoch [28][100/172]	Time 0.388	Loss 99.30656	
+2024-02-28 18:13:48,641 Epoch [28][110/172]	Time 0.392	Loss 79.89247	
+2024-02-28 18:13:54,469 Epoch [28][120/172]	Time 0.387	Loss 96.1423	
+2024-02-28 18:13:58,914 Epoch [28][130/172]	Time 0.361	Loss 71.42966	
+2024-02-28 18:14:02,731 Epoch [28][140/172]	Time 0.391	Loss 100.66458	
+2024-02-28 18:14:06,843 Epoch [28][150/172]	Time 0.362	Loss 98.91521	
+2024-02-28 18:14:12,721 Epoch [28][160/172]	Time 0.389	Loss 107.45123	
+2024-02-28 18:14:17,363 Epoch [28][170/172]	Time 0.386	Loss 107.249664	
+2024-02-28 18:14:43,374 Epoch [29][0/172]	Time 0.393	Loss 100.61243	
+2024-02-28 18:14:47,980 Epoch [29][10/172]	Time 0.389	Loss 92.26935	
+2024-02-28 18:14:52,750 Epoch [29][20/172]	Time 0.396	Loss 85.58367	
+2024-02-28 18:14:56,929 Epoch [29][30/172]	Time 0.627	Loss 77.79232	
+2024-02-28 18:15:01,725 Epoch [29][40/172]	Time 0.385	Loss 112.368866	
+2024-02-28 18:15:06,745 Epoch [29][50/172]	Time 0.384	Loss 80.42933	
+2024-02-28 18:15:12,475 Epoch [29][60/172]	Time 0.382	Loss 100.56192	
+2024-02-28 18:15:17,235 Epoch [29][70/172]	Time 1.293	Loss 83.30744	
+2024-02-28 18:15:21,757 Epoch [29][80/172]	Time 0.385	Loss 70.599945	
+2024-02-28 18:15:25,851 Epoch [29][90/172]	Time 0.385	Loss 78.213326	
+2024-02-28 18:15:30,519 Epoch [29][100/172]	Time 0.886	Loss 70.90575	
+2024-02-28 18:15:34,801 Epoch [29][110/172]	Time 0.391	Loss 83.91585	
+2024-02-28 18:15:41,559 Epoch [29][120/172]	Time 0.396	Loss 75.050735	
+2024-02-28 18:15:45,677 Epoch [29][130/172]	Time 0.391	Loss 105.311676	
+2024-02-28 18:15:49,534 Epoch [29][140/172]	Time 0.387	Loss 121.60411	
+2024-02-28 18:15:53,542 Epoch [29][150/172]	Time 0.384	Loss 107.025314	
+2024-02-28 18:15:57,645 Epoch [29][160/172]	Time 0.396	Loss 133.21768	
+2024-02-28 18:16:01,810 Epoch [29][170/172]	Time 0.388	Loss 95.87045	
+2024-02-28 18:16:28,110 Epoch [30][0/172]	Time 0.362	Loss 87.70598	
+2024-02-28 18:16:33,941 Epoch [30][10/172]	Time 2.305	Loss 104.11134	
+2024-02-28 18:16:37,795 Epoch [30][20/172]	Time 0.384	Loss 82.77327	
+2024-02-28 18:16:42,559 Epoch [30][30/172]	Time 0.391	Loss 88.04633	
+2024-02-28 18:16:46,425 Epoch [30][40/172]	Time 0.388	Loss 106.1174	
+2024-02-28 18:16:50,234 Epoch [30][50/172]	Time 0.384	Loss 119.99753	
+2024-02-28 18:16:54,153 Epoch [30][60/172]	Time 0.396	Loss 107.18672	
+2024-02-28 18:16:58,367 Epoch [30][70/172]	Time 0.395	Loss 95.80116	
+2024-02-28 18:17:03,307 Epoch [30][80/172]	Time 0.396	Loss 99.163635	
+2024-02-28 18:17:07,483 Epoch [30][90/172]	Time 0.391	Loss 90.73751	
+2024-02-28 18:17:11,338 Epoch [30][100/172]	Time 0.383	Loss 73.633575	
+2024-02-28 18:17:15,933 Epoch [30][110/172]	Time 0.644	Loss 107.4313	
+2024-02-28 18:17:21,805 Epoch [30][120/172]	Time 0.382	Loss 93.68375	
+2024-02-28 18:17:25,693 Epoch [30][130/172]	Time 0.388	Loss 115.20691	
+2024-02-28 18:17:29,521 Epoch [30][140/172]	Time 0.389	Loss 75.168304	
+2024-02-28 18:17:33,766 Epoch [30][150/172]	Time 0.390	Loss 93.29018	
+2024-02-28 18:17:37,764 Epoch [30][160/172]	Time 0.365	Loss 87.838165	
+2024-02-28 18:17:41,629 Epoch [30][170/172]	Time 0.387	Loss 110.21451	
+2024-02-28 18:18:09,678 Epoch [31][0/172]	Time 0.390	Loss 89.88945	
+2024-02-28 18:18:14,523 Epoch [31][10/172]	Time 1.157	Loss 82.40078	
+2024-02-28 18:18:18,855 Epoch [31][20/172]	Time 0.388	Loss 80.15416	
+2024-02-28 18:18:22,767 Epoch [31][30/172]	Time 0.430	Loss 75.915276	
+2024-02-28 18:18:26,951 Epoch [31][40/172]	Time 0.383	Loss 87.76816	
+2024-02-28 18:18:30,826 Epoch [31][50/172]	Time 0.386	Loss 81.45892	
+2024-02-28 18:18:35,247 Epoch [31][60/172]	Time 0.929	Loss 87.02159	
+2024-02-28 18:18:39,130 Epoch [31][70/172]	Time 0.390	Loss 87.768875	
+2024-02-28 18:18:43,776 Epoch [31][80/172]	Time 0.398	Loss 84.494415	
+2024-02-28 18:18:52,630 Epoch [31][90/172]	Time 0.395	Loss 122.57451	
+2024-02-28 18:18:56,494 Epoch [31][100/172]	Time 0.383	Loss 73.49376	
+2024-02-28 18:19:00,346 Epoch [31][110/172]	Time 0.386	Loss 85.59169	
+2024-02-28 18:19:06,541 Epoch [31][120/172]	Time 0.383	Loss 75.625534	
+2024-02-28 18:19:13,618 Epoch [31][130/172]	Time 0.388	Loss 67.58478	
+2024-02-28 18:19:18,557 Epoch [31][140/172]	Time 0.386	Loss 86.573944	
+2024-02-28 18:19:22,852 Epoch [31][150/172]	Time 0.361	Loss 81.968	
+2024-02-28 18:19:26,950 Epoch [31][160/172]	Time 0.389	Loss 76.321175	
+2024-02-28 18:19:31,860 Epoch [31][170/172]	Time 0.380	Loss 68.66084	
+2024-02-28 18:19:57,707 Epoch [32][0/172]	Time 0.671	Loss 69.04109	
+2024-02-28 18:20:03,296 Epoch [32][10/172]	Time 0.624	Loss 83.55705	
+2024-02-28 18:20:09,960 Epoch [32][20/172]	Time 0.580	Loss 93.38115	
+2024-02-28 18:20:16,978 Epoch [32][30/172]	Time 2.743	Loss 86.75064	
+2024-02-28 18:20:22,062 Epoch [32][40/172]	Time 0.994	Loss 94.25513	
+2024-02-28 18:20:26,293 Epoch [32][50/172]	Time 0.417	Loss 71.77638	
+2024-02-28 18:20:31,369 Epoch [32][60/172]	Time 0.465	Loss 79.62326	
+2024-02-28 18:20:38,207 Epoch [32][70/172]	Time 0.419	Loss 74.8004	
+2024-02-28 18:20:43,756 Epoch [32][80/172]	Time 1.332	Loss 84.75067	
+2024-02-28 18:20:48,021 Epoch [32][90/172]	Time 0.386	Loss 76.680046	
+2024-02-28 18:20:52,553 Epoch [32][100/172]	Time 0.836	Loss 76.30426	
+2024-02-28 18:20:56,707 Epoch [32][110/172]	Time 0.423	Loss 86.88666	
+2024-02-28 18:21:01,631 Epoch [32][120/172]	Time 0.379	Loss 93.22165	
+2024-02-28 18:21:05,915 Epoch [32][130/172]	Time 0.395	Loss 67.07619	
+2024-02-28 18:21:11,036 Epoch [32][140/172]	Time 1.651	Loss 115.02359	
+2024-02-28 18:21:14,983 Epoch [32][150/172]	Time 0.394	Loss 78.65859	
+2024-02-28 18:21:18,864 Epoch [32][160/172]	Time 0.386	Loss 80.43435	
+2024-02-28 18:21:24,465 Epoch [32][170/172]	Time 0.382	Loss 96.74495	
+
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 23.89 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [25/50] epochs
+Now val score:
+i2t => r1i:7.80 r5i:18.51 r10i:28.17 medri:27.00 meanri:101.56
+t2i => r1t:5.80 r5t:22.03 r10t:38.42 medrt:15.00 meanrt:49.01
+mR:20.12
+Best val score:
+i2t => r1i:6.98 r5i:19.79 r10i:29.45 medri:27.00 meanri:97.61
+t2i => r1t:6.47 r5t:22.91 r10t:38.39 medrt:15.00 meanrt:49.02
+mR:20.67
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 23.93 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [26/50] epochs
+Now val score:
+i2t => r1i:6.52 r5i:18.04 r10i:27.71 medri:27.00 meanri:93.51
+t2i => r1t:5.89 r5t:22.93 r10t:38.42 medrt:15.00 meanrt:49.86
+mR:19.92
+Best val score:
+i2t => r1i:6.98 r5i:19.79 r10i:29.45 medri:27.00 meanri:97.61
+t2i => r1t:6.47 r5t:22.91 r10t:38.39 medrt:15.00 meanrt:49.02
+mR:20.67
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.94 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [27/50] epochs
+Now val score:
+i2t => r1i:7.57 r5i:18.16 r10i:29.22 medri:27.00 meanri:104.54
+t2i => r1t:5.68 r5t:21.47 r10t:38.32 medrt:15.00 meanrt:50.86
+mR:20.07
+Best val score:
+i2t => r1i:6.98 r5i:19.79 r10i:29.45 medri:27.00 meanri:97.61
+t2i => r1t:6.47 r5t:22.91 r10t:38.39 medrt:15.00 meanrt:49.02
+mR:20.67
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.79 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [28/50] epochs
+Now val score:
+i2t => r1i:8.15 r5i:18.51 r10i:30.27 medri:28.00 meanri:108.83
+t2i => r1t:5.94 r5t:22.40 r10t:37.44 medrt:15.00 meanrt:51.36
+mR:20.45
+Best val score:
+i2t => r1i:6.98 r5i:19.79 r10i:29.45 medri:27.00 meanri:97.61
+t2i => r1t:6.47 r5t:22.91 r10t:38.39 medrt:15.00 meanrt:49.02
+mR:20.67
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.42 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [29/50] epochs
+Now val score:
+i2t => r1i:7.57 r5i:20.26 r10i:29.10 medri:26.00 meanri:101.78
+t2i => r1t:6.47 r5t:22.49 r10t:38.93 medrt:15.00 meanrt:50.63
+mR:20.80
+Best val score:
+i2t => r1i:7.57 r5i:20.26 r10i:29.10 medri:26.00 meanri:101.78
+t2i => r1t:6.47 r5t:22.49 r10t:38.93 medrt:15.00 meanrt:50.63
+mR:20.80
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.80 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [30/50] epochs
+Now val score:
+i2t => r1i:7.92 r5i:17.58 r10i:27.47 medri:27.00 meanri:109.69
+t2i => r1t:5.96 r5t:23.10 r10t:39.35 medrt:15.00 meanrt:52.09
+mR:20.23
+Best val score:
+i2t => r1i:7.57 r5i:20.26 r10i:29.10 medri:26.00 meanri:101.78
+t2i => r1t:6.47 r5t:22.49 r10t:38.93 medrt:15.00 meanrt:50.63
+mR:20.80
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.67 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [31/50] epochs
+Now val score:
+i2t => r1i:7.33 r5i:20.49 r10i:29.45 medri:26.00 meanri:93.89
+t2i => r1t:6.08 r5t:22.35 r10t:39.02 medrt:15.00 meanrt:49.39
+mR:20.79
+Best val score:
+i2t => r1i:7.57 r5i:20.26 r10i:29.10 medri:26.00 meanri:101.78
+t2i => r1t:6.47 r5t:22.49 r10t:38.93 medrt:15.00 meanrt:50.63
+mR:20.80
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.35 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [32/50] epochs
+Now val score:
+i2t => r1i:7.92 r5i:17.93 r10i:29.57 medri:27.00 meanri:113.44
+t2i => r1t:6.03 r5t:22.00 r10t:38.23 medrt:15.00 meanrt:52.48
+mR:20.28
+Best val score:
+i2t => r1i:7.57 r5i:20.26 r10i:29.10 medri:26.00 meanri:101.78
+t2i => r1t:6.47 r5t:22.49 r10t:38.93 medrt:15.00 meanrt:50.63
+mR:20.80
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 25.80 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [33/50] epochs
+Now val score:
+i2t => r1i:7.92 r5i:19.09 r10i:30.62 medri:26.00 meanri:106.82
+t2i => r1t:6.78 r5t:23.73 r10t:39.30 medrt:15.00 meanrt:51.43
+mR:21.24
+Best val score:
+i2t => r1i:7.92 r5i:19.09 r10i:30.62 medri:26.00 meanri:106.82
+t2i => r1t:6.78 r5t:23.73 r10t:39.30 medrt:15.00 meanrt:51.43
+mR:21.242024-02-28 18:21:51,469 Epoch [33][0/172]	Time 0.381	Loss 68.15279	
+2024-02-28 18:21:56,977 Epoch [33][10/172]	Time 0.385	Loss 74.25894	
+2024-02-28 18:22:01,840 Epoch [33][20/172]	Time 0.633	Loss 76.71933	
+2024-02-28 18:22:06,411 Epoch [33][30/172]	Time 0.408	Loss 87.790764	
+2024-02-28 18:22:11,076 Epoch [33][40/172]	Time 0.398	Loss 65.20684	
+2024-02-28 18:22:15,753 Epoch [33][50/172]	Time 0.408	Loss 80.949554	
+2024-02-28 18:22:20,341 Epoch [33][60/172]	Time 0.961	Loss 70.57912	
+2024-02-28 18:22:24,316 Epoch [33][70/172]	Time 0.404	Loss 128.9244	
+2024-02-28 18:22:29,442 Epoch [33][80/172]	Time 0.416	Loss 82.09859	
+2024-02-28 18:22:34,674 Epoch [33][90/172]	Time 1.445	Loss 72.60611	
+2024-02-28 18:22:39,167 Epoch [33][100/172]	Time 0.381	Loss 79.01671	
+2024-02-28 18:22:44,217 Epoch [33][110/172]	Time 0.386	Loss 85.23363	
+2024-02-28 18:22:50,712 Epoch [33][120/172]	Time 0.583	Loss 87.02043	
+2024-02-28 18:22:54,794 Epoch [33][130/172]	Time 0.626	Loss 85.854546	
+2024-02-28 18:22:59,566 Epoch [33][140/172]	Time 0.397	Loss 73.41214	
+2024-02-28 18:23:03,823 Epoch [33][150/172]	Time 0.391	Loss 98.79895	
+2024-02-28 18:23:07,841 Epoch [33][160/172]	Time 0.382	Loss 66.60816	
+2024-02-28 18:23:12,689 Epoch [33][170/172]	Time 0.391	Loss 69.64653	
+2024-02-28 18:23:39,162 Epoch [34][0/172]	Time 0.359	Loss 64.777145	
+2024-02-28 18:23:43,278 Epoch [34][10/172]	Time 0.390	Loss 76.22052	
+2024-02-28 18:23:47,135 Epoch [34][20/172]	Time 0.384	Loss 83.52101	
+2024-02-28 18:23:51,048 Epoch [34][30/172]	Time 0.397	Loss 67.55373	
+2024-02-28 18:23:56,526 Epoch [34][40/172]	Time 0.399	Loss 64.62103	
+2024-02-28 18:24:00,855 Epoch [34][50/172]	Time 0.838	Loss 75.46389	
+2024-02-28 18:24:04,964 Epoch [34][60/172]	Time 0.381	Loss 60.80591	
+2024-02-28 18:24:11,245 Epoch [34][70/172]	Time 0.385	Loss 81.71597	
+2024-02-28 18:24:16,436 Epoch [34][80/172]	Time 0.396	Loss 92.87254	
+2024-02-28 18:24:20,745 Epoch [34][90/172]	Time 0.824	Loss 87.99018	
+2024-02-28 18:24:25,327 Epoch [34][100/172]	Time 0.388	Loss 64.75659	
+2024-02-28 18:24:31,046 Epoch [34][110/172]	Time 0.389	Loss 79.410706	
+2024-02-28 18:24:35,842 Epoch [34][120/172]	Time 0.860	Loss 100.08029	
+2024-02-28 18:24:40,002 Epoch [34][130/172]	Time 0.388	Loss 78.277016	
+2024-02-28 18:24:44,328 Epoch [34][140/172]	Time 0.387	Loss 92.326744	
+2024-02-28 18:24:48,974 Epoch [34][150/172]	Time 0.392	Loss 81.23514	
+2024-02-28 18:24:53,906 Epoch [34][160/172]	Time 0.386	Loss 81.84746	
+2024-02-28 18:24:57,905 Epoch [34][170/172]	Time 0.391	Loss 86.34659	
+2024-02-28 18:25:25,824 Epoch [35][0/172]	Time 0.388	Loss 65.914154	
+2024-02-28 18:25:31,083 Epoch [35][10/172]	Time 0.382	Loss 67.15407	
+2024-02-28 18:25:35,473 Epoch [35][20/172]	Time 0.386	Loss 71.0045	
+2024-02-28 18:25:39,897 Epoch [35][30/172]	Time 0.388	Loss 80.45393	
+2024-02-28 18:25:44,620 Epoch [35][40/172]	Time 0.570	Loss 77.19812	
+2024-02-28 18:25:48,728 Epoch [35][50/172]	Time 0.399	Loss 73.40831	
+2024-02-28 18:25:52,939 Epoch [35][60/172]	Time 0.389	Loss 96.59304	
+2024-02-28 18:25:57,732 Epoch [35][70/172]	Time 0.382	Loss 82.78206	
+2024-02-28 18:26:04,191 Epoch [35][80/172]	Time 0.682	Loss 82.26782	
+2024-02-28 18:26:10,524 Epoch [35][90/172]	Time 0.460	Loss 80.89928	
+2024-02-28 18:26:15,735 Epoch [35][100/172]	Time 0.466	Loss 56.221035	
+2024-02-28 18:26:20,883 Epoch [35][110/172]	Time 0.522	Loss 53.19725	
+2024-02-28 18:26:25,143 Epoch [35][120/172]	Time 0.385	Loss 66.498566	
+2024-02-28 18:26:29,843 Epoch [35][130/172]	Time 0.773	Loss 91.56065	
+2024-02-28 18:26:35,670 Epoch [35][140/172]	Time 0.956	Loss 70.56462	
+2024-02-28 18:26:40,201 Epoch [35][150/172]	Time 0.462	Loss 84.92184	
+2024-02-28 18:26:47,822 Epoch [35][160/172]	Time 0.552	Loss 70.96692	
+2024-02-28 18:26:54,627 Epoch [35][170/172]	Time 0.438	Loss 78.30327	
+2024-02-28 18:27:23,989 Epoch [36][0/172]	Time 0.390	Loss 65.75635	
+2024-02-28 18:27:29,521 Epoch [36][10/172]	Time 0.396	Loss 68.20213	
+2024-02-28 18:27:33,973 Epoch [36][20/172]	Time 0.383	Loss 61.097363	
+2024-02-28 18:27:37,922 Epoch [36][30/172]	Time 0.425	Loss 70.69443	
+2024-02-28 18:27:42,028 Epoch [36][40/172]	Time 0.362	Loss 73.56204	
+2024-02-28 18:27:46,172 Epoch [36][50/172]	Time 0.395	Loss 67.39485	
+2024-02-28 18:27:50,697 Epoch [36][60/172]	Time 0.406	Loss 74.35448	
+2024-02-28 18:27:56,764 Epoch [36][70/172]	Time 0.380	Loss 68.56115	
+2024-02-28 18:28:02,631 Epoch [36][80/172]	Time 2.379	Loss 72.36249	
+2024-02-28 18:28:06,828 Epoch [36][90/172]	Time 0.751	Loss 75.621216	
+2024-02-28 18:28:11,311 Epoch [36][100/172]	Time 0.444	Loss 70.02089	
+2024-02-28 18:28:15,186 Epoch [36][110/172]	Time 0.381	Loss 79.99701	
+2024-02-28 18:28:20,033 Epoch [36][120/172]	Time 1.412	Loss 62.38569	
+2024-02-28 18:28:24,506 Epoch [36][130/172]	Time 0.387	Loss 62.315495	
+2024-02-28 18:28:31,423 Epoch [36][140/172]	Time 0.391	Loss 80.27007	
+2024-02-28 18:28:36,489 Epoch [36][150/172]	Time 0.385	Loss 75.37407	
+2024-02-28 18:28:41,839 Epoch [36][160/172]	Time 0.388	Loss 57.76929	
+2024-02-28 18:28:45,671 Epoch [36][170/172]	Time 0.386	Loss 63.27294	
+2024-02-28 18:29:11,443 Epoch [37][0/172]	Time 0.394	Loss 71.179596	
+2024-02-28 18:29:15,288 Epoch [37][10/172]	Time 0.384	Loss 52.026287	
+2024-02-28 18:29:20,100 Epoch [37][20/172]	Time 0.398	Loss 72.80483	
+2024-02-28 18:29:24,713 Epoch [37][30/172]	Time 0.397	Loss 66.87633	
+2024-02-28 18:29:29,388 Epoch [37][40/172]	Time 0.383	Loss 57.62964	
+2024-02-28 18:29:34,119 Epoch [37][50/172]	Time 0.387	Loss 51.21604	
+2024-02-28 18:29:37,899 Epoch [37][60/172]	Time 0.384	Loss 67.78183	
+2024-02-28 18:29:41,732 Epoch [37][70/172]	Time 0.383	Loss 68.423935	
+2024-02-28 18:29:47,169 Epoch [37][80/172]	Time 0.385	Loss 65.00699	
+2024-02-28 18:29:51,614 Epoch [37][90/172]	Time 0.385	Loss 64.24336	
+2024-02-28 18:29:56,611 Epoch [37][100/172]	Time 0.388	Loss 66.11037	
+2024-02-28 18:30:01,332 Epoch [37][110/172]	Time 0.395	Loss 62.426987	
+2024-02-28 18:30:05,213 Epoch [37][120/172]	Time 0.397	Loss 80.64746	
+2024-02-28 18:30:10,752 Epoch [37][130/172]	Time 1.942	Loss 57.992973	
+2024-02-28 18:30:15,550 Epoch [37][140/172]	Time 0.382	Loss 63.37613	
+2024-02-28 18:30:20,718 Epoch [37][150/172]	Time 0.384	Loss 83.7376	
+2024-02-28 18:30:25,063 Epoch [37][160/172]	Time 0.380	Loss 55.246864	
+2024-02-28 18:30:30,294 Epoch [37][170/172]	Time 0.398	Loss 71.42198	
+2024-02-28 18:30:56,871 Epoch [38][0/172]	Time 0.366	Loss 80.82344	
+2024-02-28 18:31:01,413 Epoch [38][10/172]	Time 0.385	Loss 63.990368	
+2024-02-28 18:31:05,578 Epoch [38][20/172]	Time 0.684	Loss 61.64583	
+2024-02-28 18:31:09,486 Epoch [38][30/172]	Time 0.390	Loss 58.710037	
+2024-02-28 18:31:13,776 Epoch [38][40/172]	Time 0.391	Loss 68.13911	
+2024-02-28 18:31:18,646 Epoch [38][50/172]	Time 0.389	Loss 51.98166	
+2024-02-28 18:31:22,842 Epoch [38][60/172]	Time 0.397	Loss 60.16024	
+2024-02-28 18:31:27,838 Epoch [38][70/172]	Time 0.369	Loss 62.417038	
+2024-02-28 18:31:32,152 Epoch [38][80/172]	Time 0.383	Loss 72.6635	
+2024-02-28 18:31:36,356 Epoch [38][90/172]	Time 0.386	Loss 65.248825	
+2024-02-28 18:31:40,892 Epoch [38][100/172]	Time 0.396	Loss 64.76253	
+2024-02-28 18:31:45,696 Epoch [38][110/172]	Time 0.393	Loss 55.542328	
+2024-02-28 18:31:51,938 Epoch [38][120/172]	Time 0.384	Loss 82.01544	
+2024-02-28 18:31:57,753 Epoch [38][130/172]	Time 2.339	Loss 64.71144	
+2024-02-28 18:32:02,034 Epoch [38][140/172]	Time 0.795	Loss 46.975082	
+2024-02-28 18:32:07,439 Epoch [38][150/172]	Time 0.388	Loss 63.577377	
+2024-02-28 18:32:11,919 Epoch [38][160/172]	Time 0.390	Loss 87.70776	
+2024-02-28 18:32:17,582 Epoch [38][170/172]	Time 0.382	Loss 67.50168	
+2024-02-28 18:32:43,403 Epoch [39][0/172]	Time 0.392	Loss 62.11931	
+2024-02-28 18:32:47,348 Epoch [39][10/172]	Time 0.425	Loss 57.804203	
+2024-02-28 18:32:52,122 Epoch [39][20/172]	Time 1.302	Loss 46.647144	
+2024-02-28 18:32:57,541 Epoch [39][30/172]	Time 0.397	Loss 75.15591	
+2024-02-28 18:33:01,906 Epoch [39][40/172]	Time 0.386	Loss 66.791176	
+2024-02-28 18:33:05,703 Epoch [39][50/172]	Time 0.381	Loss 52.74887	
+2024-02-28 18:33:11,016 Epoch [39][60/172]	Time 0.385	Loss 67.12174	
+2024-02-28 18:33:15,410 Epoch [39][70/172]	Time 0.389	Loss 53.213196	
+2024-02-28 18:33:19,293 Epoch [39][80/172]	Time 0.387	Loss 59.09124	
+2024-02-28 18:33:23,476 Epoch [39][90/172]	Time 0.667	Loss 51.33686	
+2024-02-28 18:33:27,590 Epoch [39][100/172]	Time 0.386	Loss 55.544678	
+2024-02-28 18:33:31,430 Epoch [39][110/172]	Time 0.383	Loss 51.15365	
+2024-02-28 18:33:39,327 Epoch [39][120/172]	Time 0.973	Loss 54.986927	
+2024-02-28 18:33:43,627 Epoch [39][130/172]	Time 0.391	Loss 79.67698	
+2024-02-28 18:33:48,866 Epoch [39][140/172]	Time 0.382	Loss 59.370407	
+2024-02-28 18:33:52,971 Epoch [39][150/172]	Time 0.387	Loss 53.42773	
+2024-02-28 18:33:58,412 Epoch [39][160/172]	Time 1.961	Loss 61.687828	
+2024-02-28 18:34:02,292 Epoch [39][170/172]	Time 0.394	Loss 45.452137	
+2024-02-28 18:34:29,891 Epoch [40][0/172]	Time 0.387	Loss 50.206463	
+2024-02-28 18:34:36,167 Epoch [40][10/172]	Time 0.384	Loss 63.85623	
+2024-02-28 18:34:40,105 Epoch [40][20/172]	Time 0.396	Loss 57.70291	
+2024-02-28 18:34:43,987 Epoch [40][30/172]	Time 0.385	Loss 50.758865	
+2024-02-28 18:34:48,894 Epoch [40][40/172]	Time 0.385	Loss 60.541794	
+2024-02-28 18:34:54,820 Epoch [40][50/172]	Time 0.388	Loss 50.137085	
+2024-02-28 18:34:59,421 Epoch [40][60/172]	Time 0.504	Loss 55.184765	
+2024-02-28 18:35:03,500 Epoch [40][70/172]	Time 0.388	Loss 47.149647	
+2024-02-28 18:35:07,965 Epoch [40][80/172]	Time 0.924	Loss 52.331833	
+2024-02-28 18:35:12,532 Epoch [40][90/172]	Time 0.387	Loss 54.786972	
+2024-02-28 18:35:17,330 Epoch [40][100/172]	Time 0.399	Loss 68.58306	
+2024-02-28 18:35:21,810 Epoch [40][110/172]	Time 0.388	Loss 58.89098	
+2024-02-28 18:35:27,496 Epoch [40][120/172]	Time 0.389	Loss 55.60691	
+2024-02-28 18:35:31,769 Epoch [40][130/172]	Time 0.550	Loss 62.730553	
+2024-02-28 18:35:35,640 Epoch [40][140/172]	Time 0.390	Loss 63.38268	
+2024-02-28 18:35:39,638 Epoch [40][150/172]	Time 0.381	Loss 53.996094	
+2024-02-28 18:35:45,542 Epoch [40][160/172]	Time 0.388	Loss 49.938023	
+2024-02-28 18:35:49,977 Epoch [40][170/172]	Time 0.387	Loss 58.684265	
+2024-02-28 18:36:15,751 Epoch [41][0/172]	Time 0.383	Loss 41.351425	
+2024-02-28 18:36:19,602 Epoch [41][10/172]	Time 0.385	Loss 62.404938	
+2024-02-28 18:36:24,318 Epoch [41][20/172]	Time 0.387	Loss 50.405884	
+2024-02-28 18:36:28,718 Epoch [41][30/172]	Time 0.379	Loss 67.356384	
+2024-02-28 18:36:33,571 Epoch [41][40/172]	Time 0.379	Loss 59.63587	
+2024-02-28 18:36:37,875 Epoch [41][50/172]	Time 0.422	Loss 86.51026	
+2024-02-28 18:36:41,711 Epoch [41][60/172]	Time 0.382	Loss 56.424652	
+2024-02-28 18:36:45,618 Epoch [41][70/172]	Time 0.380	Loss 57.497025	
+2024-02-28 18:36:51,381 Epoch [41][80/172]	Time 0.383	Loss 47.276	
+2024-02-28 18:36:55,880 Epoch [41][90/172]	Time 0.389	Loss 50.601456	
+2024-02-28 18:36:59,990 Epoch [41][100/172]	Time 0.384	Loss 58.79892	
+2024-02-28 18:37:06,226 Epoch [41][110/172]	Time 1.131	Loss 51.363976	
+2024-02-28 18:37:10,674 Epoch [41][120/172]	Time 0.921	Loss 53.951523	
+2024-02-28 18:37:14,709 Epoch [41][130/172]	Time 0.385	Loss 66.949394	
+2024-02-28 18:37:18,586 Epoch [41][140/172]	Time 0.394	Loss 55.621033	
+2024-02-28 18:37:24,114 Epoch [41][150/172]	Time 0.384	Loss 47.71524	
+2024-02-28 18:37:28,214 Epoch [41][160/172]	Time 0.387	Loss 74.83789	
+2024-02-28 18:37:32,120 Epoch [41][170/172]	Time 0.394	Loss 71.27406	
+
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 25.41 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [34/50] epochs
+Now val score:
+i2t => r1i:6.52 r5i:18.39 r10i:28.17 medri:29.00 meanri:99.90
+t2i => r1t:5.66 r5t:22.77 r10t:38.91 medrt:15.00 meanrt:51.61
+mR:20.07
+Best val score:
+i2t => r1i:7.92 r5i:19.09 r10i:30.62 medri:26.00 meanri:106.82
+t2i => r1t:6.78 r5t:23.73 r10t:39.30 medrt:15.00 meanrt:51.43
+mR:21.24
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.68 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [35/50] epochs
+Now val score:
+i2t => r1i:7.45 r5i:18.63 r10i:30.62 medri:27.00 meanri:116.38
+t2i => r1t:6.33 r5t:23.14 r10t:39.28 medrt:15.00 meanrt:52.72
+mR:20.91
+Best val score:
+i2t => r1i:7.92 r5i:19.09 r10i:30.62 medri:26.00 meanri:106.82
+t2i => r1t:6.78 r5t:23.73 r10t:39.30 medrt:15.00 meanrt:51.43
+mR:21.24
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 28.28 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [36/50] epochs
+Now val score:
+i2t => r1i:7.57 r5i:20.72 r10i:28.06 medri:27.00 meanri:106.43
+t2i => r1t:6.03 r5t:23.59 r10t:38.44 medrt:15.00 meanrt:52.94
+mR:20.73
+Best val score:
+i2t => r1i:7.92 r5i:19.09 r10i:30.62 medri:26.00 meanri:106.82
+t2i => r1t:6.78 r5t:23.73 r10t:39.30 medrt:15.00 meanrt:51.43
+mR:21.24
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.55 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [37/50] epochs
+Now val score:
+i2t => r1i:6.87 r5i:17.69 r10i:30.27 medri:27.00 meanri:105.51
+t2i => r1t:6.40 r5t:22.68 r10t:38.86 medrt:15.00 meanrt:52.75
+mR:20.46
+Best val score:
+i2t => r1i:7.92 r5i:19.09 r10i:30.62 medri:26.00 meanri:106.82
+t2i => r1t:6.78 r5t:23.73 r10t:39.30 medrt:15.00 meanrt:51.43
+mR:21.24
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.47 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [38/50] epochs
+Now val score:
+i2t => r1i:7.92 r5i:20.26 r10i:30.97 medri:27.00 meanri:112.53
+t2i => r1t:6.36 r5t:23.52 r10t:38.63 medrt:15.00 meanrt:54.51
+mR:21.27
+Best val score:
+i2t => r1i:7.92 r5i:20.26 r10i:30.97 medri:27.00 meanri:112.53
+t2i => r1t:6.36 r5t:23.52 r10t:38.63 medrt:15.00 meanrt:54.51
+mR:21.27
+=================================================================
+
+Current lr: 0.00014
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.76 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [39/50] epochs
+Now val score:
+i2t => r1i:8.50 r5i:19.67 r10i:29.92 medri:26.00 meanri:120.11
+t2i => r1t:6.38 r5t:23.86 r10t:38.39 medrt:16.00 meanrt:55.27
+mR:21.12
+Best val score:
+i2t => r1i:7.92 r5i:20.26 r10i:30.97 medri:27.00 meanri:112.53
+t2i => r1t:6.36 r5t:23.52 r10t:38.63 medrt:15.00 meanrt:54.51
+mR:21.27
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.41 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [40/50] epochs
+Now val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.72 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [41/50] epochs
+Now val score:
+i2t => r1i:7.80 r5i:20.84 r10i:30.15 medri:25.00 meanri:113.76
+t2i => r1t:6.24 r5t:22.96 r10t:39.37 medrt:15.00 meanrt:54.58
+mR:21.23
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.84 s2024-02-28 18:37:58,530 Epoch [42][0/172]	Time 0.389	Loss 46.921986	
+2024-02-28 18:38:03,057 Epoch [42][10/172]	Time 0.386	Loss 51.879433	
+2024-02-28 18:38:07,265 Epoch [42][20/172]	Time 0.382	Loss 58.057796	
+2024-02-28 18:38:14,192 Epoch [42][30/172]	Time 0.384	Loss 50.59079	
+2024-02-28 18:38:18,414 Epoch [42][40/172]	Time 0.670	Loss 48.87488	
+2024-02-28 18:38:22,242 Epoch [42][50/172]	Time 0.387	Loss 49.109825	
+2024-02-28 18:38:26,613 Epoch [42][60/172]	Time 0.396	Loss 48.341694	
+2024-02-28 18:38:30,967 Epoch [42][70/172]	Time 0.390	Loss 58.93329	
+2024-02-28 18:38:34,903 Epoch [42][80/172]	Time 0.389	Loss 49.74985	
+2024-02-28 18:38:38,746 Epoch [42][90/172]	Time 0.392	Loss 63.307213	
+2024-02-28 18:38:43,585 Epoch [42][100/172]	Time 0.384	Loss 48.95547	
+2024-02-28 18:38:49,600 Epoch [42][110/172]	Time 0.387	Loss 45.957043	
+2024-02-28 18:38:53,775 Epoch [42][120/172]	Time 0.389	Loss 47.94166	
+2024-02-28 18:38:57,991 Epoch [42][130/172]	Time 0.392	Loss 59.119965	
+2024-02-28 18:39:01,846 Epoch [42][140/172]	Time 0.388	Loss 49.987717	
+2024-02-28 18:39:07,867 Epoch [42][150/172]	Time 0.392	Loss 53.973633	
+2024-02-28 18:39:11,749 Epoch [42][160/172]	Time 0.385	Loss 72.25702	
+2024-02-28 18:39:17,410 Epoch [42][170/172]	Time 0.387	Loss 70.90011	
+2024-02-28 18:39:43,223 Epoch [43][0/172]	Time 0.384	Loss 53.504715	
+2024-02-28 18:39:47,079 Epoch [43][10/172]	Time 0.388	Loss 40.95843	
+2024-02-28 18:39:54,571 Epoch [43][20/172]	Time 0.385	Loss 57.84912	
+2024-02-28 18:39:58,927 Epoch [43][30/172]	Time 0.560	Loss 48.255222	
+2024-02-28 18:40:02,812 Epoch [43][40/172]	Time 0.387	Loss 71.118835	
+2024-02-28 18:40:06,706 Epoch [43][50/172]	Time 0.386	Loss 44.31728	
+2024-02-28 18:40:10,570 Epoch [43][60/172]	Time 0.394	Loss 52.156166	
+2024-02-28 18:40:14,895 Epoch [43][70/172]	Time 0.384	Loss 50.364502	
+2024-02-28 18:40:19,132 Epoch [43][80/172]	Time 0.619	Loss 52.7213	
+2024-02-28 18:40:23,061 Epoch [43][90/172]	Time 0.395	Loss 51.48849	
+2024-02-28 18:40:27,321 Epoch [43][100/172]	Time 0.387	Loss 76.00061	
+2024-02-28 18:40:31,829 Epoch [43][110/172]	Time 0.384	Loss 51.778442	
+2024-02-28 18:40:35,952 Epoch [43][120/172]	Time 0.398	Loss 52.501167	
+2024-02-28 18:40:41,739 Epoch [43][130/172]	Time 2.296	Loss 41.408485	
+2024-02-28 18:40:45,616 Epoch [43][140/172]	Time 0.385	Loss 59.67971	
+2024-02-28 18:40:50,855 Epoch [43][150/172]	Time 0.396	Loss 61.302673	
+2024-02-28 18:40:54,905 Epoch [43][160/172]	Time 0.386	Loss 50.035213	
+2024-02-28 18:40:59,180 Epoch [43][170/172]	Time 0.386	Loss 62.74038	
+2024-02-28 18:41:24,915 Epoch [44][0/172]	Time 0.383	Loss 44.62017	
+2024-02-28 18:41:30,845 Epoch [44][10/172]	Time 0.396	Loss 41.129253	
+2024-02-28 18:41:35,350 Epoch [44][20/172]	Time 0.385	Loss 34.939823	
+2024-02-28 18:41:42,062 Epoch [44][30/172]	Time 0.390	Loss 53.33003	
+2024-02-28 18:41:51,769 Epoch [44][40/172]	Time 0.395	Loss 44.63616	
+2024-02-28 18:41:56,407 Epoch [44][50/172]	Time 0.386	Loss 56.359108	
+2024-02-28 18:42:00,479 Epoch [44][60/172]	Time 0.389	Loss 55.138195	
+2024-02-28 18:42:07,238 Epoch [44][70/172]	Time 0.387	Loss 60.091274	
+2024-02-28 18:42:12,145 Epoch [44][80/172]	Time 0.380	Loss 58.39629	
+2024-02-28 18:42:17,401 Epoch [44][90/172]	Time 0.382	Loss 43.064785	
+2024-02-28 18:42:21,492 Epoch [44][100/172]	Time 0.387	Loss 52.396305	
+2024-02-28 18:42:27,198 Epoch [44][110/172]	Time 0.383	Loss 46.04175	
+2024-02-28 18:42:32,841 Epoch [44][120/172]	Time 0.395	Loss 53.18577	
+2024-02-28 18:42:37,983 Epoch [44][130/172]	Time 0.389	Loss 49.884018	
+2024-02-28 18:42:42,028 Epoch [44][140/172]	Time 0.390	Loss 44.404945	
+2024-02-28 18:42:45,904 Epoch [44][150/172]	Time 0.392	Loss 62.430965	
+2024-02-28 18:42:51,152 Epoch [44][160/172]	Time 0.391	Loss 51.986164	
+2024-02-28 18:42:57,081 Epoch [44][170/172]	Time 0.388	Loss 47.042015	
+2024-02-28 18:43:22,847 Epoch [45][0/172]	Time 0.425	Loss 61.155106	
+2024-02-28 18:43:27,551 Epoch [45][10/172]	Time 0.414	Loss 55.417442	
+2024-02-28 18:43:32,956 Epoch [45][20/172]	Time 0.423	Loss 81.677925	
+2024-02-28 18:43:38,357 Epoch [45][30/172]	Time 0.601	Loss 57.8515	
+2024-02-28 18:43:44,584 Epoch [45][40/172]	Time 0.490	Loss 47.235985	
+2024-02-28 18:43:51,724 Epoch [45][50/172]	Time 0.496	Loss 55.41561	
+2024-02-28 18:44:00,156 Epoch [45][60/172]	Time 0.500	Loss 48.48828	
+2024-02-28 18:44:06,135 Epoch [45][70/172]	Time 0.497	Loss 43.64138	
+2024-02-28 18:44:10,566 Epoch [45][80/172]	Time 0.443	Loss 46.970764	
+2024-02-28 18:44:16,649 Epoch [45][90/172]	Time 0.505	Loss 55.459267	
+2024-02-28 18:44:20,738 Epoch [45][100/172]	Time 0.400	Loss 50.027946	
+2024-02-28 18:44:24,672 Epoch [45][110/172]	Time 0.392	Loss 53.937275	
+2024-02-28 18:44:29,493 Epoch [45][120/172]	Time 0.389	Loss 72.05571	
+2024-02-28 18:44:33,602 Epoch [45][130/172]	Time 0.386	Loss 39.38106	
+2024-02-28 18:44:39,597 Epoch [45][140/172]	Time 0.383	Loss 59.825096	
+2024-02-28 18:44:45,001 Epoch [45][150/172]	Time 0.384	Loss 42.62699	
+2024-02-28 18:44:50,273 Epoch [45][160/172]	Time 1.752	Loss 53.45348	
+2024-02-28 18:44:54,118 Epoch [45][170/172]	Time 0.383	Loss 60.263504	
+2024-02-28 18:45:21,095 Epoch [46][0/172]	Time 0.370	Loss 44.83364	
+2024-02-28 18:45:25,819 Epoch [46][10/172]	Time 0.384	Loss 41.79384	
+2024-02-28 18:45:32,276 Epoch [46][20/172]	Time 0.387	Loss 54.263153	
+2024-02-28 18:45:38,466 Epoch [46][30/172]	Time 0.391	Loss 55.339355	
+2024-02-28 18:45:44,130 Epoch [46][40/172]	Time 0.389	Loss 44.12407	
+2024-02-28 18:45:47,987 Epoch [46][50/172]	Time 0.387	Loss 43.13758	
+2024-02-28 18:45:51,865 Epoch [46][60/172]	Time 0.386	Loss 30.921982	
+2024-02-28 18:45:57,722 Epoch [46][70/172]	Time 0.389	Loss 47.546257	
+2024-02-28 18:46:01,581 Epoch [46][80/172]	Time 0.384	Loss 57.06652	
+2024-02-28 18:46:05,908 Epoch [46][90/172]	Time 0.388	Loss 51.084427	
+2024-02-28 18:46:09,754 Epoch [46][100/172]	Time 0.385	Loss 55.689087	
+2024-02-28 18:46:13,782 Epoch [46][110/172]	Time 0.388	Loss 49.161522	
+2024-02-28 18:46:17,912 Epoch [46][120/172]	Time 0.661	Loss 54.74192	
+2024-02-28 18:46:21,771 Epoch [46][130/172]	Time 0.383	Loss 47.50844	
+2024-02-28 18:46:26,001 Epoch [46][140/172]	Time 0.383	Loss 53.381866	
+2024-02-28 18:46:29,912 Epoch [46][150/172]	Time 0.387	Loss 47.10749	
+2024-02-28 18:46:34,181 Epoch [46][160/172]	Time 0.385	Loss 44.318176	
+2024-02-28 18:46:38,928 Epoch [46][170/172]	Time 1.260	Loss 56.203465	
+2024-02-28 18:47:04,853 Epoch [47][0/172]	Time 0.392	Loss 58.509815	
+2024-02-28 18:47:09,447 Epoch [47][10/172]	Time 0.392	Loss 47.792374	
+2024-02-28 18:47:13,513 Epoch [47][20/172]	Time 0.388	Loss 46.99466	
+2024-02-28 18:47:17,477 Epoch [47][30/172]	Time 0.384	Loss 50.87259	
+2024-02-28 18:47:21,736 Epoch [47][40/172]	Time 0.386	Loss 32.99691	
+2024-02-28 18:47:25,894 Epoch [47][50/172]	Time 0.390	Loss 43.617775	
+2024-02-28 18:47:30,119 Epoch [47][60/172]	Time 0.763	Loss 37.9965	
+2024-02-28 18:47:34,183 Epoch [47][70/172]	Time 0.387	Loss 42.25196	
+2024-02-28 18:47:38,718 Epoch [47][80/172]	Time 0.384	Loss 51.760265	
+2024-02-28 18:47:45,062 Epoch [47][90/172]	Time 0.388	Loss 45.961136	
+2024-02-28 18:47:49,007 Epoch [47][100/172]	Time 0.396	Loss 45.052765	
+2024-02-28 18:47:53,077 Epoch [47][110/172]	Time 0.393	Loss 45.36123	
+2024-02-28 18:47:57,022 Epoch [47][120/172]	Time 0.385	Loss 49.28061	
+2024-02-28 18:48:01,436 Epoch [47][130/172]	Time 0.385	Loss 46.78689	
+2024-02-28 18:48:06,190 Epoch [47][140/172]	Time 0.391	Loss 42.133522	
+2024-02-28 18:48:10,180 Epoch [47][150/172]	Time 0.395	Loss 64.17869	
+2024-02-28 18:48:14,058 Epoch [47][160/172]	Time 0.393	Loss 49.868824	
+2024-02-28 18:48:17,944 Epoch [47][170/172]	Time 0.392	Loss 48.72661	
+2024-02-28 18:48:42,767 Epoch [48][0/172]	Time 0.360	Loss 41.0016	
+2024-02-28 18:48:47,223 Epoch [48][10/172]	Time 0.387	Loss 41.84482	
+2024-02-28 18:48:52,920 Epoch [48][20/172]	Time 0.803	Loss 42.825172	
+2024-02-28 18:48:56,815 Epoch [48][30/172]	Time 0.388	Loss 55.846302	
+2024-02-28 18:49:02,990 Epoch [48][40/172]	Time 1.211	Loss 42.12162	
+2024-02-28 18:49:06,864 Epoch [48][50/172]	Time 0.385	Loss 54.102737	
+2024-02-28 18:49:11,161 Epoch [48][60/172]	Time 0.383	Loss 38.681698	
+2024-02-28 18:49:16,962 Epoch [48][70/172]	Time 0.394	Loss 40.038704	
+2024-02-28 18:49:21,052 Epoch [48][80/172]	Time 0.383	Loss 43.152252	
+2024-02-28 18:49:25,681 Epoch [48][90/172]	Time 0.385	Loss 46.21757	
+2024-02-28 18:49:31,877 Epoch [48][100/172]	Time 0.387	Loss 54.126167	
+2024-02-28 18:49:36,023 Epoch [48][110/172]	Time 0.386	Loss 56.68952	
+2024-02-28 18:49:39,868 Epoch [48][120/172]	Time 0.381	Loss 38.907043	
+2024-02-28 18:49:43,708 Epoch [48][130/172]	Time 0.383	Loss 42.010845	
+2024-02-28 18:49:47,770 Epoch [48][140/172]	Time 0.384	Loss 38.0112	
+2024-02-28 18:49:53,494 Epoch [48][150/172]	Time 0.384	Loss 45.755962	
+2024-02-28 18:49:58,926 Epoch [48][160/172]	Time 0.389	Loss 42.342834	
+2024-02-28 18:50:02,763 Epoch [48][170/172]	Time 0.385	Loss 41.997513	
+2024-02-28 18:50:28,825 Epoch [49][0/172]	Time 0.383	Loss 47.546173	
+2024-02-28 18:50:33,193 Epoch [49][10/172]	Time 0.391	Loss 44.116535	
+2024-02-28 18:50:37,088 Epoch [49][20/172]	Time 0.382	Loss 43.149113	
+2024-02-28 18:50:42,883 Epoch [49][30/172]	Time 0.384	Loss 55.670662	
+2024-02-28 18:50:47,295 Epoch [49][40/172]	Time 0.388	Loss 46.501717	
+2024-02-28 18:50:51,221 Epoch [49][50/172]	Time 0.389	Loss 32.727028	
+2024-02-28 18:50:55,097 Epoch [49][60/172]	Time 0.393	Loss 40.91266	
+2024-02-28 18:50:59,921 Epoch [49][70/172]	Time 0.387	Loss 57.288513	
+2024-02-28 18:51:06,109 Epoch [49][80/172]	Time 0.386	Loss 47.25566	
+2024-02-28 18:51:11,618 Epoch [49][90/172]	Time 0.383	Loss 46.87921	
+2024-02-28 18:51:15,508 Epoch [49][100/172]	Time 0.391	Loss 40.555298	
+2024-02-28 18:51:20,133 Epoch [49][110/172]	Time 0.386	Loss 42.187347	
+2024-02-28 18:51:23,974 Epoch [49][120/172]	Time 0.387	Loss 42.263367	
+2024-02-28 18:51:28,198 Epoch [49][130/172]	Time 0.390	Loss 43.45431	
+2024-02-28 18:51:37,339 Epoch [49][140/172]	Time 0.405	Loss 34.10665	
+2024-02-28 18:51:41,260 Epoch [49][150/172]	Time 0.384	Loss 51.52162	
+2024-02-28 18:51:45,446 Epoch [49][160/172]	Time 0.385	Loss 65.35374	
+2024-02-28 18:51:49,322 Epoch [49][170/172]	Time 0.387	Loss 39.53167	
+
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [42/50] epochs
+Now val score:
+i2t => r1i:7.68 r5i:19.79 r10i:31.08 medri:25.00 meanri:113.12
+t2i => r1t:6.85 r5t:23.31 r10t:40.19 medrt:15.00 meanrt:55.07
+mR:21.48
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.75 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [43/50] epochs
+Now val score:
+i2t => r1i:8.85 r5i:20.26 r10i:29.57 medri:26.00 meanri:120.50
+t2i => r1t:6.45 r5t:23.70 r10t:39.23 medrt:15.00 meanrt:56.47
+mR:21.34
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.67 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [44/50] epochs
+Now val score:
+i2t => r1i:7.80 r5i:19.56 r10i:28.99 medri:28.00 meanri:111.69
+t2i => r1t:6.50 r5t:23.84 r10t:38.81 medrt:15.00 meanrt:54.99
+mR:20.92
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.67 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [45/50] epochs
+Now val score:
+i2t => r1i:7.57 r5i:20.84 r10i:32.60 medri:26.00 meanri:121.68
+t2i => r1t:6.08 r5t:24.00 r10t:39.88 medrt:15.00 meanrt:57.35
+mR:21.83
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 25.93 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [46/50] epochs
+Now val score:
+i2t => r1i:6.29 r5i:20.26 r10i:29.10 medri:27.00 meanri:125.92
+t2i => r1t:6.52 r5t:23.56 r10t:39.42 medrt:15.00 meanrt:59.01
+mR:20.86
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.28 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [47/50] epochs
+Now val score:
+i2t => r1i:7.33 r5i:20.37 r10i:30.85 medri:26.00 meanri:121.40
+t2i => r1t:6.17 r5t:24.42 r10t:40.26 medrt:15.00 meanrt:57.80
+mR:21.57
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 23.79 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [48/50] epochs
+Now val score:
+i2t => r1i:7.45 r5i:17.81 r10i:29.57 medri:26.00 meanri:125.09
+t2i => r1t:6.92 r5t:23.82 r10t:39.25 medrt:16.00 meanrt:59.56
+mR:20.80
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.55 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [49/50] epochs
+Now val score:
+i2t => r1i:6.17 r5i:20.14 r10i:30.38 medri:26.00 meanri:126.33
+t2i => r1t:6.94 r5t:23.75 r10t:38.79 medrt:16.00 meanrt:59.18
+mR:21.03
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
+Current lr: 9.799999999999998e-05
+
+--------------------- start val on training ---------------------
+==> start to compute image-caption pairwise distance <==
+Calculate the similarity in batches: [0/4]
+Calculate the similarity in batches: [1/4]
+Calculate the similarity in batches: [2/4]
+Calculate the similarity in batches: [3/4]
+infer time:0.10
+==> end to compute image-caption pairwise distance <==
+calculate similarity time: 24.71 s
+--------------------- end val on training ---------------------
+
+
+================ evaluate result on val set =====================
+Current => [1/1] fold & [50/50] epochs
+Now val score:
+i2t => r1i:7.22 r5i:20.37 r10i:29.92 medri:28.00 meanri:125.72
+t2i => r1t:6.80 r5t:23.56 r10t:39.39 medrt:16.00 meanrt:58.97
+mR:21.21
+Best val score:
+i2t => r1i:8.50 r5i:20.84 r10i:32.95 medri:26.00 meanri:117.12
+t2i => r1t:6.80 r5t:23.66 r10t:39.21 medrt:15.00 meanrt:54.99
+mR:21.99
+=================================================================
+
