@@ -3,8 +3,10 @@ import torch
 import numpy as np
 from torch.autograd import Variable
 import utils
-import tensorboard_logger as tb_logger
-import logging
+# import tensorboard_logger as tb_logger
+import wandb
+# import logging
+from loguru import logger
 from torch.nn.utils.clip_grad import clip_grad_norm
 
 
@@ -29,7 +31,7 @@ def train(args, train_loader, model, optimizer, epoch):
     params = list(model.parameters())
 
     for i, train_data in enumerate(train_loader):
-        images, captions, lengths, ids= train_data
+        images, captions, lengths, ids, tokens_clip = train_data
 
         batch_size = images.size(0)
         margin = float(margin)
@@ -39,7 +41,10 @@ def train(args, train_loader, model, optimizer, epoch):
 
         input_visual = Variable(images)
 
-        input_text = Variable(captions)
+        # input_text = Variable(captions)
+        input_text = Variable(tokens_clip)
+        
+        # import ipdb;ipdb.set_trace()
 
         if torch.cuda.is_available():
             input_visual = input_visual.cuda(args.gpuid)
@@ -82,7 +87,7 @@ def train(args, train_loader, model, optimizer, epoch):
         end = time.time()
 
         if i % print_freq == 0 and args.rank == 0:
-            logging.info(
+            logger.info(
                 'Epoch [{0}][{1}/{2}]\t'
                 'Time {batch_time.val:.3f}\t'
                 '{elog}\t'
@@ -99,12 +104,17 @@ def train(args, train_loader, model, optimizer, epoch):
                             elog=str(train_logger)),
                 args.ckpt_save_path+ args.model_name + "_" + args.data_name + ".txt"
             )
+        # import ipdb;ipdb.set_trace()
+        # tb_logger.log_value('epoch', epoch, step=model.Eiters)
+        # tb_logger.log_value('step', i, step=model.Eiters)
+        # tb_logger.log_value('batch_time', batch_time.val, step=model.Eiters)
+        # train_logger.tb_log(tb_logger, step=model.Eiters)
 
-        tb_logger.log_value('epoch', epoch, step=model.Eiters)
-        tb_logger.log_value('step', i, step=model.Eiters)
-        tb_logger.log_value('batch_time', batch_time.val, step=model.Eiters)
-        train_logger.tb_log(tb_logger, step=model.Eiters)
-
+        wandb.log({
+            'epoch': epoch,
+            'batch_time': batch_time.val,
+        })
+        train_logger.wandb_log()
 
 def validate(args, val_loader, model):
     print('')
@@ -152,18 +162,32 @@ def validate(args, val_loader, model):
     print("--------------------- end val on training ---------------------")
     print('')
 
-    tb_logger.log_value('r1i', r1i, step=model.Eiters)
-    tb_logger.log_value('r5i', r5i, step=model.Eiters)
-    tb_logger.log_value('r10i', r10i, step=model.Eiters)
-    tb_logger.log_value('medri', medri, step=model.Eiters)
-    tb_logger.log_value('meanri', meanri, step=model.Eiters)
-    tb_logger.log_value('r1t', r1t, step=model.Eiters)
-    tb_logger.log_value('r5t', r5t, step=model.Eiters)
-    tb_logger.log_value('r10t', r10t, step=model.Eiters)
-    tb_logger.log_value('medrt', medrt, step=model.Eiters)
-    tb_logger.log_value('meanrt', meanrt, step=model.Eiters)
-    tb_logger.log_value('rsum', currscore, step=model.Eiters)
+    # tb_logger.log_value('r1i', r1i, step=model.Eiters)
+    # tb_logger.log_value('r5i', r5i, step=model.Eiters)
+    # tb_logger.log_value('r10i', r10i, step=model.Eiters)
+    # tb_logger.log_value('medri', medri, step=model.Eiters)
+    # tb_logger.log_value('meanri', meanri, step=model.Eiters)
+    # tb_logger.log_value('r1t', r1t, step=model.Eiters)
+    # tb_logger.log_value('r5t', r5t, step=model.Eiters)
+    # tb_logger.log_value('r10t', r10t, step=model.Eiters)
+    # tb_logger.log_value('medrt', medrt, step=model.Eiters)
+    # tb_logger.log_value('meanrt', meanrt, step=model.Eiters)
+    # tb_logger.log_value('rsum', currscore, step=model.Eiters)
 
+    wandb.log({
+        'val/r1i': r1i,
+        'val/r5i': r5i,
+        'val/r10i': r10i,
+        'val/medri': medri,
+        'val/meanri': meanri,
+        'val/r1t': r1t,
+        'val/r5t': r5t,
+        'val/r10t': r10t,
+        'val/medrt': medrt,
+        'val/meanrt': meanrt,
+        'val/rsum': currscore
+    })
+    
     return currscore, all_score
 
 
@@ -217,18 +241,31 @@ def validate_test(args, test_loader, model):
     print("--------------------- end test on training ---------------------")
     print('')
 
-    tb_logger.log_value('r1i_test', r1i, step=model.Eiters)
-    tb_logger.log_value('r5i_test', r5i, step=model.Eiters)
-    tb_logger.log_value('r10i_test', r10i, step=model.Eiters)
-    tb_logger.log_value('medri_test', medri, step=model.Eiters)
-    tb_logger.log_value('meanri_test', meanri, step=model.Eiters)
-    tb_logger.log_value('r1t_test', r1t, step=model.Eiters)
-    tb_logger.log_value('r5t_test', r5t, step=model.Eiters)
-    tb_logger.log_value('r10t_test', r10t, step=model.Eiters)
-    tb_logger.log_value('medrt_test', medrt, step=model.Eiters)
-    tb_logger.log_value('meanrt_test', meanrt, step=model.Eiters)
-    tb_logger.log_value('rsum_test', currscore, step=model.Eiters)
-
+    # tb_logger.log_value('r1i_test', r1i, step=model.Eiters)
+    # tb_logger.log_value('r5i_test', r5i, step=model.Eiters)
+    # tb_logger.log_value('r10i_test', r10i, step=model.Eiters)
+    # tb_logger.log_value('medri_test', medri, step=model.Eiters)
+    # tb_logger.log_value('meanri_test', meanri, step=model.Eiters)
+    # tb_logger.log_value('r1t_test', r1t, step=model.Eiters)
+    # tb_logger.log_value('r5t_test', r5t, step=model.Eiters)
+    # tb_logger.log_value('r10t_test', r10t, step=model.Eiters)
+    # tb_logger.log_value('medrt_test', medrt, step=model.Eiters)
+    # tb_logger.log_value('meanrt_test', meanrt, step=model.Eiters)
+    # tb_logger.log_value('rsum_test', currscore, step=model.Eiters)
+    
+    wandb.log({
+        'test/r1i': r1i,
+        'test/r5i': r5i,
+        'test/r10i': r10i,
+        'test/medri': medri,
+        'test/meanri': meanri,
+        'test/r1t': r1t,
+        'test/r5t': r5t,
+        'test/r10t': r10t,
+        'test/medrt': medrt,
+        'test/meanrt': meanrt,
+        'test/rsum': currscore
+    })
     return currscore, all_score
 
 

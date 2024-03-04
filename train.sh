@@ -1,6 +1,6 @@
 datename=$(date +%Y%m%d-%H%M%S)
 # RSITMD Dataset
-python train.py \
+python train_mine.py \
        --gpuid 0 \
        --model_name SWAN \
        --experiment_name SWAN \

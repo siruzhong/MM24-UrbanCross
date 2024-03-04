@@ -10,3 +10,6 @@ rs_data.zip
 rs_data
 checkpoint/rsitmd/SWAN/SWAN_best.pth.tar
 .vector_cache
+outputs/*
+checkpoint/*
+urbancross_data/*

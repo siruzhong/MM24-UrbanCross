@@ -11,7 +11,7 @@ import time
 import torch.distributed as dist
 import seaborn as sns
 from matplotlib import pyplot as plt
-
+import wandb
 
 # 从npy中读取
 def load_from_npy(filename):
@@ -562,12 +562,20 @@ class LogCollector(object):
             s += k + ' ' + str(v)
         return s
 
-    def tb_log(self, tb_logger, prefix='', step=None):
-        """Log using tensorboard
-        """
-        for k, v in self.meters.items():
-            tb_logger.log_value(prefix + k, v.val, step=step)
+    # def tb_log(self, tb_logger, prefix='', step=None):
+    #     """Log using tensorboard
+    #     """
+    #     for k, v in self.meters.items():
+    #         tb_logger.log_value(prefix + k, v.val, step=step)
 
+    def wandb_log(self):
+        """Log using wandb
+        """
+        # import ipdb;ipdb.set_trace()
+        for k, v in self.meters.items():
+            wandb.log({k: v.val})
+            # tb_logger.log_value(prefix + k, v.val, step=step)
+    
 
 def update_values(dict_from, dict_to):
     for key, value in dict_from.items():

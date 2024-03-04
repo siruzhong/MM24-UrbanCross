@@ -32,21 +32,32 @@ class SWAN(nn.Module):
         self.tcge = TCGE(args)
 
     def forward(self, img , text, lengths):
+        import ipdb;ipdb.set_trace()
         # Visual Part
+        #img [bs,3,256,256]
         vl_fea, vg_emb = self.image_encoder(img)
-
+        #vl_fea [bs,32,64,64]
+        #vg_emb [bs,512]
+        
+        #scene fine-grained sensing module
         vl_emb = self.sfgs(vl_fea)
+        #vl_emb [bs,512]
 
         img_emb = self.agg(vl_emb, vg_emb)
+        #img_emb [bs,512]
 
         # Textual Part
         cap_fea = self.text_encoder(text, lengths)
+        #cap_fea [bs,21,512]
 
+        #textual coarse-grained enhancement module
         text_emb = self.tcge(cap_fea, lengths)
+        #text_emb [bs,512]
 
         # Calculating similarity
         sims = cosine_sim(img_emb, text_emb)
-
+        #sims [bs,bs]
+        
         return sims
 #=========================
 # Image feature extraction
