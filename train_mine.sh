@@ -7,6 +7,7 @@ python train_mine.py \
        --data_name rsitmd  \
        --ckpt_save_path checkpoint/ \
        --epochs 50 \
+       --batch_size 10 \
        --k_fold_nums 1 \
        --workers 0 \
        |& tee outputs/logs_$datename.txt 2>&1

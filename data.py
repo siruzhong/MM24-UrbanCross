@@ -63,6 +63,13 @@ class PrecompDataset(data.Dataset):
                 transforms.ToTensor(),
                 transforms.Normalize((0.485, 0.456, 0.406),
                                      (0.229, 0.224, 0.225))])
+            self.transform_segment = transforms.Compose([
+                # transforms.Resize((256, 256)),
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406),
+                                     (0.229, 0.224, 0.225))])
+
         else:
             self.transform = transforms.Compose([
                 # transforms.Resize((256, 256)),
@@ -94,8 +101,23 @@ class PrecompDataset(data.Dataset):
         # import ipdb;ipdb.set_trace()
         image = Image.open(self.img_path +str(self.images[img_id])[2:-1]).convert('RGB')
         image = self.transform(image)  # torch.Size([3, 256, 256])
+        img_name = str(self.images[img_id])[2:-1].split('.')[0]
+        seg_path = os.path.join(self.img_path.replace('images', 'images_segment'), img_name)
+        num_seg = 10
+        seg_list = []
+        for i in range(num_seg):
+            seg_list.append(
+                self.transform_segment(
+                    Image.open(os.path.join(seg_path,img_name+f'_{i}'+'.jpg')).convert('RGB')
+                )
+            )
+            
+        segment_img = torch.stack(seg_list,dim=0)
+            
         # import ipdb;ipdb.set_trace()
-        return image, caption, tokens_UNK, index, img_id, tokens_clip
+        # return image, caption, tokens_UNK, index, img_id, tokens_clip
+        return image, caption, tokens_UNK, index, img_id, tokens_clip, segment_img
+
 
     def __len__(self):
         return self.length
@@ -105,10 +127,11 @@ def collate_fn(data):
 
     # Sort a data list by caption length
     data.sort(key=lambda x: len(x[2]), reverse=True)
-    images, captions, tokens, ids, img_ids, tokens_clip = zip(*data)
+    images, captions, tokens, ids, img_ids, tokens_clip, segment_img = zip(*data)
 
     # Merge images (convert tuple of 3D tensor to 4D tensor)
     images = torch.stack(images, 0)
+    segment_img = torch.stack(segment_img, 0)
     # import ipdb;ipdb.set_trace()
     tokens_clip = torch.cat(tokens_clip, dim=0)
 
@@ -121,7 +144,7 @@ def collate_fn(data):
 
     lengths = [l if l !=0 else 1 for l in lengths]
 
-    return images, targets, lengths, ids, tokens_clip
+    return images, targets, lengths, ids, tokens_clip, segment_img
 
 
 def get_precomp_loader(args, 

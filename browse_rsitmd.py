@@ -18,4 +18,5 @@ for i in tqdm(os.listdir(img_path)):
     # import ipdb;ipdb.set_trace()
     # image = transform_(image)  # torch.Size([3, 256, 256])
 
-    image.save(os.path.join(img_path+'_rgb', i.replace('.tif','.jpg')))
+    # image.save(os.path.join(img_path+'_rgb', i.replace('.tif','.jpg')))
+    image.save(os.path.join(img_path+'_rgb_png', i.replace('.tif','.png')))

@@ -78,7 +78,11 @@ def collect_neg(args, input):
 
 
 # 计算对比损失函数
-def calcul_contraloss(args, scores, size, margin, max_violation=False):
+def calcul_contraloss(args, 
+                      scores, 
+                      size, 
+                      margin, 
+                      max_violation=False):
     diagonal = scores.diag().view(size, 1)
 
     d1 = diagonal.expand_as(scores)

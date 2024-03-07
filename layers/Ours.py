@@ -1,5 +1,5 @@
 import math
-import open_clip
+import open_clip_mine as open_clip
 import numpy as np
 import torchtext
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
@@ -11,6 +11,7 @@ import torch
 import torch.nn as nn
 import torch.nn.init
 from .resnet import resnet50
+from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
 #============
 # Main Model
@@ -27,49 +28,102 @@ class SWAN(nn.Module):
             pretrained='laion2B-s32B-b82K',  #mscoco_finetuned_laion2B-s13B-b90k
             output_dict=True,
         )
-        self.tokenizer = open_clip.get_tokenizer("ViT-L-14")
+        self.clip_model1 = copy.deepcopy(self.clip_model)
+        self.clip_model2 = copy.deepcopy(self.clip_model)
+        self.clip_model3 = copy.deepcopy(self.clip_model)
+        del self.clip_model1.visual
+        del self.clip_model2.visual
+        del self.clip_model3.visual
+        self.clip_img_seg = copy.deepcopy(self.clip_model)
+        del self.clip_img_seg.transformer
+        # self.tokenizer = open_clip.get_tokenizer("ViT-L-14")
         # import ipdb;ipdb.set_trace()
         # Image Encoder
-        self.image_encoder =  ImageExtractFeature(args)
-        # Text Encoder
-        self.text_encoder = TextExtractFeature(args, word2idx)
-        # Scene Fine-Grained Sensing Module
-        self.sfgs = SFGS(args)
-        # Vsion Global-Local Features Fusion
-        self.agg = Aggregation(args)
-        # Text Coarse-Grained Enhancement Module
-        self.tcge = TCGE(args)
+        # self.image_encoder =  ImageExtractFeature(args)
+        # # Text Encoder
+        # self.text_encoder = TextExtractFeature(args, word2idx)
+        # # Scene Fine-Grained Sensing Module
+        # self.sfgs = SFGS(args)
+        # # Vsion Global-Local Features Fusion
+        # self.agg = Aggregation(args)
+        # # Text Coarse-Grained Enhancement Module
+        # self.tcge = TCGE(args)
 
-    def forward(self, img , text, lengths):
+
+        self.sam = sam_model_registry['vit_h'](checkpoint='sam_vit_h_4b8939.pth')
+        # sam.to(device=device)
+
+        self.mask_generator = SamAutomaticMaskGenerator(self.sam)
+
+    def forward(self, img , text, lengths,
+                segment_imgs
+                ):
         #img [bs,3,256,256]
         # text是[bs,30]
-        import ipdb;ipdb.set_trace()
-        clip_model_out = self.clip_model(img, text)
-        # Visual Part
-        vl_fea, vg_emb = self.image_encoder(img)
-        #vl_fea [bs,32,64,64]
-        #vg_emb [bs,512]
         
-        #scene fine-grained sensing module
-        vl_emb = self.sfgs(vl_fea)
-        #vl_emb [bs,512]
+        title = copy.deepcopy(text)
+        ingredients = copy.deepcopy(text)
+        instructions = copy.deepcopy(text)
+        clip_model_out = self.clip_model(img, text)
+        
+        # import ipdb;ipdb.set_trace()
+        title_emb = self.clip_model1.encode_text(title)
+        ingredients_emb = self.clip_model2.encode_text(ingredients)
+        instructions_emb = self.clip_model3.encode_text(instructions)
+        tags_emb = torch.cat((title_emb,ingredients_emb,instructions_emb), dim=1)
+        # ipdb> clip_model_out.keys()
+        # dict_keys(['image_features', 'text_features', 'logit_scale'])
+        
+        # ipdb> clip_model_out['image_features'].shape
+        # torch.Size([100, 768])
+        # ipdb> clip_model_out['text_features'].shape
+        # torch.Size([100, 768])
+        img_emb = clip_model_out['image_features']
+        text_emb = clip_model_out['text_features']
+        # Visual Part
+        # vl_fea, vg_emb = self.image_encoder(img)
+        # #vl_fea [bs,32,64,64]
+        # #vg_emb [bs,512]
+        num_seg = segment_imgs.shape[0]
+        seg_emb_list = []
+        # import ipdb; ipdb.set_trace()
+        for i in range(num_seg):
+            seg_emb_list.append(self.clip_img_seg.encode_image(segment_imgs[i]))
+        # import ipdb;ipdb.set_trace()
+        img_seg_emb = torch.mean(torch.stack(seg_emb_list,dim=0), dim=0)
+        # img_seg_emb = self.clip_img_seg.encode_image(segment_imgs)
+        # #scene fine-grained sensing module
+        # vl_emb = self.sfgs(vl_fea)
+        # #vl_emb [bs,512]
+        # import ipdb;ipdb.set_trace()
+        # img_emb = self.agg(vl_emb, vg_emb)
+        # #img_emb [bs,512]
 
-        img_emb = self.agg(vl_emb, vg_emb)
-        #img_emb [bs,512]
+        # # Textual Part
+        # cap_fea = self.text_encoder(text, lengths)
+        # #cap_fea [bs,21,512]
+        # list_of_imgs = torch.chunk(img, img.shape[0], dim=0)
 
-        # Textual Part
-        cap_fea = self.text_encoder(text, lengths)
-        #cap_fea [bs,21,512]
-
-        #textual coarse-grained enhancement module
-        text_emb = self.tcge(cap_fea, lengths)
-        #text_emb [bs,512]
+        # # 使用squeeze函数将每个元素的维度为1的维度去除，得到形状为[3, h, w]
+        # list_of_imgs = [{'image':t.squeeze(0),
+        #                  'original_size':(t.shape[-2],t.shape[-1])} for t in list_of_imgs]
+        # import ipdb;ipdb.set_trace()
+        # self.sam(list_of_imgs, multimask_output=False)
+        # masks = self.mask_generator.generate(img.permute(0,2,3,1))
+        # #textual coarse-grained enhancement module
+        # text_emb = self.tcge(cap_fea, lengths)
+        # #text_emb [bs,512]
 
         # Calculating similarity
-        sims = cosine_sim(img_emb, text_emb)
+        sim_img2text = cosine_sim(img_emb, text_emb)
+        sim_img2tag = cosine_sim(img_emb, tags_emb)
+        sim_seg2text = cosine_sim(img_seg_emb, text_emb)
+        sim_seg2tag = cosine_sim(img_seg_emb, tags_emb)
+        # sims = cosine_sim(img_emb, text_emb)
         #sims [bs,bs]
         
-        return sims
+        # return sims
+        return sim_img2text, sim_img2tag, sim_seg2text, sim_seg2tag
 #=========================
 # Image feature extraction
 #========================

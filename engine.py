@@ -31,7 +31,7 @@ def train(args, train_loader, model, optimizer, epoch):
     params = list(model.parameters())
 
     for i, train_data in enumerate(train_loader):
-        images, captions, lengths, ids, tokens_clip = train_data
+        images, captions, lengths, ids, tokens_clip, segment_imgs = train_data
 
         batch_size = images.size(0)
         margin = float(margin)
@@ -40,7 +40,8 @@ def train(args, train_loader, model, optimizer, epoch):
         model.logger = train_logger
 
         input_visual = Variable(images)
-
+        # import ipdb; ipdb.set_trace()
+        segment_imgs = Variable(segment_imgs)
         # input_text = Variable(captions)
         input_text = Variable(tokens_clip)
         
@@ -49,13 +50,22 @@ def train(args, train_loader, model, optimizer, epoch):
         if torch.cuda.is_available():
             input_visual = input_visual.cuda(args.gpuid)
             input_text = input_text.cuda(args.gpuid)
+            segment_imgs = segment_imgs.cuda(args.gpuid)
 
         torch.cuda.synchronize(device=args.gpuid)
-
-        if not args.il_measure:
+        # import ipdb;ipdb.set_trace()
+        if not args.il_measure:  #go this way
             # ONE
-            scores = model(input_visual, input_text, lengths)
-            loss = utils.calcul_contraloss(args, scores, input_visual.size(0), margin, max_violation=max_violation)
+            scores = model(input_visual, input_text, lengths,
+                           segment_imgs,
+                           )
+            loss = utils.calcul_contraloss(
+                        args, 
+                        scores, 
+                        input_visual.size(0), 
+                        margin, 
+                        max_violation=max_violation
+                )
 
         else:
             scores,scores_intra_img,scores_intra_cap = model(input_visual, input_text, lengths)
