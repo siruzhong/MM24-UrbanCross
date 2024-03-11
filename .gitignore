@@ -8,7 +8,7 @@ __pycache__/
 aid_28-rsp-resnet-50-ckpt.pth
 rs_data.zip
 rs_data
-checkpoint/rsitmd/SWAN/SWAN_best.pth.tar
+# checkpoint/rsitmd/SWAN/SWAN_best.pth.tar
 .vector_cache
 outputs/*
 checkpoint/*

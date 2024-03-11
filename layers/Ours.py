@@ -11,6 +11,9 @@ import torch
 import torch.nn as nn
 import torch.nn.init
 from .resnet import resnet50
+# import ipdb;ipdb.set_trace()
+import sys
+sys.path.append('..')
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
 #============
@@ -29,11 +32,11 @@ class SWAN(nn.Module):
             output_dict=True,
         )
         self.clip_model1 = copy.deepcopy(self.clip_model)
-        self.clip_model2 = copy.deepcopy(self.clip_model)
-        self.clip_model3 = copy.deepcopy(self.clip_model)
+        # self.clip_model2 = copy.deepcopy(self.clip_model)
+        # self.clip_model3 = copy.deepcopy(self.clip_model)
         del self.clip_model1.visual
-        del self.clip_model2.visual
-        del self.clip_model3.visual
+        # del self.clip_model2.visual
+        # del self.clip_model3.visual
         self.clip_img_seg = copy.deepcopy(self.clip_model)
         del self.clip_img_seg.transformer
         # self.tokenizer = open_clip.get_tokenizer("ViT-L-14")
@@ -49,28 +52,32 @@ class SWAN(nn.Module):
         # # Text Coarse-Grained Enhancement Module
         # self.tcge = TCGE(args)
 
-
         self.sam = sam_model_registry['vit_h'](checkpoint='sam_vit_h_4b8939.pth')
         # sam.to(device=device)
 
         self.mask_generator = SamAutomaticMaskGenerator(self.sam)
 
-    def forward(self, img , text, lengths,
+    def forward(self, img , text, input_tags,
+                # lengths,
                 segment_imgs
+                # images, ids, cap_tokens, segment_img, tag_tokens
                 ):
         #img [bs,3,256,256]
         # text是[bs,30]
         
-        title = copy.deepcopy(text)
-        ingredients = copy.deepcopy(text)
-        instructions = copy.deepcopy(text)
+        # import ipdb;ipdb.set_trace()
+        # title = copy.deepcopy(text)
+        # ingredients = copy.deepcopy(text)
+        # instructions = copy.deepcopy(text)
         clip_model_out = self.clip_model(img, text)
         
-        # import ipdb;ipdb.set_trace()
-        title_emb = self.clip_model1.encode_text(title)
-        ingredients_emb = self.clip_model2.encode_text(ingredients)
-        instructions_emb = self.clip_model3.encode_text(instructions)
-        tags_emb = torch.cat((title_emb,ingredients_emb,instructions_emb), dim=1)
+        # title_emb = self.clip_model1.encode_text(title)
+        # ingredients_emb = self.clip_model2.encode_text(ingredients)
+        # instructions_emb = self.clip_model3.encode_text(instructions)
+        # tags_emb = torch.cat((title_emb,ingredients_emb,instructions_emb), dim=1)
+        
+        tags_emb = self.clip_model1.encode_text(input_tags)
+        
         # ipdb> clip_model_out.keys()
         # dict_keys(['image_features', 'text_features', 'logit_scale'])
         
@@ -121,7 +128,7 @@ class SWAN(nn.Module):
         sim_seg2tag = cosine_sim(img_seg_emb, tags_emb)
         # sims = cosine_sim(img_emb, text_emb)
         #sims [bs,bs]
-        
+        import ipdb; ipdb.set_trace()
         # return sims
         return sim_img2text, sim_img2tag, sim_seg2text, sim_seg2tag
 #=========================

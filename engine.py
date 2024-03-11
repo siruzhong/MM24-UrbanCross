@@ -31,7 +31,9 @@ def train(args, train_loader, model, optimizer, epoch):
     params = list(model.parameters())
 
     for i, train_data in enumerate(train_loader):
-        images, captions, lengths, ids, tokens_clip, segment_imgs = train_data
+        images, ids, cap_tokens, segment_imgs, tag_tokens = train_data
+        # images, ids, cap_tokens, segment_img, tag_tokens
+    
 
         batch_size = images.size(0)
         margin = float(margin)
@@ -43,20 +45,24 @@ def train(args, train_loader, model, optimizer, epoch):
         # import ipdb; ipdb.set_trace()
         segment_imgs = Variable(segment_imgs)
         # input_text = Variable(captions)
-        input_text = Variable(tokens_clip)
-        
+        input_text = Variable(cap_tokens)
+        input_tags = Variable(tag_tokens)
         # import ipdb;ipdb.set_trace()
 
         if torch.cuda.is_available():
             input_visual = input_visual.cuda(args.gpuid)
             input_text = input_text.cuda(args.gpuid)
             segment_imgs = segment_imgs.cuda(args.gpuid)
-
+            input_tags = input_tags.cuda(args.gpuid)
+            
         torch.cuda.synchronize(device=args.gpuid)
         # import ipdb;ipdb.set_trace()
         if not args.il_measure:  #go this way
             # ONE
-            scores = model(input_visual, input_text, lengths,
+            scores = model(input_visual, 
+                           input_text, 
+                           input_tags,
+                        #    lengths,
                            segment_imgs,
                            )
             loss = utils.calcul_contraloss(
@@ -308,7 +314,12 @@ def test(args, test_loader, model):
     embed_end = time.time()
     print("## embedding time: {:.2f} s".format(embed_end-embed_start))
 
-    d = utils.shard_dis_SWAN(args, input_visual, input_text, model, lengths=input_text_lengeth)
+    d = utils.shard_dis_SWAN(args, 
+                             input_visual, 
+                             input_text, 
+                             model, 
+                             lengths=input_text_lengeth
+                             )
 
     end = time.time()
     print("calculate similarity time: {:.2f} s".format(end - start))

@@ -269,6 +269,7 @@ def srr_t2i(sim, all_class_idxs, r):
         cnt_idxs.append(list(inds_r))
     # return cnt_pro,cnt_idxs
     return np.average(cnt_pro)
+
 # 分块计算距离
 def shard_dis_SWAN(args, images, captions, model, lengths):
     """compute image-caption pairwise distance during validation and test"""
