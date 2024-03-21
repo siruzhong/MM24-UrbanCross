@@ -43,7 +43,10 @@ def parser_options():
     parser.add_argument('--eval_step', default=1, type=int, help="the epochs of eval")
     parser.add_argument('--test_step', default=0, type=int, help="the epochs of test")
     parser.add_argument('--batch_size', default=100, type=int, help="Batch train size")
-    parser.add_argument('--batch_size_val', default=100, type=int, help="Batch val size")
+    parser.add_argument('--batch_size_source', default=100, type=int, help="Batch train size")
+    parser.add_argument('--batch_size_target', default=100, type=int, help="Batch train size")  
+    parser.add_argument('--batch_size_val_source', default=100, type=int, help="Batch val size")
+    parser.add_argument('--batch_size_val_target', default=100, type=int, help="Batch val size")
     parser.add_argument('--shard_size', default=256, type=int, help="Batch shard size")
     parser.add_argument('--workers', default=3, type=int, help="the worker num of dataloader")
     parser.add_argument('-kf', '--k_fold_nums', default=1, type=int, help="the total num of k_flod")
@@ -107,16 +110,20 @@ def parser_options():
         type=str, 
         default='./outputs',
     )
-
     parser.add_argument(
         "--country", 
+        type=str, 
+        # default='Finland',
+    )
+    parser.add_argument(
+        "--country_source", 
         type=str, 
         default='Finland',
     )
     parser.add_argument(
-        "--num_seg", 
-        type=int, 
-        default=10,
+        "--country_target", 
+        type=str, 
+        default='Finland',
     )
     # parser.add_argument(
     #         "--experiment_name",
@@ -181,67 +188,61 @@ def main(args):
         raise NotImplementedError
 
     # remove last train_info txt
-    # path_train_info = args.ckpt_save_path + args.model_name + "_" + args.data_name + ".txt"
+    path_train_info = args.ckpt_save_path + args.model_name + "_" + args.data_name + ".txt"
     # 'checkpoint/rsitmd/SWAN/SWAN_rsitmd.txt'
     
     # import ipdb;ipdb.set_trace()
-    # if os.path.exists(path_train_info):
-    #     os.remove(path_train_info)
+    if os.path.exists(path_train_info):
+        os.remove(path_train_info)
     # make ckpt save dir
-    # if not os.path.exists(args.ckpt_save_path) and args.rank == 0:
-    #     os.makedirs(args.ckpt_save_path)
+    if not os.path.exists(args.ckpt_save_path) and args.rank == 0:
+        os.makedirs(args.ckpt_save_path)
 
     # print & save args
-    logger.info(args.__dict__)
-    # utils.log_to_txt(contexts='# Hyper Parameters setting', filename=path_train_info)
-    # utils.log_to_txt(contexts=args.__dict__, filename=path_train_info)
-    # utils.log_to_txt(contexts='-------------------------', filename=path_train_info)
-    # utils.log_to_txt(contexts='', filename=path_train_info)
+
+    utils.log_to_txt(contexts='# Hyper Parameters setting', filename=path_train_info)
+    utils.log_to_txt(contexts=args.__dict__, filename=path_train_info)
+    utils.log_to_txt(contexts='-------------------------', filename=path_train_info)
+    utils.log_to_txt(contexts='', filename=path_train_info)
 
     # make vocab
-    # vocab = deserialize_vocab(args.vocab_path) #./vocab/rsitmd_splits_vocab.json
+    vocab = deserialize_vocab(args.vocab_path) #./vocab/rsitmd_splits_vocab.json
     
 
     # Create dataset, model, criterion and optimizer
     # train_loader, val_loader = data.get_loaders(args, vocab)
-    train_loader, val_loader = data.get_loaders_mine(args, 
-                                                    #  vocab
-                                                     )
+    train_loader_source, train_loader_target, val_loader_source, val_loader_target = data.get_loaders_finetune(
+                                    args, 
+                                    vocab
+                               )
     if args.test_step:
-        test_loader = data.get_test_loader(args, 
-                                        #    vocab
-                                           )
-    print("len of train_loader is {}, len of val_loader is {}".format(len(train_loader), len(val_loader)))
+        test_loader = data.get_test_loader(args, vocab)
+    print(f"len of train_loader is {train_loader_source}(source)/{train_loader_target}(target), len of val_loader is {val_loader_source}(source)/{val_loader_target}(target)")
 
-    model = models.factory(args,
-                        #    vocab.word2idx,
+    # model = models.factory(args,
+    #                        vocab.word2idx,
+    #                        cuda=True, 
+    #                        data_parallel=args.distributed
+    #                        )
+    model = models.factory_finetune(args,
+                           vocab.word2idx,
                            cuda=True, 
                            data_parallel=args.distributed
                            )
-
     # print & save model info
     if args.rank == 0:
-        # path_model_info = args.ckpt_save_path + args.model_name + "_info.txt"
-        # if os.path.exists(path_model_info):
-        #     os.remove(path_model_info)
-        # log = open(path_model_info, mode="a", encoding="utf-8")
-        # print("Total Params: ", sum(p.numel() for p in model.parameters()))
-        # print("Total Requires_grad Params: ", sum(p.numel() for p in model.parameters() if p.requires_grad))
-        # print("Total Params: ", sum(p.numel() for p in model.parameters()), file=log)
-        # print("Total Requires_grad Params: ", sum(p.numel() for p in model.parameters() if p.requires_grad), file=log)
-        total_params = sum(p.numel() for p in model.parameters())
-        total_requires_grad_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-        total_params_mb = total_params / (1024 * 1024)
-        total_requires_grad_params_mb = total_requires_grad_params / (1024 * 1024)
+        path_model_info = args.ckpt_save_path + args.model_name + "_info.txt"
+        if os.path.exists(path_model_info):
+            os.remove(path_model_info)
+        log = open(path_model_info, mode="a", encoding="utf-8")
+        print("Total Params: ", sum(p.numel() for p in model.parameters()))
+        print("Total Requires_grad Params: ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+        print("Total Params: ", sum(p.numel() for p in model.parameters()), file=log)
+        print("Total Requires_grad Params: ", sum(p.numel() for p in model.parameters() if p.requires_grad), file=log)
+        print("========================================================", file=log)
+        print(model, file=log)
+        print("========================================================", file=log)
 
-        logger.info("Total Params: {:.2f} MB".format(total_params_mb))
-        logger.info("Total Requires_grad Params: {:.2f} MB".format(total_requires_grad_params_mb))
-        # print("Total Params: {:.2f} MB".format(total_params_mb), file=log)
-        # print("Total Requires_grad Params: {:.2f} MB".format(total_requires_grad_params_mb), file=log)
-        # print("========================================================", file=log)
-        logger.info(model)
-        # print("========================================================", file=log)
-    # import ipdb; ipdb.set_trace()
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
     # optionally resume from a checkpoint
@@ -260,7 +261,7 @@ def main(args):
          
             # Eiters is used to show logs as the continuation of another
             # training
-            # model.Eiters = checkpoint['Eiters']
+            model.Eiters = checkpoint['Eiters']
    
             print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})"
                   .format(args.resume, start_epoch, best_rsum))
@@ -271,19 +272,23 @@ def main(args):
 
     # Train the Model
     for epoch in range(start_epoch, args.epochs):
+
         if args.distributed:
             train_loader.sampler.set_epoch(epoch)
 
-        # decayed by 10 every 30 epochs
-        utils.adjust_learning_rate(args, 
-                                   optimizer, 
-                                   epoch)
+        utils.adjust_learning_rate(args, optimizer, epoch)
 
         # # test validate
         # engine.validate(args, val_loader, model)
-        # engine.validate_test(args, val_loader, model)
+
         # train for one epoch
-        engine.train(args, train_loader, model, optimizer, epoch)
+        engine.train_finetune(args, 
+                              train_loader_source,
+                              train_loader_target,
+                              model, 
+                              optimizer, 
+                              epoch
+                              )
 
         # evaluate on validation set
         if (epoch + 1) % args.eval_step == 0:
@@ -302,51 +307,43 @@ def main(args):
                         'model': model.state_dict(),
                         'best_rsum': best_rsum,
                         'args': args,
-                        # 'Eiters': model.Eiters,
+                        'Eiters': model.Eiters,
                     },
                     is_best,
                     filename='ckpt_{}_{}_{:.2f}.pth.tar'.format(args.model_name ,epoch, best_rsum),
                     prefix=args.ckpt_save_path,
-                    model_name=args.model_name
-                )
-                # print('')
-                logger.info("================ evaluate result on val set =====================")
-                # print("Current => [{}/{}] fold & [{}/{}] epochs"
-                #       .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs))
-                logger.info("[{}/{}] epochs"
-                      .format(epoch + 1, args.epochs))
-                
-                logger.info("Now val score:")
-                logger.info(all_scores)
-                logger.info("Best val score:")
-                logger.info(best_score)
-                # print("=================================================================")
-                # print('')
+                    model_name=args.model_name)
+                print('')
+                print("================ evaluate result on val set =====================")
+                print("Current => [{}/{}] fold & [{}/{}] epochs"
+                      .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs))
+                print("Now val score:")
+                print(all_scores)
+                print("Best val score:")
+                print(best_score)
+                print("=================================================================")
+                print('')
 
-                # utils.log_to_txt(contexts="",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="================ evaluate on val set ============================",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="Current => [{}/{}] fold & [{}/{}] epochs"
-                #                  .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs),
-                #                  filename=path_train_info)
-                # utils.log_to_txt("Now val score:",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts=all_scores, filename=path_train_info)
-                # utils.log_to_txt("Best val score:",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(best_score, filename=path_train_info)
-                # utils.log_to_txt(contexts="=================================================================",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="",
-                #                  filename=path_train_info)
-
+                utils.log_to_txt(contexts="",
+                                 filename=path_train_info)
+                utils.log_to_txt(contexts="================ evaluate on val set ============================",
+                                 filename=path_train_info)
+                utils.log_to_txt(contexts="Current => [{}/{}] fold & [{}/{}] epochs"
+                                 .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs),
+                                 filename=path_train_info)
+                utils.log_to_txt("Now val score:",
+                                 filename=path_train_info)
+                utils.log_to_txt(contexts=all_scores, filename=path_train_info)
+                utils.log_to_txt("Best val score:",
+                                 filename=path_train_info)
+                utils.log_to_txt(best_score, filename=path_train_info)
+                utils.log_to_txt(contexts="=================================================================",
+                                 filename=path_train_info)
+                utils.log_to_txt(contexts="",
+                                 filename=path_train_info)
         # evaluate on test set
         if args.test_step and (epoch + 1) % args.test_step == 0:
-            rsum_, all_scores_ = engine.validate_test(args, 
-                                                      test_loader, 
-                                                      model
-                                                      )
+            rsum_, all_scores_ = engine.validate_test(args, test_loader, model)
 
             is_best_ = rsum_ > best_rsum_
             if is_best_:
@@ -354,34 +351,34 @@ def main(args):
             best_rsum_ = max(rsum_, best_rsum_)
 
             if args.rank == 0:
-                # print('')
-                logger.info("================ evaluate result on test set =====================")
-                logger.info("[{}/{}] epochs"
-                      .format(epoch + 1, args.epochs))
-                logger.info("Now test score:")
-                logger.info(all_scores_)
-                logger.info("Best test score:")
-                logger.info(best_score_)
-                # logger.info("=================================================================")
-                # print('')
+                print('')
+                print("================ evaluate result on test set =====================")
+                print("Current => [{}/{}] fold & [{}/{}] epochs"
+                      .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs))
+                print("Now test score:")
+                print(all_scores_)
+                print("Best test score:")
+                print(best_score_)
+                print("=================================================================")
+                print('')
 
-                # utils.log_to_txt(contexts="",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="================ evaluate on test set ============================",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="Current => [{}/{}] fold & [{}/{}] epochs"
-                #                  .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs),
-                #                  filename=path_train_info)
-                # utils.log_to_txt("Now test score:",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts=all_scores_,filename=path_train_info)
-                # utils.log_to_txt("Best test score:",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(best_score_,filename=path_train_info)
-                # utils.log_to_txt(contexts="=================================================================",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="",
-                #                  filename=path_train_info)
+                utils.log_to_txt(contexts="",
+                                 filename=path_train_info)
+                utils.log_to_txt(contexts="================ evaluate on test set ============================",
+                                 filename=path_train_info)
+                utils.log_to_txt(contexts="Current => [{}/{}] fold & [{}/{}] epochs"
+                                 .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs),
+                                 filename=path_train_info)
+                utils.log_to_txt("Now test score:",
+                                 filename=path_train_info)
+                utils.log_to_txt(contexts=all_scores_,filename=path_train_info)
+                utils.log_to_txt("Best test score:",
+                                 filename=path_train_info)
+                utils.log_to_txt(best_score_,filename=path_train_info)
+                utils.log_to_txt(contexts="=================================================================",
+                                 filename=path_train_info)
+                utils.log_to_txt(contexts="",
+                                 filename=path_train_info)
 
     if args.distributed:
         # destroy process
@@ -538,29 +535,28 @@ if __name__ == '__main__':
     args = parser_options()
 
     # make logger
-    # logger_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/"
+    logger_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/"
     # tb_logger.configure(logger_path, flush_secs=5)
     # logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
-    # import ipdb; ipdb.set_trace()
+
     # k_fold verify
-    # for k in range(args.k_fold_nums):
-    #     print("Start {}th fold, total {} flod".format(k + 1, args.k_fold_nums))
+    for k in range(args.k_fold_nums):
 
-    #     # update save path
+        print("Start {}th fold, total {} flod".format(k + 1, args.k_fold_nums))
 
-    #     args_new = update_options_savepath(args, k)
+        # update save path
 
-    #     # generate random train and val samples
-    #     if not args.fix_data:
-    #         if args_new.step_sample:
-    #             generate_stratified_random_samples(args_new)
-    #         else:
-    #             generate_random_samples(args_new)
-    #     else:
-    #         print('==> This experiment uses fixed data partition <==')
-    #         args_new.data_path = './fix_data/'+ args_new.data_name + '_precomp/'
+        args_new = update_options_savepath(args, k)
+
+        # generate random train and val samples
+        if not args.fix_data:
+            if args_new.step_sample:
+                generate_stratified_random_samples(args_new)
+            else:
+                generate_random_samples(args_new)
+        else:
+            print('==> This experiment uses fixed data partition <==')
+            args_new.data_path = './fix_data/'+ args_new.data_name + '_precomp/'
 
         # run experiment
-    
-    # main(args_new)
-    main(args)
+        main(args_new)

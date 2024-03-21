@@ -91,11 +91,11 @@ def show_masks_mine(anns, ori_img, img_path):
 
 
 if __name__ == '__main__':
+    img_path = 'urbancross_data/images_target/Finland/images'
+    df = pd.read_csv('urbancross_data/images_target/Finland/captions.csv')
+    
     sam_checkpoint = "sam_vit_h_4b8939.pth"
     model_type = "vit_h"
-    # img_path = 'rs_data/rsitmd/images_rgb'
-    img_path = 'urbancross_data/images_target/Spain/images'
-    df = pd.read_csv('urbancross_data/images_target/Spain/captions_top30.csv')
 
     sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
     sam.to(device='cuda')
@@ -112,7 +112,12 @@ if __name__ == '__main__':
     # for idx, i in enumerate(tqdm(img_lists[::-1][21000:])):
     # for idx, i in enumerate(tqdm(img_lists[::-1][28000:])):
     # for idx, i in enumerate(tqdm(img_lists[::-1][35000:])):
-    for idx, i in enumerate(tqdm(img_lists[::-1][42000:])):
+    # for idx, i in enumerate(tqdm(img_lists)):
+    # for idx, i in enumerate(tqdm(img_lists[10000:])):
+    # for idx, i in enumerate(tqdm(img_lists[20000:])):
+    # for idx, i in enumerate(tqdm(img_lists[30000:])):
+    # for idx, i in enumerate(tqdm(img_lists[40000:])):
+    for idx, i in enumerate(tqdm(img_lists[50000:])):
         seg_path = os.path.join(img_path[:-6] + 'image_segments/', i.split('.')[0])
         # seg_path = os.path.join(img_path[:-6] + 'image_segments/', img_name)
         if os.path.exists(seg_path):
@@ -120,6 +125,7 @@ if __name__ == '__main__':
         # import ipdb;ipdb.set_trace()
         # seg_path = os.path.join(img_path.replace('images_rgb', 'image_segments').split('.')[0], i.split('.')[0])
         # image = cv2.imread('../SWAN-pytorch-main/rs_data/rsitmd/images_rgb/airport_2.jpg')
+        # print(os.path.join(img_path, i))
         image = cv2.imread(os.path.join(img_path, i))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         #image [256,256,3]
@@ -138,8 +144,6 @@ if __name__ == '__main__':
         # ipdb> masks[0].keys()
         # dict_keys(['segmentation', 'area', 'bbox', 'predicted_iou', 'point_coords', 'stability_score', 'crop_box'])
 
-        # print(len(masks))
-        # print(masks[0].keys())
         plt.imshow(image)
         show_anns(masks, image, os.path.join(img_path, i))
         masks = masks[:10]

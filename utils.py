@@ -12,6 +12,8 @@ import torch.distributed as dist
 import seaborn as sns
 from matplotlib import pyplot as plt
 import wandb
+import pynvml
+from loguru import logger
 
 # 从npy中读取
 def load_from_npy(filename):
@@ -83,6 +85,7 @@ def calcul_contraloss(args,
                       size, 
                       margin, 
                       max_violation=False):
+    
     diagonal = scores.diag().view(size, 1)
 
     d1 = diagonal.expand_as(scores)
@@ -92,6 +95,7 @@ def calcul_contraloss(args,
     # caption retrieval
     cost_s = (margin + scores - d1).clamp(min=0)
     # compare every diagonal score to scores in its row
+    
     # image retrieval
     cost_im = (margin + scores - d2).clamp(min=0)
 
@@ -163,19 +167,59 @@ def acc_train(input):
     return acc, recall, precision
 
 
+def acc_i2t_mine(similarity_matrix):
+    #code from gpt
+    
+    # 计算检索指标
+    bs = similarity_matrix.shape[0]
+    # similarity_matrix = similarity_matrix.cpu().detach().numpy()
+
+    # import ipdb; ipdb.set_trace()
+    # 计算r1, r5, r10
+    ranks = []
+    for i in range(bs):
+        rank = (similarity_matrix[i, :] > similarity_matrix[i, i]).sum() + 1
+        ranks.append(rank)
+    ranks = torch.tensor(ranks)
+    r1 = (ranks <= 1).float().mean().item()
+    r5 = (ranks <= 5).float().mean().item()
+    r10 = (ranks <= 10).float().mean().item()
+    # import ipdb; ipdb.set_trace()
+    # 计算medr, meanr
+    medr = torch.median(ranks.float()).item()
+    meanr = ranks.float().mean().item()
+
+    # 计算top1
+    top1 = (ranks == 1).float().mean().item()
+
+    # return r1, r5, r10, medr, meanr, top1
+    return (r1, r5, r10, medr, meanr), (ranks, top1)
+
 def acc_i2t(input):
     """Computes the precision@k for the specified values of k of i2t"""
     # input = collect_match(input).numpy()
+    #input shape [len(images), len(captions)]
+    
     image_size = input.shape[0]
-    ranks = np.zeros(image_size)
+    ranks = np.zeros(image_size) #每个图像的排名
     top1 = np.zeros(image_size)
 
+    # import ipdb; ipdb.set_trace()
+    # 遍历每个图像
+    # 对于每个图像，根据其匹配得分从高到低排序，然后找到前5个匹配的索引，并计算排名rank
+    # 排名是指该图像匹配到的最高排名文本的索引位置
     for index in range(image_size):
+        #np.argsort从小到大，[::-1]变成从大到小
         inds = np.argsort(input[index])[::-1]
         # Score
         rank = 1e20
+        
+        # 遍历当前图像的前5个匹配得分最高的text的索引
         for i in range(5 * index, 5 * index + 5, 1):
-            tmp = np.where(inds == i)[0][0]
+            # import ipdb; ipdb.set_trace()
+            # tmp = np.where(inds == i)[0][0]
+            print(np.where(inds == i)[0])
+            tmp = np.where(inds == i)[0].item()
             if tmp < rank:
                 rank = tmp
         ranks[index] = rank
@@ -185,7 +229,9 @@ def acc_i2t(input):
     r1 = 100.0 * len(np.where(ranks < 1)[0]) / len(ranks)
     r5 = 100.0 * len(np.where(ranks < 5)[0]) / len(ranks)
     r10 = 100.0 * len(np.where(ranks < 10)[0]) / len(ranks)
+    # 中位数排名 median rank
     medr = np.floor(np.median(ranks)) + 1
+    # 平均排名 mean rank
     meanr = ranks.mean() + 1
 
     return (r1, r5, r10, medr, meanr), (ranks, top1)
@@ -215,6 +261,33 @@ def acc_t2i(input):
     meanr = ranks.mean() + 1
 
     return (r1, r5, r10, medr, meanr), (ranks, top1)
+
+# def acc_t2i_mine(input):
+#     #code from gpt
+#     """Computes the precision@k for the specified values of k of t2i"""
+#     # input = collect_match(input).numpy()
+#     image_size = input.shape[0]
+#     ranks = np.zeros(5 * image_size)
+#     top1 = np.zeros(5 * image_size)
+
+#     # --> (5N(caption), N(image))
+#     input = input.T
+
+#     for index in range(image_size):
+#         for i in range(5):
+#             inds = np.argsort(input[5 * index + i])[::-1]
+#             ranks[5 * index + i] = np.where(inds == index)[0][0]
+#             top1[5 * index + i] = inds[0]
+
+#     # Compute metrics
+#     r1 = 100.0 * len(np.where(ranks < 1)[0]) / len(ranks)
+#     r5 = 100.0 * len(np.where(ranks < 5)[0]) / len(ranks)
+#     r10 = 100.0 * len(np.where(ranks < 10)[0]) / len(ranks)
+#     medr = np.floor(np.median(ranks)) + 1
+#     meanr = ranks.mean() + 1
+
+#     return (r1, r5, r10, medr, meanr), (ranks, top1)
+
 # 计算同类映射
 def cal_class_idxs(class_):
     all_class_idxs = []
@@ -248,6 +321,16 @@ def srr_i2t(sim, all_class_idxs, r):
     # return cnt_pro, cnt_idxs
     return np.average(cnt_pro)
 
+def get_GPU_usage():
+    pynvml.nvmlInit()
+    device_count = pynvml.nvmlDeviceGetCount()
+    for i in range(device_count):
+        handle = pynvml.nvmlDeviceGetHandleByIndex(i)
+        info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        logger.info(f"GPU {i}: Total memory: {info.total/1024**3:.2f} GB, Used memory: {info.used/1024**3:.2f} GB, Memory utilization: {(info.used/info.total)*100:.2f}%")
+        
+    pynvml.nvmlShutdown()
+    
 # 计算同类场景检索排序指标-t2i
 def srr_t2i(sim, all_class_idxs, r):
     """Computes the scene retrieval ranking of k of t2i"""
@@ -271,11 +354,19 @@ def srr_t2i(sim, all_class_idxs, r):
     return np.average(cnt_pro)
 
 # 分块计算距离
-def shard_dis_SWAN(args, images, captions, model, lengths):
+# 分片计算距离的主要原因是内存管理。在处理大量数据时，一次性加载所有数据到内存可能会导致内存溢出。通过将数据分成更小的片段（或分片），我们可以一次只处理一部分数据，从而有效地管理内存使用。
+def shard_dis_SWAN(args, 
+                   images, 
+                   captions, 
+                   model, 
+                   lengths):
     """compute image-caption pairwise distance during validation and test"""
     # l1 = len(images)
     # l2 = len(captions)
+    
+    #图片分成多少块
     n_im_shard = (len(images) - 1) // args.shard_size + 1
+    #text分成多少块
     n_cap_shard = (len(captions) - 1) // args.shard_size + 1
 
     d = np.zeros((len(images), len(captions)))
@@ -306,6 +397,59 @@ def shard_dis_SWAN(args, images, captions, model, lengths):
 
                 d[im_start:im_end, cap_start:cap_end] = sim.data.cpu().numpy()
 
+    print("infer time:{:.2f}".format(np.average(all)))
+    print("==> end to compute image-caption pairwise distance <==")
+    return d
+
+# 分块计算距离
+# 分片计算距离的主要原因是内存管理。在处理大量数据时，一次性加载所有数据到内存可能会导致内存溢出。通过将数据分成更小的片段（或分片），我们可以一次只处理一部分数据，从而有效地管理内存使用。
+def shard_dis_mine(args, 
+                   images, 
+                   captions, 
+                   segments,
+                   model, 
+                #    lengths
+                   ):
+    """compute image-caption pairwise distance during validation and test"""
+    # l1 = len(images)
+    # l2 = len(captions)
+    
+    #图片分成多少块
+    n_img_shard = (len(images) - 1) // args.shard_size + 1
+    #text分成多少块
+    n_cap_shard = (len(captions) - 1) // args.shard_size + 1
+
+    d = np.zeros((len(images), len(captions)))
+    all = []
+    print("==> start to compute image-caption pairwise distance <==")
+    for i in range(n_img_shard):
+        img_start, img_end = args.shard_size * i, min(args.shard_size * (i + 1), len(images))
+
+        print("Calculate the similarity in batches: [{}/{}]".format(i, n_img_shard))
+
+        for j in range(n_cap_shard):
+            cap_start, cap_end = args.shard_size * j, min(args.shard_size * (j + 1), len(captions))
+            with torch.no_grad():
+                # img = torch.from_numpy(images[img_start:img_end]).float().cuda(args.gpuid)
+                img = images[img_start:img_end].cuda(args.gpuid)
+
+                texts = captions[cap_start:cap_end].cuda(args.gpuid)
+                segs = segments[img_start:img_end].cuda(args.gpuid)
+                # l = lengths[cap_start:cap_end]
+                t1 = time.time()
+                # if args.il_measure:
+                #     sim,_,_ = model(im, s, l)
+                # else:
+                sim_img2text, sim_seg2text = model(img, texts, segs)
+                sim = sim_img2text
+                t2 = time.time()
+                all.append(t2 - t1)
+
+                # sim = sim.squeeze()
+
+                d[img_start:img_end, cap_start:cap_end] = sim.data.cpu().numpy()
+
+    # import ipdb; ipdb.set_trace()
     print("infer time:{:.2f}".format(np.average(all)))
     print("==> end to compute image-caption pairwise distance <==")
     return d
@@ -349,7 +493,7 @@ def save_checkpoint(state, is_best, filename, prefix='', model_name=None):
         try:
             # torch.save(state, prefix + filename)
             if is_best:
-                torch.save(state, prefix + model_name + '_best.pth.tar')
+                torch.save(state, prefix + model_name + '_best.pth')
 
         except IOError as e:
             error = e
