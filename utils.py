@@ -454,6 +454,65 @@ def shard_dis_mine(args,
     print("==> end to compute image-caption pairwise distance <==")
     return d
 
+# 分块计算距离
+# 分片计算距离的主要原因是内存管理。在处理大量数据时，一次性加载所有数据到内存可能会导致内存溢出。通过将数据分成更小的片段（或分片），我们可以一次只处理一部分数据，从而有效地管理内存使用。
+def shard_dis_mine_finetune(args, 
+                   images, 
+                   captions, 
+                #    segments,
+                   model, 
+                #    lengths
+                   ):
+    """compute image-caption pairwise distance during validation and test"""
+    # l1 = len(images)
+    # l2 = len(captions)
+    
+    #图片分成多少块
+    n_img_shard = (len(images) - 1) // args.shard_size + 1
+    #text分成多少块
+    n_cap_shard = (len(captions) - 1) // args.shard_size + 1
+
+    d = np.zeros((len(images), len(captions)))
+    all = []
+    print("==> start to compute image-caption pairwise distance <==")
+    for i in range(n_img_shard):
+        img_start, img_end = args.shard_size * i, min(args.shard_size * (i + 1), len(images))
+
+        print("Calculate the similarity in batches: [{}/{}]".format(i, n_img_shard))
+
+        for j in range(n_cap_shard):
+            cap_start, cap_end = args.shard_size * j, min(args.shard_size * (j + 1), len(captions))
+            with torch.no_grad():
+                # img = torch.from_numpy(images[img_start:img_end]).float().cuda(args.gpuid)
+                img = images[img_start:img_end].cuda(args.gpuid)
+
+                texts = captions[cap_start:cap_end].cuda(args.gpuid)
+                # segs = segments[img_start:img_end].cuda(args.gpuid)
+                # l = lengths[cap_start:cap_end]
+                t1 = time.time()
+                # if args.il_measure:
+                #     sim,_,_ = model(im, s, l)
+                # else:
+                sim_img2text= model(img,
+                                    img, 
+                                    texts,
+                                    texts, 
+                                    val=True,
+                                    )
+                sim = sim_img2text
+                t2 = time.time()
+                all.append(t2 - t1)
+
+                # sim = sim.squeeze()
+
+                d[img_start:img_end, cap_start:cap_end] = sim.data.cpu().numpy()
+
+    # import ipdb; ipdb.set_trace()
+    print("infer time:{:.2f}".format(np.average(all)))
+    print("==> end to compute image-caption pairwise distance <==")
+    return d
+
+
 # 导出图像向量和文本向量
 def save_img_text_emb(args, images, captions, model, lengths):
     """compute image-caption pairwise distance during validation and test"""
@@ -485,15 +544,22 @@ def save_img_text_emb(args, images, captions, model, lengths):
     return img_emb_all[1:,:], text_emb_all[1:,:]
 
 # 保存模型文件
-def save_checkpoint(state, is_best, filename, prefix='', model_name=None):
+def save_checkpoint(state, 
+                    # is_best, 
+                    filename, 
+                    prefix='', 
+                    model_name=None
+                    ):
     tries = 15
     error = None
     # deal with unstable I/O. Usually not necessary.
     while tries:
         try:
             # torch.save(state, prefix + filename)
-            if is_best:
-                torch.save(state, prefix + model_name + '_best.pth')
+            # if is_best:
+            # torch.save(state, prefix + model_name + '_best.pth')
+            # torch.save(state, prefix + model_name + filename)
+            torch.save(state, os.path.join(prefix, filename))
 
         except IOError as e:
             error = e
@@ -517,7 +583,7 @@ def adjust_learning_rate(args, optimizer, epoch):
 
         param_group['lr'] = lr
 
-    print("Current lr: {}".format(optimizer.state_dict()['param_groups'][0]['lr']))
+    logger.info("Current lr: {}".format(optimizer.state_dict()['param_groups'][0]['lr']))
 
 
 # ====================================================================
@@ -717,12 +783,17 @@ class LogCollector(object):
     #     for k, v in self.meters.items():
     #         tb_logger.log_value(prefix + k, v.val, step=step)
 
-    def wandb_log(self):
+    def wandb_log(self,
+                  epoch
+                  ):
         """Log using wandb
         """
         # import ipdb;ipdb.set_trace()
         for k, v in self.meters.items():
-            wandb.log({k: v.val})
+            wandb.log({
+                k: v.val,
+                'epoch':epoch,
+        })
             # tb_logger.log_value(prefix + k, v.val, step=step)
     
 

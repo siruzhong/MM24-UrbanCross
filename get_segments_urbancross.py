@@ -91,8 +91,10 @@ def show_masks_mine(anns, ori_img, img_path):
 
 
 if __name__ == '__main__':
-    img_path = 'urbancross_data/images_target/Finland/images'
-    df = pd.read_csv('urbancross_data/images_target/Finland/captions.csv')
+    # img_path = 'urbancross_data/images_target/Finland/images'
+    country = 'Germany'
+    img_path = f'urbancross_data/images_target/{country}/images'
+    df = pd.read_csv(f'urbancross_data/instructblip_generation_with_tag/instructblip_generation_{country.lower()}_refine.csv')
     
     sam_checkpoint = "sam_vit_h_4b8939.pth"
     model_type = "vit_h"
@@ -102,6 +104,7 @@ if __name__ == '__main__':
 
     mask_generator = SamAutomaticMaskGenerator(sam)
 
+    # import ipdb; ipdb.set_trace()
     # image = cv2.imread('notebooks/images/dog.jpg')
     img_lists = df['image_name']
     # import ipdb; ipdb.set_trace()
@@ -112,12 +115,17 @@ if __name__ == '__main__':
     # for idx, i in enumerate(tqdm(img_lists[::-1][21000:])):
     # for idx, i in enumerate(tqdm(img_lists[::-1][28000:])):
     # for idx, i in enumerate(tqdm(img_lists[::-1][35000:])):
-    # for idx, i in enumerate(tqdm(img_lists)):
+    for idx, i in enumerate(tqdm(img_lists)):
     # for idx, i in enumerate(tqdm(img_lists[10000:])):
     # for idx, i in enumerate(tqdm(img_lists[20000:])):
     # for idx, i in enumerate(tqdm(img_lists[30000:])):
     # for idx, i in enumerate(tqdm(img_lists[40000:])):
-    for idx, i in enumerate(tqdm(img_lists[50000:])):
+    # for idx, i in enumerate(tqdm(img_lists[50000:])):
+    # for idx, i in enumerate(tqdm(img_lists[60000:])):
+    # for idx, i in enumerate(tqdm(img_lists[80000:])):
+    # for idx, i in enumerate(tqdm(img_lists[100000:])):
+    # for idx, i in enumerate(tqdm(img_lists[120000:])):
+    # for idx, i in enumerate(tqdm(img_lists[164500:])):
         seg_path = os.path.join(img_path[:-6] + 'image_segments/', i.split('.')[0])
         # seg_path = os.path.join(img_path[:-6] + 'image_segments/', img_name)
         if os.path.exists(seg_path):

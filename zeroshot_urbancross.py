@@ -241,7 +241,7 @@ def main(args):
     #                        cuda=True, 
     #                        data_parallel=args.distributed
     #                        )
-    model = models.factory_finetune(args,
+    model = models.factory_wo_seg(args,
                         #    vocab.word2idx,
                            cuda=True, 
                            data_parallel=args.distributed
@@ -310,13 +310,13 @@ def main(args):
         # engine.validate(args, val_loader, model)
 
         # train for one epoch
-        engine.train_finetune(args, 
-                              train_loader_source,
-                              train_loader_target,
-                              model, 
-                              optimizer, 
-                              epoch
-                              )
+        # engine.train_finetune(args, 
+        #                       train_loader_source,
+        #                       train_loader_target,
+        #                       model, 
+        #                       optimizer, 
+        #                       epoch
+        #                       )
 
         # evaluate on validation set
         if (epoch + 1) % args.eval_step == 0:

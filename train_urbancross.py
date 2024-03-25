@@ -77,7 +77,11 @@ def parser_options():
     parser.add_argument('-p', '--ckpt_save_path', default='checkpoint_fix_data/', type=str,
                         help="the path of checkpoint save")
     parser.add_argument('--print_freq', default=10, type=int,  help="Print result frequency")
-    parser.add_argument('--lr', default=0.0002, type=float, help="learning rate")
+    parser.add_argument('--lr', 
+                        default=2e-4, 
+                        type=float, 
+                        help="learning rate"
+                        )
     parser.add_argument('--lr_update_epoch', default=20, type=int, help="the update epoch of learning rate")
     parser.add_argument('--lr_decay_param', default=0.7, type=float, help="the decay_param of learning rate")
     # SWAN 对比实验调参变量
@@ -149,7 +153,7 @@ def main(args):
     if not args.wandb_id:  #如果没有输入就重新生成
         args.wandb_id = wandb.util.generate_id()
     
-    wandb.login(key='85e61adb4d84c2beadf3bc99937a59d54de9dd08')
+    # wandb.login(key='85e61adb4d84c2beadf3bc99937a59d54de9dd08')
     logger.info(f"wandb id: {args.wandb_id}")
     # import ipdb;ipdb.set_trace()
     wandb.init(
@@ -175,8 +179,8 @@ def main(args):
     # choose model
     if args.model_name == "SWAN":
         from layers import SWAN as models
-    elif args.model_name == "ours":
-        from layers import Ours as models
+    elif args.model_name == "urbancross":
+        from layers import urbancross as models
     else:
         raise NotImplementedError
 
@@ -208,7 +212,8 @@ def main(args):
                                                     #  vocab
                                                      )
     if args.test_step:
-        test_loader = data.get_test_loader(args, 
+        test_loader = data.get_test_loader(
+                                            args, 
                                         #    vocab
                                            )
     print("len of train_loader is {}, len of val_loader is {}".format(len(train_loader), len(val_loader)))
@@ -257,14 +262,20 @@ def main(args):
             start_epoch = checkpoint['epoch']
             best_rsum = checkpoint['best_rsum']
             model.load_state_dict(checkpoint['model'], strict =False)
-         
+        
             # Eiters is used to show logs as the continuation of another
             # training
             # model.Eiters = checkpoint['Eiters']
    
-            print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})"
-                  .format(args.resume, start_epoch, best_rsum))
-            rsum, all_scores = engine.validate(args, val_loader, model)
+            # print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})"
+            #       .format(args.resume, start_epoch, best_rsum))
+            print("=> loaded checkpoint '{}' (epoch {}, best_rsum {:.3f})"
+                .format(args.resume, start_epoch, best_rsum))
+            rsum, all_scores = engine.validate(args, 
+                                               val_loader, 
+                                               model,
+                                               epoch=start_epoch,
+                                               )
             print(all_scores)
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
@@ -287,7 +298,11 @@ def main(args):
 
         # evaluate on validation set
         if (epoch + 1) % args.eval_step == 0:
-            rsum, all_scores = engine.validate(args, val_loader, model)
+            rsum, all_scores = engine.validate(args, 
+                                               val_loader, 
+                                               model,
+                                               epoch
+                                               )
 
             is_best = rsum > best_rsum
             if is_best:
@@ -295,20 +310,22 @@ def main(args):
             best_rsum = max(rsum, best_rsum)
 
             if args.rank == 0:
+                if is_best:
                 # save ckpt
-                utils.save_checkpoint(
-                    {
-                        'epoch': epoch + 1,
-                        'model': model.state_dict(),
-                        'best_rsum': best_rsum,
-                        'args': args,
-                        # 'Eiters': model.Eiters,
-                    },
-                    is_best,
-                    filename='ckpt_{}_{}_{:.2f}.pth.tar'.format(args.model_name ,epoch, best_rsum),
-                    prefix=args.ckpt_save_path,
-                    model_name=args.model_name
-                )
+                    utils.save_checkpoint(
+                        state={
+                            'epoch': epoch + 1,
+                            'model': model.state_dict(),
+                            'best_rsum': best_rsum,
+                            'args': args,
+                            # 'Eiters': model.Eiters,
+                            },
+                        # is_best,
+                        filename=f'ckpt_{args.model_name}_{epoch}_{best_rsum:.2f}.pth',
+                        # .format(args.model_name ,epoch, best_rsum),
+                        prefix=args.ckpt_save_path,
+                        model_name=args.model_name
+                    )
                 # print('')
                 logger.info("================ evaluate result on val set =====================")
                 # print("Current => [{}/{}] fold & [{}/{}] epochs"
