@@ -1,4 +1,20 @@
 datename=$(date +%Y%m%d-%H%M%S)
+# RSICD Dataset
+python train_urbancross.py \
+       --gpuid 0 \
+       --model_name ours \
+       --experiment_name urbancross \
+       --ckpt_save_path outputs/checkpoints/ \
+       --epochs 50 \
+       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/RSICD/images \
+       --country "" \
+       --batch_size 40 \
+       --num_seg 5 \
+       --workers 0 \
+       --data_name rsicd \
+       --test_step 50 \
+       2>&1 | tee -a outputs/logs_$datename.txt
+
 # RSITMD Dataset
 python train_urbancross.py \
        --gpuid 0 \
@@ -6,12 +22,11 @@ python train_urbancross.py \
        --experiment_name urbancross \
        --ckpt_save_path outputs/checkpoints/ \
        --epochs 50 \
-       --image_path urbancross_data/images_target \
-       --country Finland \
+       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/images \
+       --country "" \
        --batch_size 40 \
        --num_seg 5 \
        --workers 0 \
-       |& tee outputs/logs_$datename.txt 2>&1
-       # --k_fold_nums 1 \
-       # --batch_size_val 10\
-       # --data_name rsitmd  \
+       --data_name rsitmd \
+       --test_step 50 \
+       2>&1 | tee -a outputs/logs_$datename.txt

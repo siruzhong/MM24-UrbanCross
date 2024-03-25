@@ -10,5 +10,5 @@ python test_urbancross.py \
        --num_seg 5 \
        --workers 0 \
        --data_name rsicd \
-       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/checkpoints/pretrained_on_rsicd_ours_best.pth \
+       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/checkpoints/ckpt_rsicd_0.26555555934707326.pth \
        2>&1 | tee -a outputs/logs_$datename.txt

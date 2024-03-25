@@ -491,9 +491,9 @@ def save_checkpoint(state, is_best, filename, prefix='', model_name=None):
     # deal with unstable I/O. Usually not necessary.
     while tries:
         try:
-            # torch.save(state, prefix + filename)
             if is_best:
-                torch.save(state, prefix + model_name + '_best.pth')
+                torch.save(state, prefix + filename)
+                # torch.save(state, prefix + model_name + '_best.pth')
 
         except IOError as e:
             error = e
@@ -647,8 +647,16 @@ def write_excel_file(folder_path, file_name, headers, result):
         print('***** generate excel file ' + result_path + ' *****')
 
 
-# Random seed
 def setup_seed(seed):
+    """
+    Set up the random seed for reproducibility.
+
+    Args:
+        seed (int): The random seed value.
+
+    Returns:
+        None
+    """
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)  # CPU
