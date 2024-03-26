@@ -14,69 +14,57 @@ import open_clip
 
 class PrecompDataset(data.Dataset):
     """
-    Load precomputed captions and image features
+    Dataset class for loading precomputed captions and image features.
     """
 
     def __init__(self, args, data_split, vocab):
+        """
+        Initialize the PrecompDataset.
+
+        Args:
+            args (argparse.Namespace): Parsed arguments.
+            data_split (str): Data split ("train", "val", or "test").
+            vocab (Vocabulary): Vocabulary object.
+        """
         self.vocab = vocab
-        self.loc = args.data_path  #'./data/rsitmd_precomp/'
+        self.loc = args.data_path
         self.img_path = args.image_path  # ./rs_data/rsitmd/images/
-        self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
-        self.captions = []
-        self.maxlength = 0
-
+        self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")   # Use CLIP's tokenizer
+        
+        # Load captions and image filenames
         if data_split != "test":
-            # ./data/rsitmd_precomp/train_caps_verify.txt
-            with open(self.loc + "%s_caps_verify.txt" % data_split, "rb") as f:
-                for line in f:
-                    self.captions.append(line.strip())
-
-            self.images = []
-
-            with open(self.loc + "%s_filename_verify.txt" % data_split, "rb") as f:
-                for line in f:
-                    self.images.append(line.strip())
+            captions_file = f"{data_split}_caps_verify.txt"
+            filename_file = f"{data_split}_filename_verify.txt"
         else:
-            with open(self.loc + "%s_caps.txt" % data_split, "rb") as f:
-                for line in f:
-                    self.captions.append(line.strip())
+            captions_file = f"{data_split}_caps.txt"
+            filename_file = f"{data_split}_filename.txt"
 
-            self.images = []
-            with open(self.loc + "%s_filename.txt" % data_split, "rb") as f:
-                for line in f:
-                    self.images.append(line.strip())
+        with open(os.path.join(self.loc, captions_file), "r") as f:
+            self.captions = [line.strip() for line in f]
+
+        with open(os.path.join(self.loc, filename_file), "r") as f:
+            self.images = [line.strip() for line in f]
 
         self.length = len(self.captions)
-        # rkiros data has redundancy in images, we divide by 5, 10crop doesn't
-        if len(self.images) != self.length:
-            self.im_div = 5
-        else:
-            self.im_div = 1
+        self.im_div = 5 if len(self.images) != self.length else 1
 
+        # Define transformations based on data split
         if data_split == "train":
-            self.transform = transforms.Compose(
-                [
+            self.transform = transforms.Compose([
                     transforms.Resize((278, 278)),
                     transforms.RandomRotation(degrees=(0, 90)),
-                    # transforms.RandomCrop(256),
                     transforms.RandomCrop(224),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-            self.transform_segment = transforms.Compose(
-                [
-                    # transforms.Resize((256, 256)),
+                ])
+            self.transform_segment = transforms.Compose([
                     transforms.Resize((224, 224)),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-
+                ])
         else:
             self.transform = transforms.Compose(
                 [
-                    # transforms.Resize((256, 256)),
                     transforms.Resize((224, 224)),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
@@ -84,49 +72,36 @@ class PrecompDataset(data.Dataset):
             )
 
     def __getitem__(self, index):
+        """
+        Get an item from the dataset.
+
+        Args:
+            index (int): Index of the item to retrieve.
+
+        Returns:
+            tuple: Tuple containing the image, caption, tokens, and other metadata.
+        """
         # handle the image redundancy
         img_id = index // self.im_div
         caption = self.captions[index]
 
+        # Tokenize caption using CLIP tokenizer
         vocab = self.vocab
-        # import ipdb;ipdb.set_trace()
         tokens_clip = self.clip_tokenizer(caption.lower().decode("utf-8"))  # [1, 77]
 
         # Convert caption (string) to word ids.
         tokens = nltk.tokenize.word_tokenize(caption.lower().decode("utf-8"))
-        punctuations = [
-            ",",
-            ".",
-            ":",
-            ";",
-            "?",
-            "(",
-            ")",
-            "[",
-            "]",
-            "&",
-            "!",
-            "*",
-            "@",
-            "#",
-            "$",
-            "%",
-        ]
+        punctuations = [",", ".", ":", ";", "?", "(", ")", "[", "]", "&", "!", "*", "@", "#", "$", "%",]
         tokens = [k for k in tokens if k not in punctuations]
         tokens_UNK = [k if k in vocab.word2idx.keys() else "<unk>" for k in tokens]
 
         caption = []
         caption.extend([vocab(token) for token in tokens_UNK])
         caption = torch.LongTensor(caption)
-        # import ipdb;ipdb.set_trace()
-        image = Image.open(self.img_path + str(self.images[img_id])[2:-1]).convert(
-            "RGB"
-        )
+        image = Image.open(self.img_path + str(self.images[img_id])[2:-1]).convert("RGB")
         image = self.transform(image)  # torch.Size([3, 256, 256])
         img_name = str(self.images[img_id])[2:-1].split(".")[0]
-        seg_path = os.path.join(
-            self.img_path.replace("images", "images_segment"), img_name
-        )
+        seg_path = os.path.join(self.img_path.replace("images", "images_segment"), img_name)
         num_seg = 10
         seg_list = []
         for i in range(num_seg):
@@ -140,7 +115,6 @@ class PrecompDataset(data.Dataset):
 
         segment_img = torch.stack(seg_list, dim=0)
 
-        # import ipdb;ipdb.set_trace()
         # return image, caption, tokens_UNK, index, img_id, tokens_clip
         return image, caption, tokens_UNK, index, img_id, tokens_clip, segment_img
 
@@ -271,162 +245,21 @@ class PrecompDataset_mine(data.Dataset):
         return self.length
 
 
-class PrecompDataset_mine_finetune_old(data.Dataset):
-    """
-    Load precomputed captions and image features
-    """
-
-    def __init__(self, args, data_split, vocab, finetune=None):
-
-        self.img_path_source = os.path.join(
-            args.image_path, args.country_source, "images"
-        )
-        # else:
-        #     args.country = args.target_country
-        self.img_path_target = os.path.join(
-            args.image_path, args.country_target, "images"
-        )
-
-        self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
-        # Captions
-        self.captions = []
-        # self.maxlength = 0
-
-        df_source = pd.read_csv(
-            f"urbancross_data/instructblip_generation_with_tag/instructblip_generation_{args.country_source.lower()}_refine.csv"
-        )
-        # if data_split == 'train' or data_split == 'val':
-        split_list = []
-        # 打开文件并读取内容到列表中
-        with open(
-            f"urbancross_data/images_target/{args.country_source}/{data_split}_list.txt",
-            "r",
-        ) as f:
-            for line in f:
-                # 去除行末的换行符并添加到列表中
-                split_list.append(line.strip())
-
-        df_source = df_source[df_source["image_name"].isin(split_list)]
-        self.captions_source = df_source["description"].values.tolist()
-        self.images_source = df_source["image_name"].values.tolist()
-        self.length = len(self.captions_source)
-
-        df_target = pd.read_csv(
-            f"urbancross_data/instructblip_generation_with_tag/instructblip_generation_{args.country_target.lower()}_refine.csv"
-        )
-        # if data_split == 'train' or data_split == 'val':
-        split_list = []
-        # 打开文件并读取内容到列表中
-        with open(
-            f"urbancross_data/images_target/{args.country_target}/{data_split}_list.txt",
-            "r",
-        ) as f:
-            for line in f:
-                # 去除行末的换行符并添加到列表中
-                split_list.append(line.strip())
-
-        df_target = df_target[df_target["image_name"].isin(split_list)]
-        self.captions_target = df_target["description"].values.tolist()
-        self.images_target = df_target["image_name"].values.tolist()
-
-        if data_split == "train":
-            self.transform = transforms.Compose(
-                [
-                    transforms.Resize((278, 278)),
-                    transforms.RandomRotation(degrees=(0, 90)),
-                    # transforms.RandomCrop(256),
-                    transforms.RandomCrop(224),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-            self.transform_segment = transforms.Compose(
-                [
-                    # transforms.Resize((256, 256)),
-                    transforms.Resize((224, 224)),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-        else:
-            self.transform = transforms.Compose(
-                [
-                    # transforms.Resize((256, 256)),
-                    transforms.Resize((224, 224)),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-            self.transform_segment = self.transform
-
-    def __getitem__(self, index):
-        img_id = index
-        caption_source = self.captions_source[index]
-        caption_target = self.captions_target[index]
-
-        cap_tokens_source = self.clip_tokenizer(caption_source)  # [1, 77]
-        cap_tokens_target = self.clip_tokenizer(caption_target)  # [1, 77]
-
-        image_source = Image.open(
-            os.path.join(self.img_path_source, self.images_source[img_id])
-        ).convert("RGB")
-        image_source = self.transform(image_source)  # torch.Size([3, 256, 256])
-        image_target = Image.open(
-            os.path.join(self.img_path_target, self.images_target[img_id])
-        ).convert("RGB")
-        image_target = self.transform(image_target)  # torch.Size([3, 256, 256])
-
-        return (
-            image_source,
-            image_target,
-            caption_source,
-            caption_target,
-            index,
-            img_id,
-            cap_tokens_source,
-            cap_tokens_target,
-        )
-
-    def __len__(self):
-        return self.length
-
-
 class PrecompDataset_mine_finetune(data.Dataset):
     """
-    Load precomputed captions and image features
+    Load precomputed captions and image features for fine-tuning.
     """
 
-    def __init__(
-        self,
-        args,
-        data_split,
-        country,
-        #  vocab,
-        #  finetune=None
-    ):
-
-        # import ipdb; ipdb.set_trace()
+    def __init__(self, args, data_split, country):
         self.img_path = os.path.join(args.image_path, country, "images")
-        # else:
-        #     args.country = args.target_country
-        # self.img_path_target = os.path.join(args.image_path, args.country_target, 'images')
-
         self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
-        # Captions
         self.captions = []
-        # self.maxlength = 0
-
-        df = pd.read_csv(
-            f"urbancross_data/instructblip_generation_with_tag/instructblip_generation_{country.lower()}_refine.csv"
-        )
-        # if data_split == 'train' or data_split == 'val':
+        
+        df = pd.read_csv(f"urbancross_data/instructblip_generation_with_tag/instructblip_generation_{country.lower()}_refine.csv"
+                         )
         split_list = []
-        # 打开文件并读取内容到列表中
-        with open(
-            f"urbancross_data/images_target/{country}/{data_split}_list.txt", "r"
-        ) as f:
+        with open(f"urbancross_data/images_target/{country}/{data_split}_list.txt", "r") as f:
             for line in f:
-                # 去除行末的换行符并添加到列表中
                 split_list.append(line.strip())
 
         df = df[df["image_name"].isin(split_list)]
@@ -434,67 +267,34 @@ class PrecompDataset_mine_finetune(data.Dataset):
         self.images = df["image_name"].values.tolist()
         self.length = len(self.captions)
 
-        # df_target = pd.read_csv(f'urbancross_data/instructblip_generation_with_tag/instructblip_generation_{args.country_target.lower()}_refine.csv')
-        # # if data_split == 'train' or data_split == 'val':
-        # split_list = []
-        # # 打开文件并读取内容到列表中
-        # with open(f'urbancross_data/images_target/{args.country_target}/{data_split}_list.txt', 'r') as f:
-        #     for line in f:
-        #         # 去除行末的换行符并添加到列表中
-        #         split_list.append(line.strip())
-
-        # df_target = df_target[df_target['image_name'].isin(split_list)]
-        # self.captions_target = df_target['description'].values.tolist()
-        # self.images_target = df_target['image_name'].values.tolist()
-
         if data_split == "train":
-            self.transform = transforms.Compose(
-                [
+            self.transform = transforms.Compose([
                     transforms.Resize((278, 278)),
                     transforms.RandomRotation(degrees=(0, 90)),
-                    # transforms.RandomCrop(256),
                     transforms.RandomCrop(224),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-            self.transform_segment = transforms.Compose(
-                [
-                    # transforms.Resize((256, 256)),
+            ])
+            self.transform_segment = transforms.Compose([
                     transforms.Resize((224, 224)),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
+            ])
         else:
-            self.transform = transforms.Compose(
-                [
-                    # transforms.Resize((256, 256)),
+            self.transform = transforms.Compose([
                     transforms.Resize((224, 224)),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
+            ])
             self.transform_segment = self.transform
 
     def __getitem__(self, index):
         img_id = index
         caption = self.captions[index]
-        # caption_target = self.captions_target[index]
-
         cap_tokens = self.clip_tokenizer(caption)  # [1, 77]
-        # cap_tokens_target = self.clip_tokenizer(
-        #                 caption_target
-        #             )  # [1, 77]
 
-        image = Image.open(os.path.join(self.img_path, self.images[img_id])).convert(
-            "RGB"
-        )
+        image = Image.open(os.path.join(self.img_path, self.images[img_id])).convert("RGB")
         image = self.transform(image)  # torch.Size([3, 256, 256])
-        # image_target = Image.open(
-        #             os.path.join(self.img_path_target, self.images_target[img_id])
-        #         ).convert('RGB')
-        # image_target = self.transform(image_target)  # torch.Size([3, 256, 256])
 
         return image, caption, index, img_id, cap_tokens
 
@@ -503,142 +303,92 @@ class PrecompDataset_mine_finetune(data.Dataset):
 
 
 def collate_fn(data):
+    """
+    Custom collate function to be used with DataLoader for handling variable length captions.
 
-    # Sort a data list by caption length
+    Args:
+        data (list): List of tuples (image, caption, tokens, index, img_id, tokens_clip, segment_img).
+
+    Returns:
+        torch.Tensor: Stacked images tensor.
+        torch.Tensor: Padded and stacked captions tensor.
+        list: Lengths of each caption.
+        list: Indices.
+        torch.Tensor: Concatenated tokens_clip tensor.
+        torch.Tensor: Stacked segment images tensor.
+    """
+    # Sort the data list by caption length in descending order
     data.sort(key=lambda x: len(x[2]), reverse=True)
+    # Unpack the data tuples
     images, captions, tokens, ids, img_ids, tokens_clip, segment_img = zip(*data)
-    # return image, caption, tokens_UNK, index, img_id, tokens_clip, segment_img
     # Merge images (convert tuple of 3D tensor to 4D tensor)
     images = torch.stack(images, 0)
     segment_img = torch.stack(segment_img, 0)
-    # import ipdb;ipdb.set_trace()
     tokens_clip = torch.cat(tokens_clip, dim=0)
 
-    import ipdb
-
-    ipdb.set_trace()
-    # Merget captions (convert tuple of 1D tensor to 2D tensor)
+    # Merge captions (pad and convert tuple of 1D tensor to 2D tensor)
     lengths = [len(cap) for cap in captions]
     targets = torch.zeros(len(captions), max(lengths)).long()
-    import ipdb
-
-    ipdb.set_trace()
     for i, cap in enumerate(captions):
         end = lengths[i]
         targets[i, :end] = cap[:end]
 
+    # Ensure that lengths are at least 1 to avoid division by zero
     lengths = [l if l != 0 else 1 for l in lengths]
 
     return images, targets, lengths, ids, tokens_clip, segment_img
 
 
 def collate_fn_mine(data):
-    # Sort a data list by caption length
-    # data.sort(key=lambda x: len(x[2]), reverse=True)
-    # images, captions, tags, ids, img_ids, cap_tokens, tag_tokens, segment_img = zip(*data)
+    # Unpack the data tuples
     images, captions, ids, img_ids, cap_tokens, segment_img = zip(*data)
-    # import ipdb; ipdb.set_trace()
-
+    
     # Merge images (convert tuple of 3D tensor to 4D tensor)
     images = torch.stack(images, 0)
     segment_img = torch.stack(segment_img, 0)
     cap_tokens = torch.cat(cap_tokens, dim=0)
-    # tag_tokens = torch.cat(tag_tokens, dim=0)
 
-    # Merget captions (convert tuple of 1D tensor to 2D tensor)
-    # lengths = [len(cap) for cap in captions]
-    # targets = torch.zeros(len(captions), max(lengths)).long()
-    # import ipdb;ipdb.set_trace()
-    # for i, cap in enumerate(captions):
-    #     end = lengths[i]
-    #     targets[i, :end] = cap[:end]
-
-    # lengths = [l if l !=0 else 1 for l in lengths]
-
-    # return images, targets, lengths, ids, cap_tokens, segment_img, tag_tokens
-    # return images, ids, cap_tokens, segment_img, tag_tokens
     return images, ids, cap_tokens, segment_img
 
 
-def collate_fn_mine_finetune_old(data):
-    # import ipdb; ipdb.set_trace()
-    # Sort a data list by caption length
-    # data.sort(key=lambda x: len(x[2]), reverse=True)
-    # images, captions, tags, ids, img_ids, cap_tokens, tag_tokens, segment_img = zip(*data)
-    # images, captions, ids, img_ids, cap_tokens, segment_img = zip(*data)
-    (
-        images_source,
-        images_target,
-        caption_source,
-        caption_target,
-        ids,
-        img_ids,
-        cap_tokens_source,
-        cap_tokens_target,
-    ) = zip(*data)
-
-    # Merge images (convert tuple of 3D tensor to 4D tensor)
-    images_source = torch.stack(images_source, 0)
-    images_target = torch.stack(images_target, 0)
-
-    # segment_img = torch.stack(segment_img, 0)
-    cap_tokens_source = torch.cat(cap_tokens_source, dim=0)
-    cap_tokens_target = torch.cat(cap_tokens_target, dim=0)
-
-    # tag_tokens = torch.cat(tag_tokens, dim=0)
-
-    # Merget captions (convert tuple of 1D tensor to 2D tensor)
-    # lengths = [len(cap) for cap in captions]
-    # targets = torch.zeros(len(captions), max(lengths)).long()
-    # import ipdb;ipdb.set_trace()
-    # for i, cap in enumerate(captions):
-    #     end = lengths[i]
-    #     targets[i, :end] = cap[:end]
-
-    # lengths = [l if l !=0 else 1 for l in lengths]
-
-    # return images, targets, lengths, ids, cap_tokens, segment_img, tag_tokens
-    # return images, ids, cap_tokens, segment_img, tag_tokens
-    return images_source, images_target, ids, cap_tokens_source, cap_tokens_target
-
-
 def collate_fn_mine_finetune(data):
-    # import ipdb; ipdb.set_trace()
-    # Sort a data list by caption length
-    # data.sort(key=lambda x: len(x[2]), reverse=True)
-    # images, captions, tags, ids, img_ids, cap_tokens, tag_tokens, segment_img = zip(*data)
-    # images, captions, ids, img_ids, cap_tokens, segment_img = zip(*data)
+    """
+    Custom collate function for fine-tuning your specific dataset structure.
+
+    Args:
+        data (list): List of tuples (image, caption, ids, img_ids, cap_tokens).
+
+    Returns:
+        torch.Tensor: Stacked images tensor.
+        list: Indices.
+        torch.Tensor: Concatenated caption tokens tensor.
+    """
+    # Unpack the data tuples
     images, caption, ids, img_ids, cap_tokens = zip(*data)
 
     # Merge images (convert tuple of 3D tensor to 4D tensor)
     images = torch.stack(images, 0)
-    # images_target = torch.stack(images_target, 0)
-
-    # segment_img = torch.stack(segment_img, 0)
     cap_tokens = torch.cat(cap_tokens, dim=0)
-    # cap_tokens_target = torch.cat(cap_tokens_target, dim=0)
 
-    # tag_tokens = torch.cat(tag_tokens, dim=0)
-
-    # Merget captions (convert tuple of 1D tensor to 2D tensor)
-    # lengths = [len(cap) for cap in captions]
-    # targets = torch.zeros(len(captions), max(lengths)).long()
-    # import ipdb;ipdb.set_trace()
-    # for i, cap in enumerate(captions):
-    #     end = lengths[i]
-    #     targets[i, :end] = cap[:end]
-
-    # lengths = [l if l !=0 else 1 for l in lengths]
-
-    # return images, targets, lengths, ids, cap_tokens, segment_img, tag_tokens
-    # return images, ids, cap_tokens, segment_img, tag_tokens
+    # Return the necessary components
     return images, ids, cap_tokens
 
 
-def get_precomp_loader(
-    args, data_split, vocab, batch_size=100, shuffle=False, num_workers=0
-):
-    """Returns torch.utils.data.DataLoader for custom coco dataset."""
+def get_precomp_loader(args, data_split, vocab, batch_size=100, shuffle=False, num_workers=0):
+    """
+    Returns torch.utils.data.DataLoader for custom precomputed dataset.
+
+    Args:
+        args (argparse.Namespace): Parsed arguments.
+        data_split (str): Dataset split ('train', 'val', 'test').
+        vocab (Vocabulary): Vocabulary object.
+        batch_size (int, optional): Batch size. Defaults to 100.
+        shuffle (bool, optional): Whether to shuffle the data. Defaults to False.
+        num_workers (int, optional): Number of workers for data loading. Defaults to 0.
+
+    Returns:
+        torch.utils.data.DataLoader: DataLoader for the custom precomputed dataset.
+    """
     dset = PrecompDataset(args, data_split, vocab)
     if args.distributed and data_split == "train":
         sampler = torch.utils.data.distributed.DistributedSampler(dset)
@@ -744,22 +494,6 @@ def get_precomp_loader_mine_finetune(
             drop_last=True,
         )
     return data_loader
-
-
-def get_loaders(args, vocab):
-    train_loader = get_precomp_loader(
-        args,
-        data_split="train",
-        vocab=vocab,
-        batch_size=args.batch_size,
-        shuffle=True,
-        num_workers=args.workers,
-    )
-
-    val_loader = get_precomp_loader(
-        args, "val", vocab, args.batch_size_val, False, args.workers
-    )
-    return train_loader, val_loader
 
 
 def get_loaders_mine(args):
