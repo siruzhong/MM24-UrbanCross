@@ -15,11 +15,6 @@ import wandb
 import pynvml
 from loguru import logger
 
-# 从npy中读取
-def load_from_npy(filename):
-    info = np.load(filename, allow_pickle=True)
-    return info
-
 
 # 从txt文件中读取数据
 def load_from_txt(filename, encoding="utf-8"):
@@ -153,20 +148,6 @@ def calcul_intraloss(args, scores, up=0.5, down=0.05, lamb=1.0):
     return lamb * scores_norm
 
 
-# ========================================================================================================
-def acc_train(input):
-    predicted = input.squeeze().numpy()
-    batch_size = predicted.shape[0]
-    predicted[predicted > math.log(0.5)] = 1
-    predicted[predicted < math.log(0.5)] = 0
-    target = np.eye(batch_size)
-    recall = np.sum(predicted * target) / np.sum(target)
-    precision = np.sum(predicted * target) / np.sum(predicted)
-    acc = 1 - np.sum(abs(predicted - target)) / (target.shape[0] * target.shape[1])
-
-    return acc, recall, precision
-
-
 def acc_i2t_mine(similarity_matrix):
     #code from gpt
     
@@ -262,31 +243,6 @@ def acc_t2i(input):
 
     return (r1, r5, r10, medr, meanr), (ranks, top1)
 
-# def acc_t2i_mine(input):
-#     #code from gpt
-#     """Computes the precision@k for the specified values of k of t2i"""
-#     # input = collect_match(input).numpy()
-#     image_size = input.shape[0]
-#     ranks = np.zeros(5 * image_size)
-#     top1 = np.zeros(5 * image_size)
-
-#     # --> (5N(caption), N(image))
-#     input = input.T
-
-#     for index in range(image_size):
-#         for i in range(5):
-#             inds = np.argsort(input[5 * index + i])[::-1]
-#             ranks[5 * index + i] = np.where(inds == index)[0][0]
-#             top1[5 * index + i] = inds[0]
-
-#     # Compute metrics
-#     r1 = 100.0 * len(np.where(ranks < 1)[0]) / len(ranks)
-#     r5 = 100.0 * len(np.where(ranks < 5)[0]) / len(ranks)
-#     r10 = 100.0 * len(np.where(ranks < 10)[0]) / len(ranks)
-#     medr = np.floor(np.median(ranks)) + 1
-#     meanr = ranks.mean() + 1
-
-#     return (r1, r5, r10, medr, meanr), (ranks, top1)
 
 # 计算同类映射
 def cal_class_idxs(class_):
@@ -732,22 +688,4 @@ class LogCollector(object):
         for k, v in self.meters.items():
             wandb.log({k: v.val})
             # tb_logger.log_value(prefix + k, v.val, step=step)
-    
 
-def update_values(dict_from, dict_to):
-    for key, value in dict_from.items():
-        if isinstance(value, dict):
-            update_values(dict_from[key], dict_to[key])
-        elif value is not None:
-            dict_to[key] = dict_from[key]
-    return dict_to
-
-
-def params_count(model):
-    count = 0
-    for p in model.parameters():
-        c = 1
-        for i in range(p.dim()):
-            c *= p.size(i)
-        count += c
-    return count
