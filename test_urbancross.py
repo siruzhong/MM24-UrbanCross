@@ -133,13 +133,9 @@ def main(args):
         mode='dryrun',
     )
 
-    # Set random seed
-    utils.setup_seed(args.seed)
-
     # Create test data loader
     test_loader = data.get_test_loader_mine(args)
     print("len of test_loader is {}".format(len(test_loader)))
-    
     
     # Choose model
     if args.model_name == "SWAN":
@@ -167,10 +163,6 @@ def main(args):
     rsum_, all_scores_ = engine.validate_test(args, test_loader, model)
     print("Test scores:", all_scores_)
      
-    if args.distributed:
-        # Destroy process group
-        dist.destroy_process_group()
-
 
 if __name__ == '__main__':
     args = parser_options()
