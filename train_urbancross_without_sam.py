@@ -149,13 +149,13 @@ def main(args):
         raise NotImplementedError
 
     # Create train, validation and test data loaders
-    train_loader, val_loader = data.get_loaders_mine(args)
+    train_loader, val_loader = data.get_loaders_without_sam_mine(args)
     if args.test_step:
-        test_loader = data.get_loaders_mine(args)
+        test_loader = data.get_loaders_without_sam_mine(args)
     print("len of train_loader is {}, len of val_loader is {}".format(len(train_loader), len(val_loader)))
 
     # Initialize the model
-    model = models.factory(args, cuda=True, data_parallel=args.distributed)
+    model = models.factory_without_sam(args, cuda=True, data_parallel=args.distributed)
 
     # Print and save model information
     if args.rank == 0:
@@ -198,7 +198,7 @@ def main(args):
 
         # evaluate on validation set
         if (epoch + 1) % args.eval_step == 0:
-            rsum, all_scores = engine.validate(args, val_loader, model)
+            rsum, all_scores = engine.validate_without_sam(args, val_loader, model)
             logger.info("Validation scores: {}".format(all_scores))
 
             # Save checkpoint if the current model is the best
@@ -224,7 +224,7 @@ def main(args):
 
         # Evaluate on test set
         if args.test_step > 0 and (epoch + 1) % args.test_step == 0:
-            rsum_, all_scores_ = engine.validate_test(args, test_loader, model)
+            rsum_, all_scores_ = engine.validate_test_without_sam(args, test_loader, model)
             is_best_ = rsum_ > best_rsum_
             if is_best_:
                 best_score_ = all_scores_

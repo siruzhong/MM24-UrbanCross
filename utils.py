@@ -75,25 +75,32 @@ def collect_neg(args, input):
 
 
 # 计算对比损失函数
-def calcul_contraloss(args, 
-                      scores, 
-                      size, 
-                      margin, 
-                      max_violation=False):
-    
-    diagonal = scores.diag().view(size, 1)
+def calcul_contraloss(args, scores, size, margin, max_violation=False):
+    """
+    Calculate the contrastive loss function.
 
+    Args:
+        args (argparse.Namespace): Parsed arguments.
+        scores (torch.Tensor): Similarity scores computed between samples.
+        size (int): Size of the batch.
+        margin (float): Margin value for the contrastive loss.
+        max_violation (bool, optional): Whether to apply max violation constraint. Defaults to False.
+
+    Returns:
+        torch.Tensor: Computed contrastive loss.
+    """
+    # Compute diagonal of the similarity matrix
+    diagonal = scores.diag().view(size, 1)
     d1 = diagonal.expand_as(scores)
     d2 = diagonal.t().expand_as(scores)
 
-    # compare every diagonal score to scores in its column
-    # caption retrieval
+    # Calculate cost for caption retrieval
     cost_s = (margin + scores - d1).clamp(min=0)
-    # compare every diagonal score to scores in its row
     
-    # image retrieval
+    # Calculate cost for image retrieval
     cost_im = (margin + scores - d2).clamp(min=0)
 
+    # Mask diagonal elements
     mask = torch.eye(scores.size(0)) > .5
     I = Variable(mask)
     if torch.cuda.is_available():
@@ -101,17 +108,18 @@ def calcul_contraloss(args,
     cost_s = cost_s.masked_fill_(I, 0)
     cost_im = cost_im.masked_fill_(I, 0)
 
+    # Apply max violation if specified
     if max_violation:
         cost_s = cost_s.max(1)[0]
         cost_im = cost_im.max(0)[0]
 
+    # Sum up the costs
     sum_cost_s = cost_s.sum()
     sum_cost_im = cost_im.sum()
 
     return sum_cost_s + sum_cost_im
 
 
-# ========================================================================================================
 
 # 计算内部损失函数
 def calcul_intraloss(args, scores, up=0.5, down=0.05, lamb=1.0):
@@ -148,14 +156,10 @@ def calcul_intraloss(args, scores, up=0.5, down=0.05, lamb=1.0):
     return lamb * scores_norm
 
 
-def acc_i2t_mine(similarity_matrix):
-    #code from gpt
-    
+def acc_i2t_mine(similarity_matrix):    
     # 计算检索指标
     bs = similarity_matrix.shape[0]
-    # similarity_matrix = similarity_matrix.cpu().detach().numpy()
 
-    # import ipdb; ipdb.set_trace()
     # 计算r1, r5, r10
     ranks = []
     for i in range(bs):
@@ -165,7 +169,6 @@ def acc_i2t_mine(similarity_matrix):
     r1 = (ranks <= 1).float().mean().item()
     r5 = (ranks <= 5).float().mean().item()
     r10 = (ranks <= 10).float().mean().item()
-    # import ipdb; ipdb.set_trace()
     # 计算medr, meanr
     medr = torch.median(ranks.float()).item()
     meanr = ranks.float().mean().item()
@@ -177,42 +180,46 @@ def acc_i2t_mine(similarity_matrix):
     return (r1, r5, r10, medr, meanr), (ranks, top1)
 
 def acc_i2t(input):
-    """Computes the precision@k for the specified values of k of i2t"""
-    # input = collect_match(input).numpy()
-    #input shape [len(images), len(captions)]
-    
-    image_size = input.shape[0]
-    ranks = np.zeros(image_size) #每个图像的排名
-    top1 = np.zeros(image_size)
+    """
+    Computes the precision@k for the specified values of k of image-to-text retrieval.
 
-    # import ipdb; ipdb.set_trace()
-    # 遍历每个图像
-    # 对于每个图像，根据其匹配得分从高到低排序，然后找到前5个匹配的索引，并计算排名rank
-    # 排名是指该图像匹配到的最高排名文本的索引位置
+    Args:
+        input (np.ndarray): Input similarity scores matrix.
+
+    Returns:
+        tuple: Tuple containing precision@k metrics and ranks.
+
+    """
+    image_size = input.shape[0]
+    ranks = np.zeros(image_size)  # Array to store ranks for each image
+    top1 = np.zeros(image_size)  # Array to store top1 indices for each image
+
+    # Iterate over each image
     for index in range(image_size):
-        #np.argsort从小到大，[::-1]变成从大到小
+        # Sort the similarity scores for the current image in descending order
         inds = np.argsort(input[index])[::-1]
-        # Score
+        # Initialize rank to a large value
         rank = 1e20
         
-        # 遍历当前图像的前5个匹配得分最高的text的索引
+        # Iterate over the top 5 highest scoring text indices for the current image
         for i in range(5 * index, 5 * index + 5, 1):
-            # import ipdb; ipdb.set_trace()
-            # tmp = np.where(inds == i)[0][0]
-            print(np.where(inds == i)[0])
+            # Find the index of the current text in the sorted list of indices
             tmp = np.where(inds == i)[0].item()
+            # Update rank if the current index is smaller
             if tmp < rank:
                 rank = tmp
+        # Store the rank for the current image
         ranks[index] = rank
+        # Store the top1 index for the current image
         top1[index] = inds[0]
 
-    # Compute metrics
+    # Compute precision@k metrics
     r1 = 100.0 * len(np.where(ranks < 1)[0]) / len(ranks)
     r5 = 100.0 * len(np.where(ranks < 5)[0]) / len(ranks)
     r10 = 100.0 * len(np.where(ranks < 10)[0]) / len(ranks)
-    # 中位数排名 median rank
+    # Compute median rank
     medr = np.floor(np.median(ranks)) + 1
-    # 平均排名 mean rank
+    # Compute mean rank
     meanr = ranks.mean() + 1
 
     return (r1, r5, r10, medr, meanr), (ranks, top1)
@@ -357,58 +364,106 @@ def shard_dis_SWAN(args,
     print("==> end to compute image-caption pairwise distance <==")
     return d
 
-# 分块计算距离
-# 分片计算距离的主要原因是内存管理。在处理大量数据时，一次性加载所有数据到内存可能会导致内存溢出。通过将数据分成更小的片段（或分片），我们可以一次只处理一部分数据，从而有效地管理内存使用。
-def shard_dis_mine(args, 
-                   images, 
-                   captions, 
-                   segments,
-                   model, 
-                #    lengths
-                   ):
-    """compute image-caption pairwise distance during validation and test"""
-    # l1 = len(images)
-    # l2 = len(captions)
-    
-    #图片分成多少块
+
+def shard_dis_mine(args, images, captions, segments, model):
+    """
+    Compute image-caption pairwise distance during validation and test.
+
+    Args:
+        args (argparse.Namespace): Parsed arguments.
+        images (list): List of images.
+        captions (list): List of captions.
+        segments (list): List of segment tensors.
+        model (torch.nn.Module): Trained model for computing similarity.
+
+    Returns:
+        np.ndarray: Image-caption pairwise distance matrix.
+    """
+    # Calculate the number of shards for images and captions
     n_img_shard = (len(images) - 1) // args.shard_size + 1
-    #text分成多少块
     n_cap_shard = (len(captions) - 1) // args.shard_size + 1
 
+    # Initialize an array to store pairwise distances
     d = np.zeros((len(images), len(captions)))
     all = []
+    
     print("==> start to compute image-caption pairwise distance <==")
+    # Iterate over image shards
     for i in range(n_img_shard):
         img_start, img_end = args.shard_size * i, min(args.shard_size * (i + 1), len(images))
 
         print("Calculate the similarity in batches: [{}/{}]".format(i, n_img_shard))
 
+        # Iterate over caption shards
         for j in range(n_cap_shard):
             cap_start, cap_end = args.shard_size * j, min(args.shard_size * (j + 1), len(captions))
             with torch.no_grad():
-                # img = torch.from_numpy(images[img_start:img_end]).float().cuda(args.gpuid)
                 img = images[img_start:img_end].cuda(args.gpuid)
-
                 texts = captions[cap_start:cap_end].cuda(args.gpuid)
                 segs = segments[img_start:img_end].cuda(args.gpuid)
-                # l = lengths[cap_start:cap_end]
                 t1 = time.time()
-                # if args.il_measure:
-                #     sim,_,_ = model(im, s, l)
-                # else:
+                # Compute similarity scores between images and captions
                 sim_img2text, sim_seg2text = model(img, texts, segs)
                 sim = sim_img2text
                 t2 = time.time()
                 all.append(t2 - t1)
 
-                # sim = sim.squeeze()
-
                 d[img_start:img_end, cap_start:cap_end] = sim.data.cpu().numpy()
 
-    # import ipdb; ipdb.set_trace()
+    # Compute average inference time
     print("infer time:{:.2f}".format(np.average(all)))
     print("==> end to compute image-caption pairwise distance <==")
     return d
+
+
+def shard_dis_without_sam_mine(args, images, captions, model):
+    """
+    Compute image-caption pairwise distance during validation and test.
+
+    Args:
+        args (argparse.Namespace): Parsed arguments.
+        images (list): List of images.
+        captions (list): List of captions.
+        model (torch.nn.Module): Trained model for computing similarity.
+
+    Returns:
+        np.ndarray: Image-caption pairwise distance matrix.
+    """
+    # Calculate the number of shards for images and captions
+    n_img_shard = (len(images) - 1) // args.shard_size + 1
+    n_cap_shard = (len(captions) - 1) // args.shard_size + 1
+
+    # Initialize an array to store pairwise distances
+    d = np.zeros((len(images), len(captions)))
+    all = []
+    
+    print("==> start to compute image-caption pairwise distance <==")
+    # Iterate over image shards
+    for i in range(n_img_shard):
+        img_start, img_end = args.shard_size * i, min(args.shard_size * (i + 1), len(images))
+
+        print("Calculate the similarity in batches: [{}/{}]".format(i, n_img_shard))
+
+        # Iterate over caption shards
+        for j in range(n_cap_shard):
+            cap_start, cap_end = args.shard_size * j, min(args.shard_size * (j + 1), len(captions))
+            with torch.no_grad():
+                img = images[img_start:img_end].cuda(args.gpuid)
+                texts = captions[cap_start:cap_end].cuda(args.gpuid)
+                t1 = time.time()
+                # Compute similarity scores between images and captions
+                sim_img2text = model(img, texts)
+                sim = sim_img2text
+                t2 = time.time()
+                all.append(t2 - t1)
+
+                d[img_start:img_end, cap_start:cap_end] = sim.data.cpu().numpy()
+
+    # Compute average inference time
+    print("infer time:{:.2f}".format(np.average(all)))
+    print("==> end to compute image-caption pairwise distance <==")
+    return d
+
 
 # 导出图像向量和文本向量
 def save_img_text_emb(args, images, captions, model, lengths):

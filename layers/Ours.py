@@ -76,6 +76,46 @@ class UrbanCross(nn.Module):
             sim_seg2text = cosine_sim(img_seg_emb, text_emb)
 
         return sim_img2text, sim_seg2text
+    
+
+class UrbanCross_without_sam(nn.Module):
+    def __init__(self, args):
+        """
+        Initialize the UrbanCross model.
+
+        Args:
+            args: Model configuration arguments.
+        """
+        super().__init__()
+        # Create OpenCLIP model and transforms
+        self.clip_model, _, transform = open_clip.create_model_and_transforms(
+            model_name="ViT-L-14",  # coca_ViT-L-14
+            pretrained="laion2B-s32B-b82K",  # mscoco_finetuned_laion2B-s13B-b90k
+            output_dict=True,
+        )
+
+    def forward(self, img, text):
+        """
+        Forward pass of the UrbanCross model.
+
+        Args:
+            img (torch.Tensor): Input image tensor.
+            text (torch.Tensor): Input text tensor.
+
+        Returns:
+            torch.Tensor: Similarity scores between image and text.
+            torch.Tensor: Similarity scores between segmented images and text.
+        """
+        with torch.cuda.amp.autocast():
+            # Get features for the input image and text
+            clip_model_out = self.clip_model(img, text)
+            img_emb = clip_model_out["image_features"]
+            text_emb = clip_model_out["text_features"]
+
+            # Calculate cosine similarity between image and text
+            sim_img2text = cosine_sim(img_emb, text_emb)
+
+        return sim_img2text
 
 
 class AdversarialLoss(nn.Module):
@@ -1026,6 +1066,47 @@ def factory(args, cuda=True, data_parallel=False):
 
     # Initialize the model without DistributedDataParallel (DDP)
     model_without_ddp = UrbanCross(
+        args_new,
+    )
+
+    # Move the model to GPU if cuda is True
+    if cuda:
+        model_without_ddp.cuda(args_new.gpuid)
+
+    # Apply data parallelism if data_parallel is True
+    if data_parallel:
+        # Convert BatchNorm layers to SyncBatchNorm for distributed training
+        model = nn.SyncBatchNorm.convert_sync_batchnorm(model_without_ddp)
+        # Initialize DistributedDataParallel with model and GPU device ID
+        model = DistributedDataParallel(
+            model, device_ids=[args.gpuid], find_unused_parameters=False
+        )
+        # Get the module attribute of the model, as DDP wraps the model with an additional layer
+        model_without_ddp = model.module
+        # Ensure CUDA is enabled if data parallelism is used
+        if not cuda:
+            raise ValueError
+
+    return model_without_ddp
+
+
+def factory_without_sam(args, cuda=True, data_parallel=False):
+    """
+    Factory function to create and initialize the model.
+
+    Args:
+        args: Namespace containing model configuration and parameters.
+        cuda (bool, optional): Flag indicating whether to use CUDA (GPU). Defaults to True.
+        data_parallel (bool, optional): Flag indicating whether to use data parallelism. Defaults to False.
+
+    Returns:
+        nn.Module: Initialized model instance.
+    """
+    # Create a copy of args to avoid modifying the original object
+    args_new = copy.copy(args)
+
+    # Initialize the model without DistributedDataParallel (DDP)
+    model_without_ddp = UrbanCross_without_sam(
         args_new,
     )
 
