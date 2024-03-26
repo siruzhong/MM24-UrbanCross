@@ -389,8 +389,3 @@ def cosine_sim(im, s):
     s = l2norm(s, dim=-1)
     w12 = im.mm(s.t())
     return w12
-
-
-def clones(module, N):
-    """Produce N identical layers."""
-    return nn.ModuleList([copy.deepcopy(module) for _ in range(N)])

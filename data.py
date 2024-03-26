@@ -751,7 +751,18 @@ def get_test_loader_mine(args):
     test_loader = get_precomp_loader_mine(
         args,
         data_split="test",
-        #  vocab,
+        batch_size=args.batch_size_val,
+        shuffle=False,
+        num_workers=args.workers,
+    )
+
+    return test_loader
+
+
+def get_test_loader_without_sam_mine(args):
+    test_loader = get_precomp_loader_without_sam_mine(
+        args,
+        data_split="test",
         batch_size=args.batch_size_val,
         shuffle=False,
         num_workers=args.workers,
