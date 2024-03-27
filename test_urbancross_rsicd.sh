@@ -1,5 +1,6 @@
 datename=$(date +%Y%m%d-%H%M%S)
-# RSICD Dataset
+data_name=rsicd
+
 python test_urbancross.py \
        --gpuid 0 \
        --model_name ours \
@@ -7,8 +8,7 @@ python test_urbancross.py \
        --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/RSICD/images \
        --country "" \
        --batch_size 40 \
-       --num_seg 5 \
        --workers 0 \
-       --data_name rsicd \
+       --data_name $data_name \
        --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/checkpoints/ckpt_rsicd_0.24555555793146291.pth \
-       2>&1 | tee -a outputs/logs_$datename.txt
+       2>&1 | tee -a outputs/logs_${datename}_data${data_name}_seg${num_seg}_test.txt
