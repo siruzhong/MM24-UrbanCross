@@ -66,7 +66,7 @@ def parser_options():
     parser.add_argument('--logger_name', default='logs/', type=str, help="Path for logging")
     parser.add_argument('-p', '--ckpt_save_path', default='checkpoint/', type=str, help="Path for saving checkpoints")
     parser.add_argument('--print_freq', default=10, type=int,  help="Frequency of printing results")
-    parser.add_argument('--lr', default=0.0002, type=float, help="Learning rate")
+    parser.add_argument('--lr', default=0.0001, type=float, help="Learning rate")
     parser.add_argument('--lr_update_epoch', default=20, type=int, help="Epochs after which learning rate is updated")
     parser.add_argument('--lr_decay_param', default=0.7, type=float, help="Decay parameter for learning rate")
 
@@ -134,7 +134,7 @@ def main(args):
     )
 
     # Create test data loader
-    test_loader = data.get_test_loader_mine(args)
+    test_loader = data.get_test_loader_without_sam_mine(args)
     print("len of test_loader is {}".format(len(test_loader)))
     
     # Choose model
@@ -146,7 +146,7 @@ def main(args):
         raise NotImplementedError
 
     # Initialize the model
-    model = models.factory(args, cuda=True, data_parallel=args.distributed)
+    model = models.factory_without_sam(args, cuda=True, data_parallel=args.distributed)
 
     # Optionally resume from a checkpoint
     if args.resume:
@@ -160,7 +160,7 @@ def main(args):
             return
     
     # Test the model
-    rsum_, all_scores_ = engine.validate_test(args, test_loader, model)
+    rsum_, all_scores_ = engine.validate_test_without_sam(args, test_loader, model)
     print("Test scores:", all_scores_)
      
 

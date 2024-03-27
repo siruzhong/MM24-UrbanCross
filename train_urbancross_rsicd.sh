@@ -14,6 +14,7 @@ python train_urbancross.py \
        --batch_size 40 \
        --num_seg $num_seg \
        --workers 0 \
+       --lr 0.0001 \
        --data_name $data_name \
        --test_step $epochs \
        2>&1 | tee -a outputs/logs_${datename}_${data_name}_epochs${epochs}_seg${num_seg}_with_sam.txt

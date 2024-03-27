@@ -10,5 +10,5 @@ python test_urbancross.py \
        --batch_size 40 \
        --workers 0 \
        --data_name $data_name \
-       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/checkpoints/rsitmd_without_sam_ours_epoch9_bestRsum0.2694.pth \
+       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_test01/rsitmd_with_sam_ours_epoch30_bestRsum0.2833.pth \
        2>&1 | tee -a outputs/logs_${datename}_${data_name}_test.txt

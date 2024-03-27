@@ -11,6 +11,7 @@ python train_urbancross_without_sam.py \
        --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/images \
        --country "" \
        --batch_size 40 \
+       --lr 0.0001 \
        --workers 0 \
        --data_name $data_name \
        --test_step $epochs \
