@@ -16,4 +16,4 @@ python train_urbancross.py \
        --workers 0 \
        --data_name $data_name \
        --test_step $epochs \
-       2>&1 | tee -a outputs/logs_${datename}_${data_name}_epochs${epochs}_seg${num_seg}.txt
+       2>&1 | tee -a outputs/logs_${datename}_${data_name}_epochs${epochs}_seg${num_seg}_with_sam.txt
