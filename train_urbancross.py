@@ -121,7 +121,7 @@ def main(args):
         args.wandb_id = wandb.util.generate_id()
     
     # Login to W&B
-    wandb.login(key='85e61adb4d84c2beadf3bc99937a59d54de9dd08')
+    wandb.login(key='d7ec29907ca115fe6d605741c40d09cf563aa0db')
     logger.info(f"W&B ID: {args.wandb_id}")
     
     # Initialize W&B run
