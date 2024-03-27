@@ -8,6 +8,7 @@ import torch.distributed as dist
 import utils
 import data
 import engine
+import time
 from vocab import deserialize_vocab
 
 def parser_options():
@@ -207,11 +208,13 @@ def main(args):
                 best_score = all_scores
             best_rsum = max(rsum, best_rsum)
 
+            timestamp = time.strftime('%Y%m%d-%H%M%S')
+
             if args.rank == 0:
                 utils.save_checkpoint(
                     {'epoch': epoch + 1, 'model': model.state_dict(), 'best_rsum': best_rsum,'args': args,},
                     is_best,
-                    filename='ckpt_{}_{}.pth'.format(args.data_name, best_rsum),
+                    filename='ckpt_{}_{}_epoch{}_{}.pth'.format(args.data_name, args.model_name, epoch + 1, timestamp),
                     prefix=args.ckpt_save_path,
                     model_name=args.model_name
                 )
