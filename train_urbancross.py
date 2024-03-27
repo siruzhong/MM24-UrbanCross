@@ -3,6 +3,7 @@ import shutil
 import torch
 import argparse
 import wandb
+import time
 from loguru import logger
 import torch.distributed as dist
 import utils
@@ -194,7 +195,7 @@ def main(args):
         utils.adjust_learning_rate(args, optimizer, epoch)
 
         # Train for one epoch
-        engine.train_without_sam(args, train_loader, model, optimizer, epoch)
+        engine.train(args, train_loader, model, optimizer, epoch)
 
         # evaluate on validation set
         if (epoch + 1) % args.eval_step == 0:
@@ -207,11 +208,13 @@ def main(args):
                 best_score = all_scores
             best_rsum = max(rsum, best_rsum)
 
+            timestamp = time.strftime('%Y%m%d-%H%M%S')
+
             if args.rank == 0:
                 utils.save_checkpoint(
                     {'epoch': epoch + 1, 'model': model.state_dict(), 'best_rsum': best_rsum,'args': args,},
                     is_best,
-                    filename='ckpt_{}_{}_epoch{}_{}.pth'.format(args.data_name, args.model_name, epoch + 1, timestamp),
+                    filename = 'ckpt_{}_{}_epoch{}_bestRsum{:.4f}_{}_with_sam.pth'.format(args.data_name, args.model_name, epoch + 1, best_rsum, time.strftime('%Y%m%d-%H%M%S')),
                     prefix=args.ckpt_save_path,
                     model_name=args.model_name
                 )

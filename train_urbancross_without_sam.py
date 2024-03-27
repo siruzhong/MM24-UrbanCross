@@ -208,13 +208,11 @@ def main(args):
                 best_score = all_scores
             best_rsum = max(rsum, best_rsum)
 
-            timestamp = time.strftime('%Y%m%d-%H%M%S')
-
             if args.rank == 0:
                 utils.save_checkpoint(
                     {'epoch': epoch + 1, 'model': model.state_dict(), 'best_rsum': best_rsum,'args': args,},
                     is_best,
-                    filename='ckpt_{}_{}_epoch{}_{}.pth'.format(args.data_name, args.model_name, epoch + 1, timestamp),
+                    filename = 'ckpt_{}_{}_epoch{}_bestRsum{:.4f}_{}_without_sam.pth'.format(args.data_name, args.model_name, epoch + 1, best_rsum, time.strftime('%Y%m%d-%H%M%S')),
                     prefix=args.ckpt_save_path,
                     model_name=args.model_name
                 )
