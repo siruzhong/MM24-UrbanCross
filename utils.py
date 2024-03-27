@@ -496,15 +496,14 @@ def save_img_text_emb(args, images, captions, model, lengths):
     return img_emb_all[1:,:], text_emb_all[1:,:]
 
 # 保存模型文件
-def save_checkpoint(state, is_best, filename, prefix='', model_name=None):
+def save_checkpoint(state, epoch, filename, prefix='', model_name=None, args=None):
     tries = 15
     error = None
     # deal with unstable I/O. Usually not necessary.
     while tries:
         try:
-            if is_best:
+            if epoch >= args.epochs -5:
                 torch.save(state, prefix + filename)
-                # torch.save(state, prefix + model_name + '_best.pth')
 
         except IOError as e:
             error = e

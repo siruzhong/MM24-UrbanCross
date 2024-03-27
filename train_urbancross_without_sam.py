@@ -1,3 +1,4 @@
+from ast import arg
 import os,random,copy
 import shutil
 import torch
@@ -211,10 +212,11 @@ def main(args):
             if args.rank == 0:
                 utils.save_checkpoint(
                     {'epoch': epoch + 1, 'model': model.state_dict(), 'best_rsum': best_rsum,'args': args,},
-                    is_best,
+                    epoch,
                     filename = '{}_without_sam_{}_epoch{}_bestRsum{:.4f}.pth'.format(args.data_name, args.model_name, epoch + 1, best_rsum),
                     prefix=args.ckpt_save_path,
-                    model_name=args.model_name
+                    model_name=args.model_name,
+                    args=args,
                 )
                 logger.info("================ Evaluation result on validation set =====================")
                 logger.info("[{}/{}] epochs".format(epoch + 1, args.epochs))

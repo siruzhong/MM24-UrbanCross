@@ -309,10 +309,12 @@ def main(args):
                         'args': args,
                         'Eiters': model.Eiters,
                     },
-                    is_best,
+                    epoch,
                     filename='ckpt_{}_{}_{:.2f}.pth.tar'.format(args.model_name ,epoch, best_rsum),
                     prefix=args.ckpt_save_path,
-                    model_name=args.model_name)
+                    model_name=args.model_name,
+                    args=args
+                    )
                 print('')
                 print("================ evaluate result on val set =====================")
                 print("Current => [{}/{}] fold & [{}/{}] epochs"
