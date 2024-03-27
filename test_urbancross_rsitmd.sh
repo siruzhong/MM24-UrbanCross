@@ -11,4 +11,4 @@ python test_urbancross.py \
        --workers 0 \
        --data_name $data_name \
        --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/checkpoints/ckpt_rsitmd_0.24944444807867208.pth \
-       2>&1 | tee -a outputs/logs_${datename}_data${data_name}_seg${num_seg}_test.txt
+       2>&1 | tee -a outputs/logs_${datename}_${data_name}_test.txt
