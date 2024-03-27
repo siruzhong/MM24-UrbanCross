@@ -1,6 +1,6 @@
 datename=$(date +%Y%m%d-%H%M%S)
 data_name=rsitmd
-epochs=35
+epochs=30
 num_seg=5
 
 python train_urbancross.py \

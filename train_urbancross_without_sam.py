@@ -212,7 +212,7 @@ def main(args):
                 utils.save_checkpoint(
                     {'epoch': epoch + 1, 'model': model.state_dict(), 'best_rsum': best_rsum,'args': args,},
                     is_best,
-                    filename = 'ckpt_{}_{}_epoch{}_bestRsum{:.4f}_{}_without_sam.pth'.format(args.data_name, args.model_name, epoch + 1, best_rsum, time.strftime('%Y%m%d-%H%M%S')),
+                    filename = '{}_without_sam_{}_epoch{}_bestRsum{:.4f}.pth'.format(args.data_name, args.model_name, epoch + 1, best_rsum),
                     prefix=args.ckpt_save_path,
                     model_name=args.model_name
                 )
