@@ -266,10 +266,10 @@ class PrecompDataset_without_sam_mine(data.Dataset):
                     )
 
             df = pd.read_csv(
-                f"urbancross_data/instructblip_generation_with_tag/instructblip_generation_{args.country.lower()}_refine.csv"
+                f"{args.image_path}/{args.country}/instructblip_generation_{args.country.lower()}_refine.csv"
             )
             data_split_txt = (
-                f"urbancross_data/images_target/{args.country}/{data_split}_list.txt"
+                f"{args.image_path}/{args.country}/{data_split}_list.txt"
             )
         else:
             # If country is not specified, set image path and data split text file path based on the data split
