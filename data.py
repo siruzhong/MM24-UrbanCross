@@ -613,7 +613,6 @@ def get_precomp_loader_without_sam_mine(
 def get_precomp_loader_mine_finetune(
     args,
     data_split,
-    # vocab,
     country,
     batch_size=100,
     shuffle=False,
@@ -695,7 +694,6 @@ def get_loaders_finetune(args, vocab):
     source_train_loader = get_precomp_loader_mine_finetune(
         args,
         data_split="train",
-        # vocab = vocab,
         country=args.country_source,
         batch_size=args.batch_size_source,
         shuffle=True,
@@ -705,7 +703,6 @@ def get_loaders_finetune(args, vocab):
     target_train_loader = get_precomp_loader_mine_finetune(
         args,
         data_split="train",
-        # vocab = vocab,
         country=args.country_target,
         batch_size=args.batch_size_target,
         shuffle=True,
@@ -716,7 +713,6 @@ def get_loaders_finetune(args, vocab):
     val_loader_source = get_precomp_loader_mine_finetune(
         args,
         "val",
-        # vocab,
         args.country_source,
         args.batch_size_val_source,
         False,
@@ -725,7 +721,6 @@ def get_loaders_finetune(args, vocab):
     val_loader_target = get_precomp_loader_mine_finetune(
         args,
         "val",
-        # vocab,
         args.country_target,
         args.batch_size_val_target,
         False,
