@@ -502,7 +502,7 @@ def save_checkpoint(state, epoch, filename, prefix='', model_name=None, args=Non
     # deal with unstable I/O. Usually not necessary.
     while tries:
         try:
-            if epoch >= args.epochs -5:
+            if epoch >= args.epochs -15:
                 torch.save(state, prefix + filename)
 
         except IOError as e:
