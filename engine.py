@@ -614,7 +614,8 @@ def validate_test(args, test_loader, model):
     input_seg = []  # For storing segmentation data
 
     # Iterate through the test data loader to get data
-    for idx, val_data in enumerate(tqdm(itertools.islice(test_loader, 3))):
+    # for idx, val_data in enumerate(tqdm(itertools.islice(test_loader, 3))):
+    for idx, val_data in enumerate(tqdm(test_loader)):
         images, ids, cap_tokens, segment_img = val_data  # Unpack data
         input_visual.append(images)  # Store image data
         input_text.append(cap_tokens)  # Store text data
