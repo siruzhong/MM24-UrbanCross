@@ -43,7 +43,10 @@ def parser_options():
     parser.add_argument('--eval_step', default=1, type=int, help="the epochs of eval")
     parser.add_argument('--test_step', default=0, type=int, help="the epochs of test")
     parser.add_argument('--batch_size', default=100, type=int, help="Batch train size")
-    parser.add_argument('--batch_size_val', default=100, type=int, help="Batch val size")
+    parser.add_argument('--batch_size_source', default=100, type=int, help="Batch train size")
+    parser.add_argument('--batch_size_target', default=100, type=int, help="Batch train size")  
+    parser.add_argument('--batch_size_val_source', default=100, type=int, help="Batch val size")
+    parser.add_argument('--batch_size_val_target', default=100, type=int, help="Batch val size")
     parser.add_argument('--shard_size', default=256, type=int, help="Batch shard size")
     parser.add_argument('--workers', default=3, type=int, help="the worker num of dataloader")
     parser.add_argument('-kf', '--k_fold_nums', default=1, type=int, help="the total num of k_flod")
@@ -56,9 +59,7 @@ def parser_options():
     parser.add_argument('--seed', default=0, type=int, help='random seed')
     parser.add_argument('--il_measure', default=False, help='Similarity measure used (cosine|l1|l2|msd)')
     # RNN/GRU model parameter
-    parser.add_argument('--word_dim', 
-                        default=300, 
-                        type=int,
+    parser.add_argument('--word_dim', default=300, type=int,
                         help='Dimensionality of the word embedding.(e.g. 300, 512)')
     parser.add_argument('--use_bidirectional_rnn', default=True, type=str)
     parser.add_argument('--is_finetune', default=False, type=str,  help='Finetune resnet or not')
@@ -82,8 +83,7 @@ def parser_options():
     parser.add_argument('--lr', 
                         default=2e-4, 
                         type=float, 
-                        help="learning rate"
-                        )
+                        help="learning rate")
     parser.add_argument('--lr_update_epoch', default=20, type=int, help="the update epoch of learning rate")
     parser.add_argument('--lr_decay_param', default=0.7, type=float, help="the decay_param of learning rate")
     # SWAN 对比实验调参变量
@@ -113,16 +113,25 @@ def parser_options():
         type=str, 
         default='./outputs',
     )
-
     parser.add_argument(
         "--country", 
+        type=str, 
+        # default='Finland',
+    )
+    parser.add_argument(
+        "--country_source", 
         type=str, 
         default='Finland',
     )
     parser.add_argument(
-        "--num_seg", 
-        type=int, 
-        default=10,
+        "--country_target", 
+        type=str, 
+        default='Finland',
+    )
+    parser.add_argument(
+        "--load_path", 
+        type=str, 
+        # default='./',
     )
     # parser.add_argument(
     #         "--experiment_name",
@@ -176,12 +185,13 @@ def main(args):
         dist.init_process_group(backend='nccl', 
                                 init_method=args.init_method,
                                 rank=args.rank, 
-                                world_size=args.world_size)
+                                world_size=args.world_size
+                                )
 
     # choose model
     # if args.model_name == "SWAN":
     #     from layers import SWAN as models
-    # elif args.model_name == "urbancross":
+    # elif args.model_name == "urbancross" or args.model_name == "urbancross_finetune":
     from layers import urbancross as models
     # else:
     #     raise NotImplementedError
@@ -190,17 +200,17 @@ def main(args):
     # path_train_info = args.ckpt_save_path + args.model_name + "_" + args.data_name + ".txt"
     # 'checkpoint/rsitmd/SWAN/SWAN_rsitmd.txt'
     
-    # import ipdb;ipdb.set_trace()
+    # # import ipdb;ipdb.set_trace()
     # if os.path.exists(path_train_info):
     #     os.remove(path_train_info)
-    # make ckpt save dir
+    # # make ckpt save dir
     # if not os.path.exists(args.ckpt_save_path) and args.rank == 0:
     #     os.makedirs(args.ckpt_save_path)
 
     # print & save args
-    logger.info(args.__dict__)
+
     # utils.log_to_txt(contexts='# Hyper Parameters setting', filename=path_train_info)
-    # utils.log_to_txt(contexts=args.__dict__, filename=path_train_info)
+    logger.info(args)
     # utils.log_to_txt(contexts='-------------------------', filename=path_train_info)
     # utils.log_to_txt(contexts='', filename=path_train_info)
 
@@ -210,45 +220,58 @@ def main(args):
 
     # Create dataset, model, criterion and optimizer
     # train_loader, val_loader = data.get_loaders(args, vocab)
-    train_loader, val_loader = data.get_loaders_mine(args, 
-                                                    #  vocab
-                                                     )
-    if args.test_step:
-        test_loader = data.get_test_loader(
-                                            args, 
-                                        #    vocab
-                                           )
-    print("len of train_loader is {}, len of val_loader is {}".format(len(train_loader), len(val_loader)))
-
-    model = models.factory(args,
+    # train_loader_source, train_loader_target, val_loader_source, val_loader_target = data.get_loaders_finetune(
+    #                                 args, 
+    #                                 # vocab
+    #                            )
+    train_loader_source, train_loader_target, train_dataset_source, train_dataset_target, val_loader_target, val_dataset_target = data.get_loaders_finetune(
+                                args, 
+                                # vocab
+    )
+    # import ipdb; ipdb.set_trace()
+    # if args.test_step:
+    #     test_loader = data.get_test_loader_finetune(args, 
+    #                                                 # vocab
+    #                                                 )
+    # print(f"len of train_loader is {train_loader_source}(source)/{train_loader_target}(target), len of val_loader is {val_loader_source}(source)/{val_loader_target}(target)")
+    # logger.info(f"len of train_loader is {train_loader_source}(source)/{train_loader_target}(target)")
+    logger.info(f"len of train_set is {len(train_dataset_source)}(source)/{len(train_dataset_target)}(target)")
+    logger.info(f"len of val_set is {len(val_dataset_target)}(target)")
+    # model = models.factory(args,
+    #                        vocab.word2idx,
+    #                        cuda=True, 
+    #                        data_parallel=args.distributed
+    #                        )
+    model = models.factory_finetune_curriculum(args,
                         #    vocab.word2idx,
                            cuda=True, 
                            data_parallel=args.distributed
                            )
-
+    pretrained_weight = torch.load(args.load_path, map_location='cuda:{}'.format(args.gpuid))
+    model.load_state_dict(pretrained_weight['model'], strict=False)
+    # import ipdb; ipdb.set_trace()
     # print & save model info
     if args.rank == 0:
         # path_model_info = args.ckpt_save_path + args.model_name + "_info.txt"
         # if os.path.exists(path_model_info):
         #     os.remove(path_model_info)
         # log = open(path_model_info, mode="a", encoding="utf-8")
-        # print("Total Params: ", sum(p.numel() for p in model.parameters()))
-        # print("Total Requires_grad Params: ", sum(p.numel() for p in model.parameters() if p.requires_grad))
-        # print("Total Params: ", sum(p.numel() for p in model.parameters()), file=log)
-        # print("Total Requires_grad Params: ", sum(p.numel() for p in model.parameters() if p.requires_grad), file=log)
+        
         total_params = sum(p.numel() for p in model.parameters())
         total_requires_grad_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         total_params_mb = total_params / (1024 * 1024)
         total_requires_grad_params_mb = total_requires_grad_params / (1024 * 1024)
-
+        # print("Total Params: ", sum(p.numel() for p in model.parameters()))
+        # print("Total Requires_grad Params: ", sum(p.numel() for p in model.parameters() if p.requires_grad))
+        # print("Total Params: ", sum(p.numel() for p in model.parameters()), file=log)
+        # print("Total Requires_grad Params: ", sum(p.numel() for p in model.parameters() if p.requires_grad), file=log)
         logger.info("Total Params: {:.2f} MB".format(total_params_mb))
         logger.info("Total Requires_grad Params: {:.2f} MB".format(total_requires_grad_params_mb))
-        # print("Total Params: {:.2f} MB".format(total_params_mb), file=log)
-        # print("Total Requires_grad Params: {:.2f} MB".format(total_requires_grad_params_mb), file=log)
         # print("========================================================", file=log)
-        logger.info(model)
+        # print(model, file=log)
+        # logger.info(model)
         # print("========================================================", file=log)
-    # import ipdb; ipdb.set_trace()
+
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
     # optionally resume from a checkpoint
@@ -265,45 +288,44 @@ def main(args):
             best_rsum = checkpoint['best_rsum']
             model.load_state_dict(checkpoint['model'], strict =False)
         
+        
             # Eiters is used to show logs as the continuation of another
             # training
             # model.Eiters = checkpoint['Eiters']
    
-            # print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})"
-            #       .format(args.resume, start_epoch, best_rsum))
-            print("=> loaded checkpoint '{}' (epoch {}, best_rsum {:.3f})"
-                .format(args.resume, start_epoch, best_rsum))
-            rsum, all_scores = engine.validate(args, 
-                                               val_loader, 
-                                               model,
-                                               epoch=start_epoch,
-                                               )
+            print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})"
+                  .format(args.resume, start_epoch, best_rsum))
+            rsum, all_scores = engine.validate(args, val_loader, model)
             print(all_scores)
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     # Train the Model
     for epoch in range(start_epoch, args.epochs):
+
         if args.distributed:
             train_loader.sampler.set_epoch(epoch)
 
-        # decayed by 10 every 30 epochs
-        utils.adjust_learning_rate(args, 
-                                   optimizer, 
-                                   epoch)
+        utils.adjust_learning_rate(args, optimizer, epoch)
 
         # # test validate
         # engine.validate(args, val_loader, model)
-        # engine.validate_test(args, val_loader, model)
+
         # train for one epoch
-        engine.train(args, train_loader, model, optimizer, epoch)
+        engine.train_finetune_curriculum(args, 
+                              train_loader_source,
+                              train_loader_target,
+                              model, 
+                              optimizer, 
+                              epoch
+                              )
 
         # evaluate on validation set
         if (epoch + 1) % args.eval_step == 0:
-            rsum, all_scores = engine.validate(args, 
-                                               val_loader, 
+            rsum, all_scores = engine.validate_finetune(args, 
+                                               val_loader_target, 
                                                model,
-                                               epoch
+                                               epoch,
                                                )
 
             is_best = rsum > best_rsum
@@ -312,33 +334,29 @@ def main(args):
             best_rsum = max(rsum, best_rsum)
 
             if args.rank == 0:
-                if is_best:
-                # save ckpt
-                    utils.save_checkpoint(
-                        state={
-                            'epoch': epoch + 1,
-                            'model': model.state_dict(),
-                            'best_rsum': best_rsum,
-                            'args': args,
-                            # 'Eiters': model.Eiters,
-                            },
-                        # is_best,
-                        filename=f'ckpt_{args.model_name}_{epoch}_{best_rsum:.2f}.pth',
-                        # .format(args.model_name ,epoch, best_rsum),
-                        prefix=args.ckpt_save_path,
-                        model_name=args.model_name
-                    )
                 # print('')
                 logger.info("================ evaluate result on val set =====================")
-                # print("Current => [{}/{}] fold & [{}/{}] epochs"
-                #       .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs))
-                logger.info("[{}/{}] epochs"
+                logger.info("Current =>[{}/{}] epochs"
                       .format(epoch + 1, args.epochs))
-                
                 logger.info("Now val score:")
                 logger.info(all_scores)
                 logger.info("Best val score:")
                 logger.info(best_score)
+                # import ipdb; ipdb.set_trace()
+                # save ckpt
+                utils.save_checkpoint(
+                    {
+                        'epoch': epoch + 1,
+                        'model': model.state_dict(),
+                        'best_rsum': best_rsum,
+                        'args': args,
+                        # 'Eiters': model.Eiters,
+                    },
+                    # is_best,
+                    filename=f'ckpt_{args.model_name}_{epoch}_{best_rsum:.2f}.pth',
+                    prefix=args.ckpt_save_path,
+                    model_name=args.model_name
+                )
                 # print("=================================================================")
                 # print('')
 
@@ -359,197 +377,193 @@ def main(args):
                 #                  filename=path_train_info)
                 # utils.log_to_txt(contexts="",
                 #                  filename=path_train_info)
+        # # evaluate on test set
+        # if args.test_step and (epoch + 1) % args.test_step == 0:
+        #     rsum_, all_scores_ = engine.validate_test(args, test_loader, model)
 
-        # evaluate on test set
-        if args.test_step and (epoch + 1) % args.test_step == 0:
-            rsum_, all_scores_ = engine.validate_test(args, 
-                                                      test_loader, 
-                                                      model
-                                                      )
+        #     is_best_ = rsum_ > best_rsum_
+        #     if is_best_:
+        #         best_score_ = all_scores_
+        #     best_rsum_ = max(rsum_, best_rsum_)
 
-            is_best_ = rsum_ > best_rsum_
-            if is_best_:
-                best_score_ = all_scores_
-            best_rsum_ = max(rsum_, best_rsum_)
+        #     if args.rank == 0:
+        #         print('')
+        #         print("================ evaluate result on test set =====================")
+        #         print("Current => [{}/{}] fold & [{}/{}] epochs"
+        #               .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs))
+        #         print("Now test score:")
+        #         print(all_scores_)
+        #         print("Best test score:")
+        #         print(best_score_)
+        #         print("=================================================================")
+        #         print('')
 
-            if args.rank == 0:
-                # print('')
-                logger.info("================ evaluate result on test set =====================")
-                logger.info("[{}/{}] epochs"
-                      .format(epoch + 1, args.epochs))
-                logger.info("Now test score:")
-                logger.info(all_scores_)
-                logger.info("Best test score:")
-                logger.info(best_score_)
-                # logger.info("=================================================================")
-                # print('')
-
-                # utils.log_to_txt(contexts="",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="================ evaluate on test set ============================",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="Current => [{}/{}] fold & [{}/{}] epochs"
-                #                  .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs),
-                #                  filename=path_train_info)
-                # utils.log_to_txt("Now test score:",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts=all_scores_,filename=path_train_info)
-                # utils.log_to_txt("Best test score:",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(best_score_,filename=path_train_info)
-                # utils.log_to_txt(contexts="=================================================================",
-                #                  filename=path_train_info)
-                # utils.log_to_txt(contexts="",
-                #                  filename=path_train_info)
+        #         utils.log_to_txt(contexts="",
+        #                          filename=path_train_info)
+        #         utils.log_to_txt(contexts="================ evaluate on test set ============================",
+        #                          filename=path_train_info)
+        #         utils.log_to_txt(contexts="Current => [{}/{}] fold & [{}/{}] epochs"
+        #                          .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs),
+        #                          filename=path_train_info)
+        #         utils.log_to_txt("Now test score:",
+        #                          filename=path_train_info)
+        #         utils.log_to_txt(contexts=all_scores_,filename=path_train_info)
+        #         utils.log_to_txt("Best test score:",
+        #                          filename=path_train_info)
+        #         utils.log_to_txt(best_score_,filename=path_train_info)
+        #         utils.log_to_txt(contexts="=================================================================",
+        #                          filename=path_train_info)
+        #         utils.log_to_txt(contexts="",
+        #                          filename=path_train_info)
 
     if args.distributed:
         # destroy process
         dist.destroy_process_group()
 
 
-def generate_random_samples(args):
-    # load all anns
-    caps = utils.load_from_txt(args.data_path+'train_caps.txt')
-    fnames = utils.load_from_txt(args.data_path+'train_filename.txt')
+# def generate_random_samples(args):
+#     # load all anns
+#     caps = utils.load_from_txt(args.data_path+'train_caps.txt')
+#     fnames = utils.load_from_txt(args.data_path+'train_filename.txt')
 
-    # merge
-    assert len(caps) // 5 == len(fnames)
-    all_infos = []
-    for img_id in range(len(fnames)):
-        cap_id = [img_id * 5 ,(img_id+1) * 5]
-        all_infos.append([caps[cap_id[0]:cap_id[1]], fnames[img_id]])
+#     # merge
+#     assert len(caps) // 5 == len(fnames)
+#     all_infos = []
+#     for img_id in range(len(fnames)):
+#         cap_id = [img_id * 5 ,(img_id+1) * 5]
+#         all_infos.append([caps[cap_id[0]:cap_id[1]], fnames[img_id]])
 
-    # shuffle
-    random.shuffle(all_infos)
+#     # shuffle
+#     random.shuffle(all_infos)
 
-    # split_trainval
-    percent = 0.8
-    train_infos = all_infos[:int(len(all_infos)*percent)]
-    val_infos = all_infos[int(len(all_infos)*percent):]
+#     # split_trainval
+#     percent = 0.8
+#     train_infos = all_infos[:int(len(all_infos)*percent)]
+#     val_infos = all_infos[int(len(all_infos)*percent):]
 
-    # save to txt
-    train_caps = []
-    train_fnames = []
-    for item in train_infos:
-        for cap in item[0]:
-            train_caps.append(cap)
-        train_fnames.append(item[1])
-    utils.log_to_txt(train_caps, args.data_path+'train_caps_verify.txt',mode='w')
-    utils.log_to_txt(train_fnames, args.data_path+'train_filename_verify.txt',mode='w')
+#     # save to txt
+#     train_caps = []
+#     train_fnames = []
+#     for item in train_infos:
+#         for cap in item[0]:
+#             train_caps.append(cap)
+#         train_fnames.append(item[1])
+#     utils.log_to_txt(train_caps, args.data_path+'train_caps_verify.txt',mode='w')
+#     utils.log_to_txt(train_fnames, args.data_path+'train_filename_verify.txt',mode='w')
 
-    val_caps = []
-    val_fnames = []
-    for item in val_infos:
-        for cap in item[0]:
-            val_caps.append(cap)
-            val_fnames.append(item[1])
-    utils.log_to_txt(val_caps, args.data_path+'val_caps_verify.txt',mode='w')
-    utils.log_to_txt(val_fnames, args.data_path+'val_filename_verify.txt',mode='w')
+#     val_caps = []
+#     val_fnames = []
+#     for item in val_infos:
+#         for cap in item[0]:
+#             val_caps.append(cap)
+#             val_fnames.append(item[1])
+#     utils.log_to_txt(val_caps, args.data_path+'val_caps_verify.txt',mode='w')
+#     utils.log_to_txt(val_fnames, args.data_path+'val_filename_verify.txt',mode='w')
 
-    print("Generate random samples to {} complete.".format(args.data_path))
+#     print("Generate random samples to {} complete.".format(args.data_path))
 
-    ######################################################################################
-    data_info_path = args.ckpt_save_path + 'data/'
-    if os.path.exists(data_info_path):
-        shutil.rmtree(data_info_path)
-    if not os.path.exists(data_info_path) and args.rank == 0:
-        os.makedirs(data_info_path)
+#     ######################################################################################
+#     data_info_path = args.ckpt_save_path + 'data/'
+#     if os.path.exists(data_info_path):
+#         shutil.rmtree(data_info_path)
+#     if not os.path.exists(data_info_path) and args.rank == 0:
+#         os.makedirs(data_info_path)
 
-    # cpoy tran & val set
-    utils.log_to_txt(train_caps, data_info_path + 'train_caps_verify.txt',mode='w')
-    utils.log_to_txt(train_fnames, data_info_path + 'train_filename_verify.txt',mode='w')
-    utils.log_to_txt(val_caps, data_info_path + 'val_caps_verify.txt',mode='w')
-    utils.log_to_txt(val_fnames, data_info_path + 'val_filename_verify.txt',mode='w')
+#     # cpoy tran & val set
+#     utils.log_to_txt(train_caps, data_info_path + 'train_caps_verify.txt',mode='w')
+#     utils.log_to_txt(train_fnames, data_info_path + 'train_filename_verify.txt',mode='w')
+#     utils.log_to_txt(val_caps, data_info_path + 'val_caps_verify.txt',mode='w')
+#     utils.log_to_txt(val_fnames, data_info_path + 'val_filename_verify.txt',mode='w')
 
-    # vis & cal data set split
-    utils.vis_cal_data_info(args, data_info_path, train_fnames, val_fnames)
+#     # vis & cal data set split
+#     utils.vis_cal_data_info(args, data_info_path, train_fnames, val_fnames)
 
-    print("Copy random samples and Cal data info to {} complete.".format(args.ckpt_save_path))
-    ######################################################################################
+#     print("Copy random samples and Cal data info to {} complete.".format(args.ckpt_save_path))
+#     ######################################################################################
 
 # stratified_random_samples
 
-def generate_stratified_random_samples(args):
-    # load all ans
-    caps = utils.load_from_txt(args.data_path+'train_caps.txt')
-    fnames = utils.load_from_txt(args.data_path+'train_filename.txt')
+# def generate_stratified_random_samples(args):
+#     # load all ans
+#     caps = utils.load_from_txt(args.data_path+'train_caps.txt')
+#     fnames = utils.load_from_txt(args.data_path+'train_filename.txt')
 
-    # merge
-    assert len(caps) // 5 == len(fnames)
-    all_infos = []
-    for img_id in range(len(fnames)):
-        cap_id = [img_id * 5 ,(img_id+1) * 5]
-        all_infos.append([caps[cap_id[0]:cap_id[1]], fnames[img_id]])
+#     # merge
+#     assert len(caps) // 5 == len(fnames)
+#     all_infos = []
+#     for img_id in range(len(fnames)):
+#         cap_id = [img_id * 5 ,(img_id+1) * 5]
+#         all_infos.append([caps[cap_id[0]:cap_id[1]], fnames[img_id]])
 
-    # shuffle
-    random.shuffle(all_infos)
-    ff = [a[1] for a in all_infos]
-    class_ = utils.gen_class_from_list(ff)
-    cnt_cl = utils.cnt_class(class_)
-    p = 0.8
-    cnt_p = {}
+#     # shuffle
+#     random.shuffle(all_infos)
+#     ff = [a[1] for a in all_infos]
+#     class_ = utils.gen_class_from_list(ff)
+#     cnt_cl = utils.cnt_class(class_)
+#     p = 0.8
+#     cnt_p = {}
 
-    for i in cnt_cl.keys():
-        cnt_p[i] = int(round(cnt_cl[i] * p))
+#     for i in cnt_cl.keys():
+#         cnt_p[i] = int(round(cnt_cl[i] * p))
 
-    train_infos = []
-    val_infos = []
-    for i in range(len(all_infos)):
-        if cnt_p[class_[i]] > 0:
-            train_infos.append(all_infos[i])
-            cnt_p[class_[i]] -= 1
-        else:
-            val_infos.append(all_infos[i])
+#     train_infos = []
+#     val_infos = []
+#     for i in range(len(all_infos)):
+#         if cnt_p[class_[i]] > 0:
+#             train_infos.append(all_infos[i])
+#             cnt_p[class_[i]] -= 1
+#         else:
+#             val_infos.append(all_infos[i])
 
-    # save to txt
-    train_caps = []
-    train_fnames = []
-    for item in train_infos:
-        for cap in item[0]:
-            train_caps.append(cap)
-        train_fnames.append(item[1])
-    utils.log_to_txt(train_caps, args.data_path+'train_caps_verify.txt',mode='w')
-    utils.log_to_txt(train_fnames, args.data_path+'train_filename_verify.txt',mode='w')
+#     # save to txt
+#     train_caps = []
+#     train_fnames = []
+#     for item in train_infos:
+#         for cap in item[0]:
+#             train_caps.append(cap)
+#         train_fnames.append(item[1])
+#     utils.log_to_txt(train_caps, args.data_path+'train_caps_verify.txt',mode='w')
+#     utils.log_to_txt(train_fnames, args.data_path+'train_filename_verify.txt',mode='w')
 
-    val_caps = []
-    val_fnames = []
-    for item in val_infos:
-        for cap in item[0]:
-            val_caps.append(cap)
-            val_fnames.append(item[1])
-    utils.log_to_txt(val_caps, args.data_path+'val_caps_verify.txt',mode='w')
-    utils.log_to_txt(val_fnames, args.data_path+'val_filename_verify.txt',mode='w')
+#     val_caps = []
+#     val_fnames = []
+#     for item in val_infos:
+#         for cap in item[0]:
+#             val_caps.append(cap)
+#             val_fnames.append(item[1])
+#     utils.log_to_txt(val_caps, args.data_path+'val_caps_verify.txt',mode='w')
+#     utils.log_to_txt(val_fnames, args.data_path+'val_filename_verify.txt',mode='w')
 
-    print("Generate random samples to {} complete.".format(args.data_path))
-    ######################################################################################
-    data_info_path = args.ckpt_save_path + 'data/'
-    if os.path.exists(data_info_path):
-        shutil.rmtree(data_info_path)
-    if not os.path.exists(data_info_path) and args.rank == 0:
-        os.makedirs(data_info_path)
+#     print("Generate random samples to {} complete.".format(args.data_path))
+#     ######################################################################################
+#     data_info_path = args.ckpt_save_path + 'data/'
+#     if os.path.exists(data_info_path):
+#         shutil.rmtree(data_info_path)
+#     if not os.path.exists(data_info_path) and args.rank == 0:
+#         os.makedirs(data_info_path)
 
-    # cpoy tran & val set
-    utils.log_to_txt(train_caps, data_info_path + 'train_caps_verify.txt',mode='w')
-    utils.log_to_txt(train_fnames, data_info_path + 'train_filename_verify.txt',mode='w')
-    utils.log_to_txt(val_caps, data_info_path + 'val_caps_verify.txt',mode='w')
-    utils.log_to_txt(val_fnames, data_info_path + 'val_filename_verify.txt',mode='w')
+#     # cpoy tran & val set
+#     utils.log_to_txt(train_caps, data_info_path + 'train_caps_verify.txt',mode='w')
+#     utils.log_to_txt(train_fnames, data_info_path + 'train_filename_verify.txt',mode='w')
+#     utils.log_to_txt(val_caps, data_info_path + 'val_caps_verify.txt',mode='w')
+#     utils.log_to_txt(val_fnames, data_info_path + 'val_filename_verify.txt',mode='w')
 
-    # vis & cal data set split
-    utils.vis_cal_data_info(args, data_info_path, train_fnames, val_fnames)
+#     # vis & cal data set split
+#     utils.vis_cal_data_info(args, data_info_path, train_fnames, val_fnames)
 
-    print("Copy random samples and Cal data info to {} complete.".format(args.ckpt_save_path))
-    ######################################################################################
+#     print("Copy random samples and Cal data info to {} complete.".format(args.ckpt_save_path))
+#     ######################################################################################
 
 
-def update_options_savepath(args, k):
-    args_new = copy.deepcopy(args)
+# def update_options_savepath(args, k):
+#     args_new = copy.deepcopy(args)
 
-    args_new.k_fold_current_num= k
-    if args.k_fold_nums > 1:
-        args_new.ckpt_save_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/" + str(k) + "/"
-    else:
-        args_new.ckpt_save_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/"
-    return args_new
+#     args_new.k_fold_current_num= k
+#     if args.k_fold_nums > 1:
+#         args_new.ckpt_save_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/" + str(k) + "/"
+#     else:
+#         args_new.ckpt_save_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/"
+#     return args_new
 
 
 if __name__ == '__main__':
@@ -560,9 +574,10 @@ if __name__ == '__main__':
     # logger_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/"
     # tb_logger.configure(logger_path, flush_secs=5)
     # logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
-    # import ipdb; ipdb.set_trace()
-    # k_fold verify
+
+    # # k_fold verify
     # for k in range(args.k_fold_nums):
+
     #     print("Start {}th fold, total {} flod".format(k + 1, args.k_fold_nums))
 
     #     # update save path
@@ -580,6 +595,4 @@ if __name__ == '__main__':
     #         args_new.data_path = './fix_data/'+ args_new.data_name + '_precomp/'
 
         # run experiment
-    
-    # main(args_new)
     main(args)

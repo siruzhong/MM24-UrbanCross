@@ -13,6 +13,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 import wandb
 import pynvml
+from tqdm import tqdm
 from loguru import logger
 
 # 从npy中读取
@@ -467,15 +468,18 @@ def shard_dis_mine_finetune(args,
     # l1 = len(images)
     # l2 = len(captions)
     
+    #args.shard_size是256
     #图片分成多少块
     n_img_shard = (len(images) - 1) // args.shard_size + 1
     #text分成多少块
     n_cap_shard = (len(captions) - 1) // args.shard_size + 1
-
+    # import ipdb; ipdb.set_trace()
+    logger.info('n_img_shard:{}'.format(n_img_shard))
+    logger.info('n_cap_shard:{}'.format(n_cap_shard))
     d = np.zeros((len(images), len(captions)))
     all = []
     print("==> start to compute image-caption pairwise distance <==")
-    for i in range(n_img_shard):
+    for i in tqdm(range(n_img_shard)):
         img_start, img_end = args.shard_size * i, min(args.shard_size * (i + 1), len(images))
 
         print("Calculate the similarity in batches: [{}/{}]".format(i, n_img_shard))
@@ -493,7 +497,7 @@ def shard_dis_mine_finetune(args,
                 # if args.il_measure:
                 #     sim,_,_ = model(im, s, l)
                 # else:
-                sim_img2text= model(img,
+                sim_img2text = model(img,
                                     img, 
                                     texts,
                                     texts, 

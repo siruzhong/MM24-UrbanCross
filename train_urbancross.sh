@@ -1,7 +1,13 @@
 datename=$(date +%Y%m%d-%H%M%S)
-name=urbancross
-# country=Finland
-country=Germany
+country=Finland
+# country=Germany
+bs=40
+# lr=1e-4
+# lr=5e-5
+# lr=1e-5
+lr=5e-6
+num_seg=5
+name=urbancross_$country\_bs$bs\_lr$lr\_numseg$num_seg
 logging_dir=outputs/pretrain/$country/$datename
 mkdir -p $logging_dir
 pip list > $logging_dir/environment.txt
@@ -15,8 +21,9 @@ python train_urbancross.py \
        --epochs 50 \
        --image_path urbancross_data/images_target \
        --country $country \
-       --batch_size 40 \
-       --num_seg 5 \
+       --batch_size $bs \
+       --lr $lr \
+       --num_seg $num_seg \
        |& tee $logging_dir/logs_$datename.txt 2>&1
        # --workers 0 \
        # --k_fold_nums 1 \

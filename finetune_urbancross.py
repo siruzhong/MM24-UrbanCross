@@ -188,12 +188,12 @@ def main(args):
                                 world_size=args.world_size)
 
     # choose model
-    if args.model_name == "SWAN":
-        from layers import SWAN as models
-    elif args.model_name == "urbancross" or args.model_name == "urbancross_finetune":
-        from layers import urbancross as models
-    else:
-        raise NotImplementedError
+    # if args.model_name == "SWAN":
+    #     from layers import SWAN as models
+    # elif args.model_name == "urbancross" or args.model_name == "urbancross_finetune":
+    from layers import urbancross as models
+    # else:
+    #     raise NotImplementedError
 
     # remove last train_info txt
     # path_train_info = args.ckpt_save_path + args.model_name + "_" + args.data_name + ".txt"
@@ -334,8 +334,8 @@ def main(args):
             if args.rank == 0:
                 # print('')
                 logger.info("================ evaluate result on val set =====================")
-                logger.info("Current => [{}/{}] fold & [{}/{}] epochs"
-                      .format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs))
+                logger.info("Current =>[{}/{}] epochs"
+                      .format(epoch + 1, args.epochs))
                 logger.info("Now val score:")
                 logger.info(all_scores)
                 logger.info("Best val score:")
@@ -419,149 +419,149 @@ def main(args):
         dist.destroy_process_group()
 
 
-def generate_random_samples(args):
-    # load all anns
-    caps = utils.load_from_txt(args.data_path+'train_caps.txt')
-    fnames = utils.load_from_txt(args.data_path+'train_filename.txt')
+# def generate_random_samples(args):
+#     # load all anns
+#     caps = utils.load_from_txt(args.data_path+'train_caps.txt')
+#     fnames = utils.load_from_txt(args.data_path+'train_filename.txt')
 
-    # merge
-    assert len(caps) // 5 == len(fnames)
-    all_infos = []
-    for img_id in range(len(fnames)):
-        cap_id = [img_id * 5 ,(img_id+1) * 5]
-        all_infos.append([caps[cap_id[0]:cap_id[1]], fnames[img_id]])
+#     # merge
+#     assert len(caps) // 5 == len(fnames)
+#     all_infos = []
+#     for img_id in range(len(fnames)):
+#         cap_id = [img_id * 5 ,(img_id+1) * 5]
+#         all_infos.append([caps[cap_id[0]:cap_id[1]], fnames[img_id]])
 
-    # shuffle
-    random.shuffle(all_infos)
+#     # shuffle
+#     random.shuffle(all_infos)
 
-    # split_trainval
-    percent = 0.8
-    train_infos = all_infos[:int(len(all_infos)*percent)]
-    val_infos = all_infos[int(len(all_infos)*percent):]
+#     # split_trainval
+#     percent = 0.8
+#     train_infos = all_infos[:int(len(all_infos)*percent)]
+#     val_infos = all_infos[int(len(all_infos)*percent):]
 
-    # save to txt
-    train_caps = []
-    train_fnames = []
-    for item in train_infos:
-        for cap in item[0]:
-            train_caps.append(cap)
-        train_fnames.append(item[1])
-    utils.log_to_txt(train_caps, args.data_path+'train_caps_verify.txt',mode='w')
-    utils.log_to_txt(train_fnames, args.data_path+'train_filename_verify.txt',mode='w')
+#     # save to txt
+#     train_caps = []
+#     train_fnames = []
+#     for item in train_infos:
+#         for cap in item[0]:
+#             train_caps.append(cap)
+#         train_fnames.append(item[1])
+#     utils.log_to_txt(train_caps, args.data_path+'train_caps_verify.txt',mode='w')
+#     utils.log_to_txt(train_fnames, args.data_path+'train_filename_verify.txt',mode='w')
 
-    val_caps = []
-    val_fnames = []
-    for item in val_infos:
-        for cap in item[0]:
-            val_caps.append(cap)
-            val_fnames.append(item[1])
-    utils.log_to_txt(val_caps, args.data_path+'val_caps_verify.txt',mode='w')
-    utils.log_to_txt(val_fnames, args.data_path+'val_filename_verify.txt',mode='w')
+#     val_caps = []
+#     val_fnames = []
+#     for item in val_infos:
+#         for cap in item[0]:
+#             val_caps.append(cap)
+#             val_fnames.append(item[1])
+#     utils.log_to_txt(val_caps, args.data_path+'val_caps_verify.txt',mode='w')
+#     utils.log_to_txt(val_fnames, args.data_path+'val_filename_verify.txt',mode='w')
 
-    print("Generate random samples to {} complete.".format(args.data_path))
+#     print("Generate random samples to {} complete.".format(args.data_path))
 
-    ######################################################################################
-    data_info_path = args.ckpt_save_path + 'data/'
-    if os.path.exists(data_info_path):
-        shutil.rmtree(data_info_path)
-    if not os.path.exists(data_info_path) and args.rank == 0:
-        os.makedirs(data_info_path)
+#     ######################################################################################
+#     data_info_path = args.ckpt_save_path + 'data/'
+#     if os.path.exists(data_info_path):
+#         shutil.rmtree(data_info_path)
+#     if not os.path.exists(data_info_path) and args.rank == 0:
+#         os.makedirs(data_info_path)
 
-    # cpoy tran & val set
-    utils.log_to_txt(train_caps, data_info_path + 'train_caps_verify.txt',mode='w')
-    utils.log_to_txt(train_fnames, data_info_path + 'train_filename_verify.txt',mode='w')
-    utils.log_to_txt(val_caps, data_info_path + 'val_caps_verify.txt',mode='w')
-    utils.log_to_txt(val_fnames, data_info_path + 'val_filename_verify.txt',mode='w')
+#     # cpoy tran & val set
+#     utils.log_to_txt(train_caps, data_info_path + 'train_caps_verify.txt',mode='w')
+#     utils.log_to_txt(train_fnames, data_info_path + 'train_filename_verify.txt',mode='w')
+#     utils.log_to_txt(val_caps, data_info_path + 'val_caps_verify.txt',mode='w')
+#     utils.log_to_txt(val_fnames, data_info_path + 'val_filename_verify.txt',mode='w')
 
-    # vis & cal data set split
-    utils.vis_cal_data_info(args, data_info_path, train_fnames, val_fnames)
+#     # vis & cal data set split
+#     utils.vis_cal_data_info(args, data_info_path, train_fnames, val_fnames)
 
-    print("Copy random samples and Cal data info to {} complete.".format(args.ckpt_save_path))
-    ######################################################################################
+#     print("Copy random samples and Cal data info to {} complete.".format(args.ckpt_save_path))
+#     ######################################################################################
 
 # stratified_random_samples
 
-def generate_stratified_random_samples(args):
-    # load all ans
-    caps = utils.load_from_txt(args.data_path+'train_caps.txt')
-    fnames = utils.load_from_txt(args.data_path+'train_filename.txt')
+# def generate_stratified_random_samples(args):
+#     # load all ans
+#     caps = utils.load_from_txt(args.data_path+'train_caps.txt')
+#     fnames = utils.load_from_txt(args.data_path+'train_filename.txt')
 
-    # merge
-    assert len(caps) // 5 == len(fnames)
-    all_infos = []
-    for img_id in range(len(fnames)):
-        cap_id = [img_id * 5 ,(img_id+1) * 5]
-        all_infos.append([caps[cap_id[0]:cap_id[1]], fnames[img_id]])
+#     # merge
+#     assert len(caps) // 5 == len(fnames)
+#     all_infos = []
+#     for img_id in range(len(fnames)):
+#         cap_id = [img_id * 5 ,(img_id+1) * 5]
+#         all_infos.append([caps[cap_id[0]:cap_id[1]], fnames[img_id]])
 
-    # shuffle
-    random.shuffle(all_infos)
-    ff = [a[1] for a in all_infos]
-    class_ = utils.gen_class_from_list(ff)
-    cnt_cl = utils.cnt_class(class_)
-    p = 0.8
-    cnt_p = {}
+#     # shuffle
+#     random.shuffle(all_infos)
+#     ff = [a[1] for a in all_infos]
+#     class_ = utils.gen_class_from_list(ff)
+#     cnt_cl = utils.cnt_class(class_)
+#     p = 0.8
+#     cnt_p = {}
 
-    for i in cnt_cl.keys():
-        cnt_p[i] = int(round(cnt_cl[i] * p))
+#     for i in cnt_cl.keys():
+#         cnt_p[i] = int(round(cnt_cl[i] * p))
 
-    train_infos = []
-    val_infos = []
-    for i in range(len(all_infos)):
-        if cnt_p[class_[i]] > 0:
-            train_infos.append(all_infos[i])
-            cnt_p[class_[i]] -= 1
-        else:
-            val_infos.append(all_infos[i])
+#     train_infos = []
+#     val_infos = []
+#     for i in range(len(all_infos)):
+#         if cnt_p[class_[i]] > 0:
+#             train_infos.append(all_infos[i])
+#             cnt_p[class_[i]] -= 1
+#         else:
+#             val_infos.append(all_infos[i])
 
-    # save to txt
-    train_caps = []
-    train_fnames = []
-    for item in train_infos:
-        for cap in item[0]:
-            train_caps.append(cap)
-        train_fnames.append(item[1])
-    utils.log_to_txt(train_caps, args.data_path+'train_caps_verify.txt',mode='w')
-    utils.log_to_txt(train_fnames, args.data_path+'train_filename_verify.txt',mode='w')
+#     # save to txt
+#     train_caps = []
+#     train_fnames = []
+#     for item in train_infos:
+#         for cap in item[0]:
+#             train_caps.append(cap)
+#         train_fnames.append(item[1])
+#     utils.log_to_txt(train_caps, args.data_path+'train_caps_verify.txt',mode='w')
+#     utils.log_to_txt(train_fnames, args.data_path+'train_filename_verify.txt',mode='w')
 
-    val_caps = []
-    val_fnames = []
-    for item in val_infos:
-        for cap in item[0]:
-            val_caps.append(cap)
-            val_fnames.append(item[1])
-    utils.log_to_txt(val_caps, args.data_path+'val_caps_verify.txt',mode='w')
-    utils.log_to_txt(val_fnames, args.data_path+'val_filename_verify.txt',mode='w')
+#     val_caps = []
+#     val_fnames = []
+#     for item in val_infos:
+#         for cap in item[0]:
+#             val_caps.append(cap)
+#             val_fnames.append(item[1])
+#     utils.log_to_txt(val_caps, args.data_path+'val_caps_verify.txt',mode='w')
+#     utils.log_to_txt(val_fnames, args.data_path+'val_filename_verify.txt',mode='w')
 
-    print("Generate random samples to {} complete.".format(args.data_path))
-    ######################################################################################
-    data_info_path = args.ckpt_save_path + 'data/'
-    if os.path.exists(data_info_path):
-        shutil.rmtree(data_info_path)
-    if not os.path.exists(data_info_path) and args.rank == 0:
-        os.makedirs(data_info_path)
+#     print("Generate random samples to {} complete.".format(args.data_path))
+#     ######################################################################################
+#     data_info_path = args.ckpt_save_path + 'data/'
+#     if os.path.exists(data_info_path):
+#         shutil.rmtree(data_info_path)
+#     if not os.path.exists(data_info_path) and args.rank == 0:
+#         os.makedirs(data_info_path)
 
-    # cpoy tran & val set
-    utils.log_to_txt(train_caps, data_info_path + 'train_caps_verify.txt',mode='w')
-    utils.log_to_txt(train_fnames, data_info_path + 'train_filename_verify.txt',mode='w')
-    utils.log_to_txt(val_caps, data_info_path + 'val_caps_verify.txt',mode='w')
-    utils.log_to_txt(val_fnames, data_info_path + 'val_filename_verify.txt',mode='w')
+#     # cpoy tran & val set
+#     utils.log_to_txt(train_caps, data_info_path + 'train_caps_verify.txt',mode='w')
+#     utils.log_to_txt(train_fnames, data_info_path + 'train_filename_verify.txt',mode='w')
+#     utils.log_to_txt(val_caps, data_info_path + 'val_caps_verify.txt',mode='w')
+#     utils.log_to_txt(val_fnames, data_info_path + 'val_filename_verify.txt',mode='w')
 
-    # vis & cal data set split
-    utils.vis_cal_data_info(args, data_info_path, train_fnames, val_fnames)
+#     # vis & cal data set split
+#     utils.vis_cal_data_info(args, data_info_path, train_fnames, val_fnames)
 
-    print("Copy random samples and Cal data info to {} complete.".format(args.ckpt_save_path))
-    ######################################################################################
+#     print("Copy random samples and Cal data info to {} complete.".format(args.ckpt_save_path))
+#     ######################################################################################
 
 
-def update_options_savepath(args, k):
-    args_new = copy.deepcopy(args)
+# def update_options_savepath(args, k):
+#     args_new = copy.deepcopy(args)
 
-    args_new.k_fold_current_num= k
-    if args.k_fold_nums > 1:
-        args_new.ckpt_save_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/" + str(k) + "/"
-    else:
-        args_new.ckpt_save_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/"
-    return args_new
+#     args_new.k_fold_current_num= k
+#     if args.k_fold_nums > 1:
+#         args_new.ckpt_save_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/" + str(k) + "/"
+#     else:
+#         args_new.ckpt_save_path = args.ckpt_save_path + args.data_name + '/' + args.experiment_name + "/"
+#     return args_new
 
 
 if __name__ == '__main__':
