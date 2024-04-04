@@ -1,7 +1,7 @@
 datename=$(date +%Y%m%d-%H%M%S)
 data_name=finland
 country=Finland
-epochs=45
+epochs=15
 
 python train_urbancross_without_sam.py \
        --gpuid 0 \
@@ -11,8 +11,8 @@ python train_urbancross_without_sam.py \
        --epochs $epochs \
        --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
        --country $country \
-       --batch_size 40 \
-       --lr 0.0001 \
+       --batch_size 45 \
+       --lr 0.00001 \
        --workers 0 \
        --data_name $data_name \
        --test_step $epochs \

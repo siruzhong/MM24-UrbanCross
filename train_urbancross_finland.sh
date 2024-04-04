@@ -1,7 +1,7 @@
 datename=$(date +%Y%m%d-%H%M%S)
 data_name=finland
 country=Finland
-epochs=45
+epochs=20
 num_seg=5
 
 python train_urbancross.py \
@@ -14,7 +14,7 @@ python train_urbancross.py \
        --country $country \
        --batch_size 40 \
        --num_seg $num_seg \
-       --lr 0.0001 \
+       --lr 0.00001 \
        --workers 0 \
        --data_name $data_name \
        --test_step $epochs \
