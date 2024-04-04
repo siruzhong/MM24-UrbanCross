@@ -21,7 +21,7 @@ def compute_similarity(image_path, text, device=device, clip_model=clip_model, p
     计算图像与文本描述的相似度，对长文本进行分割处理。
     """
     # 将文本按照分号分割成多个部分
-    text_parts = [part.strip() for part in text.split(';') if part.strip()]
+    text_parts = [part.strip() for part in text.split('.') if part.strip()]
     text_features_list = []
     
     # 对每个部分单独进行编码
@@ -83,8 +83,8 @@ def show_masks_mine(anns, ori_img, img_path, description):
         os.remove(path)
 
 if __name__ == "__main__":
-    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/images"
-    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/dataset_rsitmd.csv")
+    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/images"
+    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/instructblip_generation_finland_refine.csv")
 
     sam_checkpoint = "sam_vit_h_4b8939.pth"
     model_type = "vit_h"
