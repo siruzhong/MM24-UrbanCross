@@ -112,7 +112,6 @@ def main(args):
         args.wandb_id = wandb.util.generate_id()
     logger.info(f"wandb id: {args.wandb_id}")
     
-    
     # Initialize Weights and Biases run
     wandb.init(
         project="UrbanCross",
