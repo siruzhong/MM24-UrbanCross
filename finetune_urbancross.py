@@ -16,7 +16,7 @@ def parser_options():
 
     # Training path settings
     parser.add_argument('-e', '--experiment_name', default='test', type=str, help="the file name of ckpt save")
-    parser.add_argument('-m', '--model_name', default='SWAN', type=str, help="Model Name")
+    parser.add_argument('-m', '--model_name', default='ours', type=str, help="Model Name")
     parser.add_argument('--data_name', default='rsitmd', type=str, help="Dataset Name.(eg.rsitmd or rsicd)")
     parser.add_argument('--data_path', default='./data/', type=str, help="Preprocessed data file path")
     parser.add_argument('--image_path', default='./rs_data/', type=str, help="remote images data path")
@@ -128,9 +128,7 @@ def main(args):
         dist.init_process_group(backend='nccl', init_method=args.init_method, rank=args.rank, world_size=args.world_size)
 
     # Choose the model
-    if args.model_name == "SWAN":
-        from layers import SWAN as models
-    elif args.model_name == "urbancross" or args.model_name == "urbancross_finetune":
+    if args.model_name == "urbancross" or args.model_name == "urbancross_finetune":
         from layers import urbancross as models
     else:
         raise NotImplementedError

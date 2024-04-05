@@ -142,9 +142,7 @@ def main(args):
         dist.init_process_group(backend='nccl', init_method=args.init_method, rank=args.rank, world_size=args.world_size)
 
     # Choose model
-    if args.model_name == "SWAN":
-        from layers import SWAN as models
-    elif args.model_name == "ours":
+    if args.model_name == "ours":
         from layers import Ours as models
     else:
         raise NotImplementedError

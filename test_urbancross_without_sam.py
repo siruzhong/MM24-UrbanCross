@@ -21,7 +21,7 @@ def parser_options():
 
     # Training path settings
     parser.add_argument('-e', '--experiment_name', default='test', type=str, help="File name for saving checkpoints")
-    parser.add_argument('-m', '--model_name', default='SWAN', type=str, help="Model Name")
+    parser.add_argument('-m', '--model_name', default='ours', type=str, help="Model Name")
     parser.add_argument('--data_name', default='rsitmd', type=str, help="Dataset Name (e.g., rsitmd or rsicd)")
     parser.add_argument('--data_path', default='./data/', type=str, help="Preprocessed data file path")
     parser.add_argument('--image_path', default='./rs_data/', type=str, help="Remote images data path")
@@ -138,9 +138,7 @@ def main(args):
     print("len of test_loader is {}".format(len(test_loader)))
     
     # Choose model
-    if args.model_name == "SWAN":
-        from layers import SWAN as models
-    elif args.model_name == "ours":
+    if args.model_name == "ours":
         from layers import Ours as models
     else:
         raise NotImplementedError

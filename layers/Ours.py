@@ -380,7 +380,6 @@ def factory_without_sam(args, cuda=True, data_parallel=False):
 def factory_wo_seg(args, cuda=True, data_parallel=False):
     args_new = copy.copy(args)
 
-    # model_without_ddp = SWAN(args_new, word2idx)
     model_without_ddp = UrbanCross_wo_seg(args_new)
 
     if cuda:
