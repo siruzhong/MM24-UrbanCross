@@ -465,6 +465,55 @@ def shard_dis_without_sam_mine(args, images, captions, model):
     return d
 
 
+def shard_dis_mine_finetune(args, images, captions, model):
+    """
+    Compute image-caption pairwise distance during validation and test.
+    The main reason for calculating distances in shards is memory management.
+    When dealing with large amounts of data, loading all the data into memory at once may cause memory overflow.
+    By dividing the data into smaller chunks (or shards), we can process a portion of the data at a time, effectively managing memory usage.
+    """
+    # Calculate the number of shards for images and captions
+    n_img_shard = (len(images) - 1) // args.shard_size + 1
+    n_cap_shard = (len(captions) - 1) // args.shard_size + 1
+
+    # Initialize a matrix to store the pairwise distances
+    d = np.zeros((len(images), len(captions)))
+    all = []
+    
+    print("==> Start to compute image-caption pairwise distance <==")
+    
+    # Iterate through image shards
+    for i in range(n_img_shard):
+        img_start, img_end = args.shard_size * i, min(args.shard_size * (i + 1), len(images))
+
+        print("Calculate the similarity in batches: [{}/{}]".format(i, n_img_shard))
+
+        # Iterate through caption shards
+        for j in range(n_cap_shard):
+            cap_start, cap_end = args.shard_size * j, min(args.shard_size * (j + 1), len(captions))
+            
+            with torch.no_grad():
+                # Move images and captions to the GPU
+                img = images[img_start:img_end].cuda(args.gpuid)
+                texts = captions[cap_start:cap_end].cuda(args.gpuid)
+
+                # Compute similarity between image and caption shards
+                t1 = time.time()
+                sim_img2text = model(img, img, texts, texts, val=True)
+                sim = sim_img2text
+                t2 = time.time()
+                all.append(t2 - t1)
+
+                # Store the computed similarity in the distance matrix
+                d[img_start:img_end, cap_start:cap_end] = sim.data.cpu().numpy()
+
+    # Print average inference time
+    print("infer time:{:.2f}".format(np.average(all)))
+    print("==> end to compute image-caption pairwise distance <==")
+    
+    return d
+
+
 # 导出图像向量和文本向量
 def save_img_text_emb(args, images, captions, model, lengths):
     """compute image-caption pairwise distance during validation and test"""
@@ -527,7 +576,7 @@ def adjust_learning_rate(args, optimizer, epoch):
 
         param_group['lr'] = lr
 
-    print("Current lr: {}".format(optimizer.state_dict()['param_groups'][0]['lr']))
+    logger.info("Current lr: {}".format(optimizer.state_dict()['param_groups'][0]['lr']))
 
 
 # ====================================================================
