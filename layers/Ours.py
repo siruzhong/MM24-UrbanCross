@@ -197,114 +197,140 @@ class UrbanCross_finetune(nn.Module):
         # Initialize the CLIP loss module
         self.clip_loss = open_clip.ClipLoss()
 
-    def forward(self, img, text, segment_imgs):
-        """
-        Forward pass of the UrbanCross_finetune model.
-
-        Args:
-            img (torch.Tensor): Input image tensor.
-            text (torch.Tensor): Input text tensor.
-            segment_imgs (torch.Tensor): Input segmented images tensor.
-
-        Returns:
-            torch.Tensor: Discriminator output.
-        """
-        # Calculate CLIP model output for source and target images
-        clip_model_out_source = self.clip_model(img_source, text_source)
-        clip_model_out_target = self.clip_model(img_target, text_target)
-
-        # Extract image embeddings for source and target images
-        img_emb_source = clip_model_out_source["image_features"]
-        img_emb_target = clip_model_out_target["image_features"]
-
-        # Extract text embeddings for source and target texts
-        text_emb_source = clip_model_out_source["text_features"]
-        text_emb_target = clip_model_out_target["text_features"]
-
-        # Calculate similarity between text embeddings
-        W1 = cosine_sim(text_emb_target, text_emb_source)
-        W1_mean = W1.mean(dim=0)
-
-        # Determine the batch size
-        batchsize = img_emb_source.shape[0]
-
-        # Select a subset of the batch based on the similarity scores (W1) between text embeddings.
-        # The selected batch size is half of the original batch size.
-        selected_batchsize = int(batchsize / 2)
+    def forward(self, img_source, img_target, text_source, text_target, num_cycle_of_target=0, val=False):
+        if val:
+            return self.forward_val(img_target, text_target)
         
-        # Sort the similarity scores (W1) along each row in descending order to get the top similarities.
-        sorted_W1, _ = torch.sort(W1, dim=1, descending=True)
-        
-        # Select the top similarities for each sample in the batch.
-        W2 = sorted_W1[:, :selected_batchsize]
-        
-        # Sort the mean similarity scores (W1_mean) across the batch in descending order to select the most relevant samples.
-        _, sorted_W1_mean_index = torch.sort(W1_mean, descending=True)
-        
-        # Select the corresponding image and text embeddings for the selected samples based on mean similarity.
-        img_emb_source_filtered = img_emb_source[sorted_W1_mean_index[:selected_batchsize]]
-        text_emb_source_filtered = text_emb_source[sorted_W1_mean_index[:selected_batchsize]]
-        
-        # Sum the top similarity scores (W2) over the second dimension to get a vector.
-        W2 = torch.sum(W2, dim=1)
+        ratio = 0.5
 
-        # Normalize the similarity scores (W2) to range [0, 1].
-        W2_min = torch.min(W2)
-        W2_max = torch.max(W2)
-        W2 = (W2 - W2_min) / (W2_max - W2_min)
-        W2 = W2 / torch.sum(W2)
+        with torch.cuda.amp.autocast():
+            clip_model_out_source = self.clip_model(img_source, text_source)
+            clip_model_out_target = self.clip_model(img_target, text_target)
+            
+            img_emb_source = clip_model_out_source['image_features']
+            img_emb_target = clip_model_out_target['image_features']
+            text_emb_source = clip_model_out_source['text_features']
+            text_emb_target = clip_model_out_target['text_features']
+            
+            # Calculate similarity between text embeddings
+            W1 = cosine_sim(text_emb_target, text_emb_source)
+            W1_mean = W1.mean(dim=0)
+            batchsize = img_emb_source.shape[0]
+            selected_batchsize = int(batchsize * ratio)
+            # Sort W1 along each row, from large to small
+            sorted_W1, _ = torch.sort(W1, dim=1, descending=True)
+            W2 = sorted_W1[:, :selected_batchsize]
+            _, sorted_W1_mean_index = torch.sort(W1_mean, descending=True)
+
+            img_emb_source_filtered = img_emb_source[sorted_W1_mean_index[:selected_batchsize]]
+            text_emb_source_filtered = text_emb_source[sorted_W1_mean_index[:selected_batchsize]]
+
+            # Sum W_2 over the second dimension to get a vector
+            W2 = torch.sum(W2, dim=1)
+
+            # Scale W_tilde_2 to range [0, 1]
+            W2_min = torch.min(W2)
+            W2_max = torch.max(W2)
+            W2 = (W2 - W2_min) / (W2_max - W2_min)
+
+            # Normalize W_tilde_2 to sum to 1
+            W2 = W2 / torch.sum(W2)
+            
+            # Calculate triplet loss
+
+            adv_loss = self.adv_loss(self.discriminator, 
+                                    img_emb_source_filtered, 
+                                    img_emb_target, 
+                                    W2
+                                    )
+            clip_loss = self.clip_loss(img_emb_source_filtered, 
+                                    text_emb_source_filtered,
+                                    logit_scale=1.0
+                                    )
+        return clip_loss, adv_loss, ratio
+    
+    def forward_val(
+                self, 
+                img_target, 
+                text_target,
+                ):
+    
+        with torch.cuda.amp.autocast():
+            clip_model_out = self.clip_model(img_target, text_target)
+            
+            img_emb = clip_model_out['image_features']
+            text_emb = clip_model_out['text_features']
+            
+            sim_img2text = cosine_sim(img_emb, text_emb)
         
-        # Calculate adversarial loss
-        adv_loss = self.adv_loss(
-            self.discriminator, img_emb_source_filtered, img_emb_target, W2
+        return sim_img2text
+    
+    
+class UrbanCross_wo_seg(nn.Module):
+    def __init__(self, args, 
+                        # word2idx
+                 ):
+        super().__init__()
+        self.clip_model, _, transform = open_clip.create_model_and_transforms(
+            # model_name="coca_ViT-L-14", 
+            model_name="ViT-L-14",
+            pretrained='laion2B-s32B-b82K',  #mscoco_finetuned_laion2B-s13B-b90k
+            output_dict=True,
         )
-        
-        # Calculate CLIP loss
-        clip_loss = self.clip_loss(
-            img_emb_source_filtered,
-            text_emb_source_filtered,
-            logit_scale=1.0,
-        )
-        
-        loss = clip_loss + adv_loss
-        return loss
+        self.clip_img_seg = copy.deepcopy(self.clip_model)
+        del self.clip_img_seg.transformer
 
+    def forward(self, 
+                img , 
+                text, 
+                ):
+        with torch.cuda.amp.autocast():
+            clip_model_out = self.clip_model(img, text)
+            
+            img_emb = clip_model_out['image_features']
+            text_emb = clip_model_out['text_features']
+
+            # Calculating similarity
+            sim_img2text = cosine_sim(img_emb, text_emb)
+
+        return sim_img2text
+
+
+#====================
+# Some Reuse Function
+#====================
+def l2norm(X, dim, eps=1e-8):
+    """L2-normalize columns of X
+    """
+    norm = torch.pow(X, 2).sum(dim=dim, keepdim=True).sqrt() + eps
+    X = torch.div(X, norm)
+    return X
+
+def cosine_sim(im, s):
+    """Cosine similarity between all the image and sentence pairs
+    """
+    im = l2norm(im, dim=-1)
+    s = l2norm(s, dim=-1)
+    w12 = im.mm(s.t())
+    return w12
+
+def clones(module, N):
+    """Produce N identical layers.
+    """
+    return nn.ModuleList([copy.deepcopy(module) for _ in range(N)])
 
 def factory(args, cuda=True, data_parallel=False):
-    """
-    Factory function to create and initialize the model.
-
-    Args:
-        args: Namespace containing model configuration and parameters.
-        cuda (bool, optional): Flag indicating whether to use CUDA (GPU). Defaults to True.
-        data_parallel (bool, optional): Flag indicating whether to use data parallelism. Defaults to False.
-
-    Returns:
-        nn.Module: Initialized model instance.
-    """
-    # Create a copy of args to avoid modifying the original object
     args_new = copy.copy(args)
 
-    # Initialize the model without DistributedDataParallel (DDP)
-    model_without_ddp = UrbanCross(
-        args_new,
-    )
+    model_without_ddp = UrbanCross(args_new)
 
-    # Move the model to GPU if cuda is True
     if cuda:
         model_without_ddp.cuda(args_new.gpuid)
 
-    # Apply data parallelism if data_parallel is True
     if data_parallel:
-        # Convert BatchNorm layers to SyncBatchNorm for distributed training
         model = nn.SyncBatchNorm.convert_sync_batchnorm(model_without_ddp)
-        # Initialize DistributedDataParallel with model and GPU device ID
-        model = DistributedDataParallel(
-            model, device_ids=[args.gpuid], find_unused_parameters=False
-        )
-        # Get the module attribute of the model, as DDP wraps the model with an additional layer
+        model = DistributedDataParallel(model, device_ids=[args.gpuid],find_unused_parameters=False)
         model_without_ddp = model.module
-        # Ensure CUDA is enabled if data parallelism is used
         if not cuda:
             raise ValueError
 
@@ -351,12 +377,11 @@ def factory_without_sam(args, cuda=True, data_parallel=False):
 
     return model_without_ddp
 
-
-def factory_finetune(args, word2idx, cuda=True, data_parallel=False):
+def factory_wo_seg(args, cuda=True, data_parallel=False):
     args_new = copy.copy(args)
 
     # model_without_ddp = SWAN(args_new, word2idx)
-    model_without_ddp = UrbanCross_finetune(args_new, word2idx)
+    model_without_ddp = UrbanCross_wo_seg(args_new)
 
     if cuda:
         model_without_ddp.cuda(args_new.gpuid)
@@ -371,21 +396,3 @@ def factory_finetune(args, word2idx, cuda=True, data_parallel=False):
             raise ValueError
 
     return model_without_ddp
-
-
-# ====================
-# Some Reuse Function
-# ====================
-def l2norm(X, dim, eps=1e-8):
-    """L2-normalize columns of X"""
-    norm = torch.pow(X, 2).sum(dim=dim, keepdim=True).sqrt() + eps
-    X = torch.div(X, norm)
-    return X
-
-
-def cosine_sim(im, s):
-    """Cosine similarity between all the image and sentence pairs"""
-    im = l2norm(im, dim=-1)
-    s = l2norm(s, dim=-1)
-    w12 = im.mm(s.t())
-    return w12

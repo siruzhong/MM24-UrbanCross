@@ -162,32 +162,22 @@ class PrecompDataset_mine(data.Dataset):
             else:
                 if finetune == "source":
                     args.country = args.source_country
-                    self.img_path = os.path.join(
-                        args.image_path, args.country, "images"
-                    )
+                    self.img_path = os.path.join(args.image_path, args.country, "images")
                 else:
                     args.country = args.target_country
-                    self.img_path = os.path.join(
-                        args.image_path, args.country, "images"
-                    )
-
-            df = pd.read_csv(
-                f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{args.country}/instructblip_generation_{args.country.lower()}_refine.csv"
-            )
+                    self.img_path = os.path.join(args.image_path, args.country, "images")
+            
+            df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{args.country}/instructblip_generation_{args.country.lower()}_refine.csv")
             data_split_txt = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{args.country}/{data_split}_list.txt"
         else:
             # If country is not specified, set image path and data split text file path based on the data split
             if args.data_name == "rsicd":
                 self.img_path = args.image_path
-                df = pd.read_csv(
-                    "/hpc2hdd/home/szhong691/zsr/projects/dataset/RSICD/dataset_rsicd.csv"
-                )
+                df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/RSICD/dataset_rsicd.csv")
                 data_split_txt = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/RSICD/{data_split}_list.txt"
             elif args.data_name == "rsitmd":
-                self.img_path = args.image_path
-                df = pd.read_csv(
-                    "/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/dataset_rsitmd.csv"
-                )
+                self.img_path = args.image_path        
+                df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/dataset_rsitmd.csv")
                 data_split_txt = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/{data_split}_list.txt"
 
         # Initialize OpenAI's CLIP tokenizer
@@ -265,16 +255,14 @@ class PrecompDataset_mine(data.Dataset):
         for i in range(current_num_seg):
             seg_list.append(
                 self.transform_segment(
-                    Image.open(os.path.join(seg_path + "/" + img_list[i])).convert(
-                        "RGB"
-                    )
+                    Image.open(os.path.join(seg_path + "/" + img_list[i])).convert("RGB")
                 )
             )
         # If the current number of image segments is less than the specified number, fill with zero tensors
         if current_num_seg < self.num_seg:
             for i in range(current_num_seg, self.num_seg):
                 seg_list.append(torch.zeros(3, 224, 224))
-
+        
         # Stack the processed image segment tensors
         segment_img = torch.stack(seg_list, dim=0)
 
@@ -283,7 +271,7 @@ class PrecompDataset_mine(data.Dataset):
 
     def __len__(self):
         return self.length
-
+    
 
 class PrecompDataset_without_sam_mine(data.Dataset):
     """
@@ -404,9 +392,7 @@ class PrecompDataset_mine_finetune(data.Dataset):
         self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
         self.captions = []
 
-        df = pd.read_csv(
-            f"urbancross_data/instructblip_generation_with_tag/instructblip_generation_{country.lower()}_refine.csv"
-        )
+        df = pd.read_csv(f"urbancross_data/instructblip_generation_with_tag/instructblip_generation_{country.lower()}_refine.csv")
         split_list = []
 
         if source:
@@ -427,30 +413,24 @@ class PrecompDataset_mine_finetune(data.Dataset):
         self.length = len(self.captions)
 
         if data_split == "train":
-            self.transform = transforms.Compose(
-                [
+            self.transform = transforms.Compose([
                     transforms.Resize((278, 278)),
                     transforms.RandomRotation(degrees=(0, 90)),
                     transforms.RandomCrop(224),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-            self.transform_segment = transforms.Compose(
-                [
+            ])
+            self.transform_segment = transforms.Compose([
                     transforms.Resize((224, 224)),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
+            ])
         else:
-            self.transform = transforms.Compose(
-                [
+            self.transform = transforms.Compose([
                     transforms.Resize((224, 224)),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
+            ])
             self.transform_segment = self.transform
 
     def __getitem__(self, index):
@@ -458,9 +438,7 @@ class PrecompDataset_mine_finetune(data.Dataset):
         caption = self.captions[index]
         cap_tokens = self.clip_tokenizer(caption)  # [1, 77]
 
-        image = Image.open(os.path.join(self.img_path, self.images[img_id])).convert(
-            "RGB"
-        )
+        image = Image.open(os.path.join(self.img_path, self.images[img_id])).convert("RGB")
         image = self.transform(image)  # torch.Size([3, 256, 256])
 
         return image, caption, index, img_id, cap_tokens
@@ -552,9 +530,7 @@ def collate_fn_mine_finetune(data):
     return images, cap_tokens
 
 
-def get_precomp_loader(
-    args, data_split, vocab, batch_size=100, shuffle=False, num_workers=0
-):
+def get_precomp_loader(args, data_split, vocab, batch_size=100, shuffle=False, num_workers=0):
     """
     Returns torch.utils.data.DataLoader for custom precomputed dataset.
 
