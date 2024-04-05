@@ -4,11 +4,11 @@ country=Finland
 bs=40
 # lr=1e-4
 # lr=5e-5
-# lr=1e-5
-lr=5e-6
+lr=1e-5
+# lr=5e-6
 num_seg=5
 name=urbancross_$country\_bs$bs\_lr$lr\_numseg$num_seg
-logging_dir=outputs/pretrain/$country/$datename
+logging_dir=outputs/pretrain/$country/$name/$datename
 mkdir -p $logging_dir
 pip list > $logging_dir/environment.txt
 cp $0 $logging_dir/$(basename $0 .sh).sh
@@ -18,7 +18,7 @@ python train_urbancross.py \
        --experiment_name $name \
        --ckpt_save_path $logging_dir \
        --wandb_logging_dir $logging_dir \
-       --epochs 50 \
+       --epochs 30 \
        --image_path urbancross_data/images_target \
        --country $country \
        --batch_size $bs \

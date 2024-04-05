@@ -10,6 +10,8 @@ import wandb
 from loguru import logger
 from torch.nn.utils.clip_grad import clip_grad_norm
 from tqdm import tqdm
+import os
+import shutil
 
 # ==============================================================
 def train(args, train_loader, model, optimizer, epoch):
@@ -204,7 +206,6 @@ def train_finetune(args,
     params = list(model.parameters())
     # iter_target = iter(train_loader_target)
     
-    # 创建 B_loader 的循环迭代器
     target_loader_cycle = itertools.cycle(train_loader_target)
     # for i, source_data in enumerate(train_loader_source):
     # for i, (source_data, target_data) in enumerate(zip(train_loader_source, train_loader_target)):
@@ -218,27 +219,6 @@ def train_finetune(args,
         if i % len(train_loader_target) == 0:
             num_cycle_of_target += 1
 
-    # 在这里添加你的代码
-        # images, ids, cap_tokens, segment_imgs, tag_tokens = train_data
-        # images, ids, cap_tokens, segment_imgs = train_data
-        # images_source, cap_tokens_source = source_data
-        # print(i)
-        # try:
-        #     target_data = next(iter_target)
-        #     # import ipdb; ipdb.set_trace()
-            
-        #     # if len(target_data) == 3:
-        #     images_target, cap_tokens_target = target_data
-        #     # else:
-        #     #     raise ValueError("Expected target_data to have 3 elements, but got {}".format(len(target_data)))
-            
-        # except StopIteration:
-        #     iter_target = iter(train_loader_target)
-        #     images_target, cap_tokens_target = next(iter_target)
-        # import ipdb; ipdb.set_trace()
-        # images, ids, cap_tokens, segment_img, tag_tokens
-    
-
         batch_size = images_source.size(0)
         margin = float(margin)
         # measure data loading time
@@ -247,13 +227,9 @@ def train_finetune(args,
 
         input_visuals_source = images_source
         input_visuals_target = images_target
-        # import ipdb; ipdb.set_trace()
-        # segment_imgs = Variable(segment_imgs)
-        # input_text = Variable(captions)
+
         input_text_source = cap_tokens_source
         input_text_target = cap_tokens_target
-        # input_tags = Variable(tag_tokens)
-        # import ipdb;ipdb.set_trace()
 
         if torch.cuda.is_available():
             input_visuals_source = input_visuals_source.cuda(args.gpuid)
@@ -324,10 +300,8 @@ def train_finetune(args,
         wandb.log(
             {
                 'loss': loss.cpu().data.numpy(),
-                # 'loss_img2text': loss_img2text.cpu().data.numpy(),
-                # # 'loss_img2tag': loss_img2tag.cpu().data.numpy(),
-                # 'loss_seg2text': loss_seg2text.cpu().data.numpy(),
-                # 'loss_seg2tag': loss_seg2tag.cpu().data.numpy(),
+                'loss_clip': clip_loss.cpu().data.numpy(),
+                'loss_adv': adv_loss.cpu().data.numpy(),
             }
         )
         optimizer.zero_grad()
@@ -692,7 +666,8 @@ def validate(args, val_loader, model, epoch):
 
     # d = utils.shard_dis_MSSF(args, input_visual, input_text, model,
     #                          lengths=input_text_lengeth)
-    d = utils.shard_dis_mine(args, 
+    d = utils.shard_dis_mine(
+                             args, 
                              input_visual, 
                              input_text, 
                              input_seg,
@@ -1047,31 +1022,40 @@ def test_mine(args, test_loader, model):
     # input_text_length = [0] * len(test_loader.dataset)
     input_visual = []
     input_text = []
+    img_paths = []
+    captions = []
     # input_seg = []
-    
-    
+        # input_seg = []
+    # input_visual = torch.empty((len(test_loader.dataset), 3,224,224))
+    # input_text = torch.empty((len(test_loader.dataset), 77))
+
+    # import ipdb;ipdb.set_trace()
     # embed_start = time.time()
     # for i, val_data in enumerate(test_loader):
-    for idx, val_data in enumerate(tqdm(test_loader)):
-
+    #len(test_loader是402)
+    
+    # for idx, val_data in enumerate(tqdm(test_loader)):
+    for idx, val_data in enumerate(tqdm(itertools.islice(test_loader, 20))):
         # images, captions, lengths, ids = val_data
         # images, ids, cap_tokens, segment_img = val_data
-        images, cap_tokens = val_data
+        images, cap_tokens, img_path, caption = val_data
         input_visual.append(images)
         input_text.append(cap_tokens)
+        img_paths.extend(img_path)
+        captions.extend(caption)
         # input_seg.append(segment_img)
-        
-        # for (id, img,cap, l) in zip(ids, (images.numpy().copy()), (captions.numpy().copy()), lengths):
-        
-        #     input_visual[id] = img
 
-        #     input_text[id, :captions.size(1)] = cap
-        #     input_text_length[id] = l
+
     input_visual = torch.cat(input_visual, dim=0)
     input_text = torch.cat(input_text, dim=0)
     # input_seg = torch.cat(input_seg, dim=0)
     # input_visual = np.array([input_visual[i] for i in range(0, len(input_visual), 5)])
-
+    # import ipdb; ipdb.set_trace()
+    # input_visual = torch.cat(input_visual, dim=0)
+    # input_text = torch.cat(input_text, dim=0)
+    # input_seg = torch.cat(input_seg, dim=0)
+    # input_visual = np.array([input_visual[i] for i in range(0, len(input_visual), 5)])
+    # import ipdb; ipdb.set_trace()
     # embed_end = time.time()
     # print("## test embedding time: {:.2f} s".format(embed_end-embed_start))
     logger.info('begin to compute distance')
@@ -1084,8 +1068,30 @@ def test_mine(args, test_loader, model):
                              model,
                             #  lengths=input_text_length
                             )
+    # Normalize d to [0, 1]
+    d_normalized = (d - np.min(d)) / (np.max(d) - np.min(d))
+
+    
+    for i in tqdm(range(len(img_paths))):
+        top10_indices = np.argsort(-d_normalized[i])[:10]
+        top10_captions = [captions[idx] for idx in top10_indices]
+        top10_values = [d_normalized[i][idx] for idx in top10_indices]
+        
+        savepath = os.path.join(args.ckpt_save_path, img_paths[i].split('/')[-1])
+        os.makedirs(savepath, exist_ok=True)
+        shutil.copy(img_paths[i], savepath)
+        # import ipdb;ipdb.set_trace()
+        with open(os.path.join(savepath, 'top10_captions.txt'), 'w') as f:
+            for j in range(10):
+                f.write(f'{top10_captions[j]}\n')
+                f.write(f'{top10_values[j]}\n')
+                f.write('\n')
+    
+    
+    
     end = time.time()
     print("calculate similarity time: {:.2f} s".format(end - start))
+    
 
     # (r1i, r5i, r10i, medri, meanri), _ = utils.acc_i2t(d)
     (r1i, r5i, r10i, medri, meanri), _ = utils.acc_i2t_mine(d)
@@ -1128,6 +1134,7 @@ def test_mine(args, test_loader, model):
         'test/rsum': currscore
     })
     return currscore, all_score
+
 
 def save(args, test_loader, model):
     print('')

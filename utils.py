@@ -182,10 +182,10 @@ def acc_i2t_mine(similarity_matrix):
         rank = (similarity_matrix[i, :] > similarity_matrix[i, i]).sum() + 1
         ranks.append(rank)
     ranks = torch.tensor(ranks)
+    # import ipdb; ipdb.set_trace()
     r1 = (ranks <= 1).float().mean().item()
     r5 = (ranks <= 5).float().mean().item()
     r10 = (ranks <= 10).float().mean().item()
-    # import ipdb; ipdb.set_trace()
     # 计算medr, meanr
     medr = torch.median(ranks.float()).item()
     meanr = ranks.float().mean().item()
@@ -497,10 +497,12 @@ def shard_dis_mine_finetune(args,
                 # if args.il_measure:
                 #     sim,_,_ = model(im, s, l)
                 # else:
-                sim_img2text = model(img,
-                                    img, 
-                                    texts,
-                                    texts, 
+                # import ipdb; ipdb.set_trace()
+                sim_img2text = model(
+                                    img_source = img,
+                                    img_target = img,
+                                    text_source = texts,
+                                    text_target = texts,
                                     val=True,
                                     )
                 sim = sim_img2text

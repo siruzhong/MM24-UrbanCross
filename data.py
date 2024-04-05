@@ -494,13 +494,12 @@ class PrecompDataset_mine_finetune(data.Dataset):
         #             os.path.join(self.img_path_target, self.images_target[img_id])
         #         ).convert('RGB')
         # image_target = self.transform(image_target)  # torch.Size([3, 256, 256])
-        
+        # import ipdb; ipdb.set_trace()    
         return image, caption, index, img_id, cap_tokens
 
 
     def __len__(self):
         return self.length
-
 
 
 class PrecompDataset_mine_zeroshot(data.Dataset):
@@ -589,6 +588,7 @@ class PrecompDataset_mine_zeroshot(data.Dataset):
         #                 caption_target
         #             )  # [1, 77]
         
+        # import ipdb;ipdb.set_trace()
         image = Image.open(
                     os.path.join(self.img_path, self.images[img_id])
                 ).convert('RGB')
@@ -597,8 +597,7 @@ class PrecompDataset_mine_zeroshot(data.Dataset):
         #             os.path.join(self.img_path_target, self.images_target[img_id])
         #         ).convert('RGB')
         # image_target = self.transform(image_target)  # torch.Size([3, 256, 256])
-        
-        return image, caption, index, img_id, cap_tokens
+        return image, caption, index, img_id, cap_tokens, os.path.join(self.img_path, self.images[img_id])
 
 
     def __len__(self):
@@ -617,7 +616,7 @@ def collate_fn(data):
     # import ipdb;ipdb.set_trace()
     tokens_clip = torch.cat(tokens_clip, dim=0)
 
-    import ipdb; ipdb.set_trace()
+    # import ipdb; ipdb.set_trace()
     # Merget captions (convert tuple of 1D tensor to 2D tensor)
     lengths = [len(cap) for cap in captions]
     targets = torch.zeros(len(captions), max(lengths)).long()
@@ -657,73 +656,67 @@ def collate_fn_mine(data):
     # return images, ids, cap_tokens, segment_img, tag_tokens
     return images, ids, cap_tokens, segment_img
     
-def collate_fn_mine_finetune_old(data):
-    # import ipdb; ipdb.set_trace()
-    # Sort a data list by caption length
-    # data.sort(key=lambda x: len(x[2]), reverse=True)
-    # images, captions, tags, ids, img_ids, cap_tokens, tag_tokens, segment_img = zip(*data)
-    # images, captions, ids, img_ids, cap_tokens, segment_img = zip(*data)
-    images_source, images_target, caption_source, caption_target, ids, img_ids, cap_tokens_source, cap_tokens_target = zip(*data)
+# def collate_fn_mine_finetune_old(data):
+#     # import ipdb; ipdb.set_trace()
+#     # Sort a data list by caption length
+#     # data.sort(key=lambda x: len(x[2]), reverse=True)
+#     # images, captions, tags, ids, img_ids, cap_tokens, tag_tokens, segment_img = zip(*data)
+#     # images, captions, ids, img_ids, cap_tokens, segment_img = zip(*data)
+#     images_source, images_target, caption_source, caption_target, ids, img_ids, cap_tokens_source, cap_tokens_target = zip(*data)
 
 
-    # Merge images (convert tuple of 3D tensor to 4D tensor)
-    images_source = torch.stack(images_source, 0)
-    images_target = torch.stack(images_target, 0)
+#     # Merge images (convert tuple of 3D tensor to 4D tensor)
+#     images_source = torch.stack(images_source, 0)
+#     images_target = torch.stack(images_target, 0)
     
-    # segment_img = torch.stack(segment_img, 0)
-    cap_tokens_source = torch.cat(cap_tokens_source, dim=0)
-    cap_tokens_target = torch.cat(cap_tokens_target, dim=0)
+#     # segment_img = torch.stack(segment_img, 0)
+#     cap_tokens_source = torch.cat(cap_tokens_source, dim=0)
+#     cap_tokens_target = torch.cat(cap_tokens_target, dim=0)
     
-    # tag_tokens = torch.cat(tag_tokens, dim=0)
+#     # tag_tokens = torch.cat(tag_tokens, dim=0)
     
-    # Merget captions (convert tuple of 1D tensor to 2D tensor)
-    # lengths = [len(cap) for cap in captions]
-    # targets = torch.zeros(len(captions), max(lengths)).long()
-    # import ipdb;ipdb.set_trace()
-    # for i, cap in enumerate(captions):
-    #     end = lengths[i]
-    #     targets[i, :end] = cap[:end]
+#     # Merget captions (convert tuple of 1D tensor to 2D tensor)
+#     # lengths = [len(cap) for cap in captions]
+#     # targets = torch.zeros(len(captions), max(lengths)).long()
+#     # import ipdb;ipdb.set_trace()
+#     # for i, cap in enumerate(captions):
+#     #     end = lengths[i]
+#     #     targets[i, :end] = cap[:end]
 
-    # lengths = [l if l !=0 else 1 for l in lengths]
+#     # lengths = [l if l !=0 else 1 for l in lengths]
 
-    # return images, targets, lengths, ids, cap_tokens, segment_img, tag_tokens
-    # return images, ids, cap_tokens, segment_img, tag_tokens
-    return images_source, images_target, ids, cap_tokens_source, cap_tokens_target
+#     # return images, targets, lengths, ids, cap_tokens, segment_img, tag_tokens
+#     # return images, ids, cap_tokens, segment_img, tag_tokens
+#     return images_source, images_target, ids, cap_tokens_source, cap_tokens_target
 
 
 def collate_fn_mine_finetune(data):
-    # import ipdb; ipdb.set_trace()
-    # Sort a data list by caption length
-    # data.sort(key=lambda x: len(x[2]), reverse=True)
-    # images, captions, tags, ids, img_ids, cap_tokens, tag_tokens, segment_img = zip(*data)
-    # images, captions, ids, img_ids, cap_tokens, segment_img = zip(*data)
+    
     images, caption, ids, img_ids, cap_tokens = zip(*data)
 
+    # image, caption, index, img_id, cap_tokens   
+    # Merge images (convert tuple of 3D tensor to 4D tensor)
+    images = torch.stack(images, 0)
+    cap_tokens = torch.cat(cap_tokens, dim=0)
+    # img_path = list(img_path)
+    # caption = list(caption)
+    # import ipdb;ipdb.set_trace()
+    
+    return images, cap_tokens
+
+
+def collate_fn_mine_zeroshot(data):
+    
+    images, caption, ids, img_ids, cap_tokens, img_path = zip(*data)
 
     # Merge images (convert tuple of 3D tensor to 4D tensor)
     images = torch.stack(images, 0)
-    # images_target = torch.stack(images_target, 0)
-    
-    # segment_img = torch.stack(segment_img, 0)
     cap_tokens = torch.cat(cap_tokens, dim=0)
-    # cap_tokens_target = torch.cat(cap_tokens_target, dim=0)
-    
-    # tag_tokens = torch.cat(tag_tokens, dim=0)
-    
-    # Merget captions (convert tuple of 1D tensor to 2D tensor)
-    # lengths = [len(cap) for cap in captions]
-    # targets = torch.zeros(len(captions), max(lengths)).long()
+    img_path = list(img_path)
+    caption = list(caption)
     # import ipdb;ipdb.set_trace()
-    # for i, cap in enumerate(captions):
-    #     end = lengths[i]
-    #     targets[i, :end] = cap[:end]
-
-    # lengths = [l if l !=0 else 1 for l in lengths]
-
-    # return images, targets, lengths, ids, cap_tokens, segment_img, tag_tokens
-    # return images, ids, cap_tokens, segment_img, tag_tokens
-    return images, cap_tokens
-
+    
+    return images, cap_tokens, img_path, caption
 
 def get_precomp_loader(args, 
                        data_split, 
@@ -1130,7 +1123,7 @@ def get_test_loader_zeroshot(args,
                         shuffle=False,
                         pin_memory=True,
                         #   pin_memory=False,
-                        collate_fn=collate_fn_mine_finetune,
+                        collate_fn=collate_fn_mine_zeroshot,
                         num_workers=args.workers,
                         drop_last=True,
     )
