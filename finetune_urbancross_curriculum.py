@@ -2,7 +2,9 @@ import os,random,copy
 import shutil
 import torch
 import argparse
+# import tensorboard_logger as tb_logger
 import wandb
+# import logging
 from loguru import logger
 import torch.distributed as dist
 import utils
@@ -121,41 +123,45 @@ def main(args):
         mode='dryrun',
     )
 
-    # Set random seed for reproducibility
+    # create random seed
     utils.setup_seed(args.seed)
 
-    # Initialize distributed training if enabled
+    # init_process_group
     if args.distributed:
-        dist.init_process_group(backend='nccl', init_method=args.init_method, rank=args.rank, world_size=args.world_size)
+        # tcp model
+        dist.init_process_group(backend='nccl', 
+                                init_method=args.init_method,
+                                rank=args.rank, 
+                                world_size=args.world_size
+                                )
 
-    # Choose the model
-    if args.model_name == "ours" or args.model_name == "urbancross_finetune":
-        from layers import Ours as models
-    else:
-        raise NotImplementedError
-    
+    from layers import Ours as models
+
     logger.info(args)
-    # Create dataset, model, criterion, and optimizer
+
     train_loader_source, train_loader_target, train_dataset_source, train_dataset_target, val_loader_target, val_dataset_target = data.get_loaders_finetune(
-        args,
+                                args, 
+                                # vocab
     )
+
     logger.info(f"len of train_set is {len(train_dataset_source)}(source)/{len(train_dataset_target)}(target)")
     logger.info(f"len of val_set is {len(val_dataset_target)}(target)")
 
-    # Load pretrained model weights
-    model = models.factory_with_finetune(args, cuda=True, data_parallel=args.distributed)
+    model = models.factory_finetune_curriculum(args,
+                           cuda=True, 
+                           data_parallel=args.distributed
+                           )
     pretrained_weight = torch.load(args.load_path, map_location='cuda:{}'.format(args.gpuid))
     model.load_state_dict(pretrained_weight['model'], strict=False)
 
-    # Print and save model info
-    if args.rank == 0:        
+    if args.rank == 0:
         total_params = sum(p.numel() for p in model.parameters())
         total_requires_grad_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         total_params_mb = total_params / (1024 * 1024)
         total_requires_grad_params_mb = total_requires_grad_params / (1024 * 1024)
+        
         logger.info("Total Params: {:.2f} MB".format(total_params_mb))
         logger.info("Total Requires_grad Params: {:.2f} MB".format(total_requires_grad_params_mb))
-        logger.info(model)
 
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
@@ -172,8 +178,6 @@ def main(args):
             start_epoch = checkpoint['epoch']
             best_rsum = checkpoint['best_rsum']
             model.load_state_dict(checkpoint['model'], strict =False)
-            # Eiters is used to show logs as the continuation of another
-            model.Eiters = checkpoint['Eiters']
    
             print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})"
                   .format(args.resume, start_epoch, best_rsum))
@@ -184,17 +188,31 @@ def main(args):
 
     # Train the Model
     for epoch in range(start_epoch, args.epochs):
+
         if args.distributed:
             train_loader.sampler.set_epoch(epoch)
 
         utils.adjust_learning_rate(args, optimizer, epoch)
 
-        # train for one epoch
-        engine.train_finetune(args, train_loader_source, train_loader_target, model, optimizer, epoch)
+        # # test validate
+        # engine.validate(args, val_loader, model)
 
-        # Evaluate on validation set
+        # train for one epoch
+        engine.train_finetune_curriculum(args, 
+                              train_loader_source,
+                              train_loader_target,
+                              model, 
+                              optimizer, 
+                              epoch
+                              )
+
+        # evaluate on validation set
         if (epoch + 1) % args.eval_step == 0:
-            rsum, all_scores = engine.validate_finetune(args, val_loader_target, model)
+            rsum, all_scores = engine.validate_finetune(args, 
+                                               val_loader_target, 
+                                               model,
+                                               epoch,
+                                               )
 
             is_best = rsum > best_rsum
             if is_best:
@@ -202,21 +220,23 @@ def main(args):
             best_rsum = max(rsum, best_rsum)
 
             if args.rank == 0:
+                # print('')
                 logger.info("================ evaluate result on val set =====================")
                 logger.info("Current =>[{}/{}] epochs".format(epoch + 1, args.epochs))
                 logger.info("Now val score:")
                 logger.info(all_scores)
                 logger.info("Best val score:")
                 logger.info(best_score)
-                logger.info("=================================================================")
- 
+
                 utils.save_checkpoint(
                     {
                         'epoch': epoch + 1,
                         'model': model.state_dict(),
                         'best_rsum': best_rsum,
                         'args': args,
+                        # 'Eiters': model.Eiters,
                     },
+                    # is_best,
                     filename=f'ckpt_{args.model_name}_{epoch}_{best_rsum:.2f}.pth',
                     prefix=args.ckpt_save_path,
                     model_name=args.model_name
@@ -225,6 +245,7 @@ def main(args):
     if args.distributed:
         # destroy process
         dist.destroy_process_group()
+
 
 if __name__ == '__main__':
     args = parser_options()

@@ -10,6 +10,7 @@ import utils
 from vocab import deserialize_vocab
 from PIL import Image
 import open_clip
+from tqdm import tqdm
 
 
 class PrecompDataset(data.Dataset):
@@ -447,6 +448,69 @@ class PrecompDataset_mine_finetune(data.Dataset):
         return self.length
 
 
+class PrecompDataset_mine_zeroshot(data.Dataset):
+    """
+    Load precomputed captions and image features
+    """
+    def __init__(self, args, data_split, country):
+        self.img_path = os.path.join(args.image_path, country, 'images')
+        self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
+        self.captions = []
+
+        df = pd.read_csv(f'/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_with_tag/instructblip_generation_{country.lower()}_refine.csv')
+        split_list = []
+        path_ = f'/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/zeroshot_list.txt'
+        
+        with open(path_, 'r') as f:
+            for line in tqdm(f):
+                # Remove newlines at the end of lines and add to list
+                split_list.append(line.strip())
+        df = df[df['image_name'].isin(split_list)]
+        self.captions = df['description'].values.tolist()
+        self.images = df['image_name'].values.tolist()
+        self.length = len(self.captions)
+
+        if data_split == "train":
+            self.transform = transforms.Compose([
+                transforms.Resize((278, 278)),
+                transforms.RandomRotation(degrees=(0, 90)),
+                transforms.RandomCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406),
+                                     (0.229, 0.224, 0.225))])
+            self.transform_segment = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406),
+                                     (0.229, 0.224, 0.225))])
+        else:
+            self.transform = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406),
+                                     (0.229, 0.224, 0.225))])
+            self.transform_segment = self.transform
+            
+    def __getitem__(self, index):
+        img_id = index
+        caption = self.captions[index]
+
+        cap_tokens = self.clip_tokenizer(
+                        caption
+                    )  # [1, 77]
+        
+        image = Image.open(
+                    os.path.join(self.img_path, self.images[img_id])
+                ).convert('RGB')
+        image = self.transform(image)  # torch.Size([3, 256, 256])
+        
+        return image, caption, index, img_id, cap_tokens
+
+
+    def __len__(self):
+        return self.length
+ 
+
 def collate_fn(data):
     """
     Custom collate function to be used with DataLoader for handling variable length captions.
@@ -688,6 +752,33 @@ def get_precomp_loader_mine_finetune(
     return data_loader, dset
 
 
+def get_precomp_loader_mine_zeroshot(args, data_split, country, batch_size=100, shuffle=False, num_workers=0, source = True):
+    """Returns torch.utils.data.DataLoader for custom coco dataset."""
+    dset = PrecompDataset_mine_finetune(args, data_split, country=country, source=source)
+    if args.distributed and data_split == 'train':
+        sampler = torch.utils.data.distributed.DistributedSampler(dset)
+        data_loader = torch.utils.data.DataLoader(
+            dataset=dset,
+            batch_size=batch_size,
+            pin_memory=True,
+            collate_fn=collate_fn_mine_finetune,
+            num_workers=num_workers,
+            sampler=sampler,
+            drop_last=True,
+        )
+    else:
+        data_loader = torch.utils.data.DataLoader(
+            dataset=dset,
+            batch_size=batch_size,
+            shuffle=shuffle,
+            pin_memory=True,
+            collate_fn=collate_fn_mine_finetune,
+            num_workers=num_workers,
+            drop_last=True,
+        )
+    return data_loader, dset
+
+
 def get_loaders_mine(args):
     train_loader = get_precomp_loader_mine(
         args,
@@ -859,3 +950,18 @@ def get_test_loader_without_sam_mine(args):
     )
 
     return test_loader
+
+
+def get_test_loader_zeroshot(args):
+    dset = PrecompDataset_mine_zeroshot(args, 'test', country=args.country)
+    test_loader = torch.utils.data.DataLoader(
+                        dataset=dset,
+                        batch_size=args.batch_size_test,
+                        shuffle=False,
+                        pin_memory=True,
+                        collate_fn=collate_fn_mine_finetune,
+                        num_workers=args.workers,
+                        drop_last=True,
+    )
+    
+    return test_loader, dset

@@ -124,9 +124,9 @@ class AdversarialLoss(nn.Module):
         Initialize the AdversarialLoss module.
         """
         super(AdversarialLoss, self).__init__()
-        self.W_tilde_2 = 1.0
+        # self.W_tilde_2 = 1.0
 
-    def forward(self, model, F_s_tilde, F_t_tilde, W2):
+    def forward(self, model, source, target, W2):
         """
         Forward pass of the AdversarialLoss module.
 
@@ -140,9 +140,9 @@ class AdversarialLoss(nn.Module):
             torch.Tensor: Adversarial loss value.
         """
         # Calculate the discriminator's probability on source features
-        prob_source = model(F_s_tilde)
+        prob_source = model(source)
         # Calculate the discriminator's probability on target features
-        prob_target = model(F_t_tilde)
+        prob_target = model(target)
 
         # Ensure the discriminator output is in the range [0, 1] by applying sigmoid
         prob_source = torch.sigmoid(prob_source)
@@ -162,13 +162,12 @@ class AdversarialLoss(nn.Module):
 
 
 class UrbanCross_finetune(nn.Module):
-    def __init__(self, args, word2idx):
+    def __init__(self, args):
         """
         Initialize the UrbanCross_finetune model.
 
         Args:
             args: Model configuration arguments.
-            word2idx: Mapping from words to indices.
         """
         super().__init__()
         # Create OpenCLIP model and transforms
@@ -237,6 +236,111 @@ class UrbanCross_finetune(nn.Module):
             W2 = W2 / torch.sum(W2)
             
             # Calculate triplet loss
+            adv_loss_img = self.adv_loss(
+                                        self.discriminator, 
+                                        img_emb_source_filtered, 
+                                        img_emb_target, 
+                                        W2,
+                                    )
+            adv_loss_text = self.adv_loss(
+                                        self.discriminator, 
+                                        text_emb_source_filtered, 
+                                        text_emb_target, 
+                                        W2,
+                                    )
+            adv_loss = adv_loss_img + adv_loss_text
+            
+            clip_loss = self.clip_loss(img_emb_source_filtered, 
+                                    text_emb_source_filtered,
+                                    logit_scale=1.0
+                                    #    img_emb_target, 
+                                    #    text_emb_target
+                                    )
+        return clip_loss, adv_loss, ratio
+    
+    
+    def forward_val(self, img_target, text_target):
+    
+        with torch.cuda.amp.autocast():
+            clip_model_out = self.clip_model(img_target, text_target)
+    
+            
+            img_emb = clip_model_out['image_features']
+            text_emb = clip_model_out['text_features']
+            
+            sim_img2text = cosine_sim(img_emb, text_emb)
+        
+        return sim_img2text
+    
+
+class UrbanCross_finetune_curriculum(nn.Module):
+    def __init__(self, args):
+        super().__init__()
+        self.clip_model, _, transform = open_clip.create_model_and_transforms(
+            # model_name="coca_ViT-L-14", 
+            model_name="ViT-L-14",
+            pretrained='laion2B-s32B-b82K',  #mscoco_finetuned_laion2B-s13B-b90k
+            output_dict=True,
+        )
+
+        self.clip_img_seg = copy.deepcopy(self.clip_model)
+        del self.clip_img_seg.transformer
+        self.discriminator = nn.Sequential(
+            nn.Linear(768, 768),
+            nn.ReLU(),
+            nn.Linear(768, 768),
+            nn.ReLU(),
+            nn.Linear(768, 2),
+            # nn.Sigmoid()
+        )
+        
+        self.adv_loss = AdversarialLoss()
+        self.clip_loss = open_clip.ClipLoss()
+
+    def forward(self, img_source, img_target, text_source, text_target, num_cycle_of_target=0, val=False):
+        if val:
+            return self.forward_val(img_target, text_target)
+        ratio = 0.2
+
+        with torch.cuda.amp.autocast():
+            clip_model_out_source = self.clip_model(img_source, text_source)
+            clip_model_out_target = self.clip_model(img_target, text_target)
+            
+            img_emb_source = clip_model_out_source['image_features']
+            img_emb_target = clip_model_out_target['image_features']
+            
+            text_emb_source = clip_model_out_source['text_features']
+            text_emb_target = clip_model_out_target['text_features']
+            
+            # Calculate similarity between text embeddings
+            W1 = cosine_sim(text_emb_target, text_emb_source)
+            W1_mean = W1.mean(dim=0)
+
+            batchsize = img_emb_source.shape[0]
+            selected_batchsize = int(batchsize * ratio)
+   
+            # Sort W1 along each row, from large to small
+            sorted_W1, _ = torch.sort(W1, dim=1, descending=True)
+          
+            W2 = sorted_W1[:, selected_batchsize * num_cycle_of_target : selected_batchsize * (num_cycle_of_target+1)]
+            _, sorted_W1_mean_index = torch.sort(W1_mean, descending=True)
+
+            img_emb_source_filtered = img_emb_source[sorted_W1_mean_index[:selected_batchsize]]
+            text_emb_source_filtered = text_emb_source[sorted_W1_mean_index[:selected_batchsize]]
+
+            # Sum W_2 over the second dimension to get a vector
+            W2 = torch.sum(W2, dim=1)
+
+            # Scale W_tilde_2 to range [0, 1]
+            W2_min = torch.min(W2)
+            W2_max = torch.max(W2)
+            W2 = (W2 - W2_min) / (W2_max - W2_min)
+
+            # Normalize W_tilde_2 to sum to 1
+            W2 = W2 / torch.sum(W2)
+            # Calculate triplet loss
+            # triplet_loss = nn.TripletMarginLoss()
+            # loss = triplet_loss(img_emb_source, text_emb_source, topk_W1)
 
             adv_loss = self.adv_loss(self.discriminator, 
                                     img_emb_source_filtered, 
@@ -248,13 +352,8 @@ class UrbanCross_finetune(nn.Module):
                                     logit_scale=1.0
                                     )
         return clip_loss, adv_loss, ratio
-    
-    def forward_val(
-                self, 
-                img_target, 
-                text_target,
-                ):
-    
+       
+    def forward_val(self, img_target, text_target):
         with torch.cuda.amp.autocast():
             clip_model_out = self.clip_model(img_target, text_target)
             
@@ -264,12 +363,10 @@ class UrbanCross_finetune(nn.Module):
             sim_img2text = cosine_sim(img_emb, text_emb)
         
         return sim_img2text
+        
     
-    
-class UrbanCross_wo_seg(nn.Module):
-    def __init__(self, args, 
-                        # word2idx
-                 ):
+class UrbanCross_zeroshot(nn.Module):
+    def __init__(self, args):
         super().__init__()
         self.clip_model, _, transform = open_clip.create_model_and_transforms(
             # model_name="coca_ViT-L-14", 
@@ -280,10 +377,7 @@ class UrbanCross_wo_seg(nn.Module):
         self.clip_img_seg = copy.deepcopy(self.clip_model)
         del self.clip_img_seg.transformer
 
-    def forward(self, 
-                img , 
-                text, 
-                ):
+    def forward(self, img, text):
         with torch.cuda.amp.autocast():
             clip_model_out = self.clip_model(img, text)
             
@@ -377,10 +471,29 @@ def factory_without_sam(args, cuda=True, data_parallel=False):
 
     return model_without_ddp
 
-def factory_wo_seg(args, cuda=True, data_parallel=False):
+
+def factory_with_finetune(args, cuda=True, data_parallel=False):
     args_new = copy.copy(args)
 
-    model_without_ddp = UrbanCross_wo_seg(args_new)
+    model_without_ddp = UrbanCross_finetune(args_new)
+
+    if cuda:
+        model_without_ddp.cuda(args_new.gpuid)
+
+    if data_parallel:
+        model = nn.SyncBatchNorm.convert_sync_batchnorm(model_without_ddp)
+        model = DistributedDataParallel(model, device_ids=[args.gpuid],find_unused_parameters=False)
+        model_without_ddp = model.module
+        if not cuda:
+            raise ValueError
+
+    return model_without_ddp
+
+
+def factory_finetune_curriculum(args, cuda=True, data_parallel=False):
+    args_new = copy.copy(args)
+
+    model_without_ddp = UrbanCross_finetune_curriculum(args_new)
 
     if cuda:
         model_without_ddp.cuda(args_new.gpuid)
@@ -390,6 +503,32 @@ def factory_wo_seg(args, cuda=True, data_parallel=False):
         model = DistributedDataParallel(
             model, device_ids=[args.gpuid], find_unused_parameters=False
         )
+        model_without_ddp = model.module
+        if not cuda:
+            raise ValueError
+
+    return model_without_ddp
+
+
+def factory_zeroshot(
+                     args, 
+                    #  word2idx, 
+                     cuda=True, 
+                     data_parallel=False
+                     ):
+    args_new = copy.copy(args)
+
+    # model_without_ddp = SWAN(args_new, word2idx)
+    model_without_ddp = UrbanCross_zeroshot(args_new, 
+                                            # word2idx
+                                            )
+
+    if cuda:
+        model_without_ddp.cuda(args_new.gpuid)
+
+    if data_parallel:
+        model = nn.SyncBatchNorm.convert_sync_batchnorm(model_without_ddp)
+        model = DistributedDataParallel(model, device_ids=[args.gpuid],find_unused_parameters=False)
         model_without_ddp = model.module
         if not cuda:
             raise ValueError

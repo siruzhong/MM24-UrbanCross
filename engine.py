@@ -365,6 +365,109 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
         train_logger.wandb_log()
 
 
+def train_finetune_curriculum(args, train_loader_source, train_loader_target, model, optimizer, epoch):
+    grad_clip = args.grad_clip
+    max_violation = args.max_violation
+    margin = args.margin
+    print_freq = args.print_freq
+    if args.distributed:
+        mean_loss = torch.zeros(1).to(args.gpuid)
+        
+    # switch to train mode
+    model.train()
+    batch_time = utils.AverageMeter()
+    data_time = utils.AverageMeter()
+    train_logger = utils.LogCollector()
+
+    end = time.time()
+    params = list(model.parameters())
+    
+    # 创建 B_loader 的循环迭代器
+    target_loader_cycle = itertools.cycle(train_loader_target)
+    source_loader_cycle = itertools.cycle(train_loader_source)
+   
+    num_cycle_of_target = 0
+    i = 0
+    while num_cycle_of_target <= 4:
+        images_source, cap_tokens_source = next(source_loader_cycle)
+        images_target, cap_tokens_target = next(target_loader_cycle)
+        if i % len(train_loader_target) == 0 and i != 0:
+            num_cycle_of_target += 1
+        if num_cycle_of_target > 4:
+            break
+        
+        i += 1
+
+        batch_size = images_source.size(0)
+        margin = float(margin)
+        # measure data loading time
+        data_time.update(time.time() - end)
+        model.logger = train_logger
+
+        input_visuals_source = images_source
+        input_visuals_target = images_target
+        input_text_source = cap_tokens_source
+        input_text_target = cap_tokens_target
+
+        if torch.cuda.is_available():
+            input_visuals_source = input_visuals_source.cuda(args.gpuid)
+            input_visuals_target = input_visuals_target.cuda(args.gpuid)
+            input_text_source = input_text_source.cuda(args.gpuid)
+            input_text_target = input_text_target.cuda(args.gpuid)
+            
+        torch.cuda.synchronize(device=args.gpuid)
+
+        clip_loss, adv_loss, filter_ratio  = model(
+                       input_visuals_source,
+                       input_visuals_target, 
+                       input_text_source,
+                       input_text_target,
+                       num_cycle_of_target = num_cycle_of_target,
+                       )
+        loss = clip_loss + adv_loss
+           
+        if grad_clip > 0:
+            clip_grad_norm(params, grad_clip)
+
+        wandb.log({'loss': loss.cpu().data.numpy()})
+        optimizer.zero_grad()
+        loss.backward()
+        if args.distributed:
+            loss = utils.reduce_value(args, loss, average=True)
+            mean_loss = (mean_loss * i + loss.detach()) / (i + 1)  # update mean losses
+
+            train_logger.update('Loss', round(mean_loss.item(),3))
+        else: 
+            train_logger.update('Loss_avg', loss.cpu().data.numpy())
+            
+        torch.cuda.synchronize(device=args.gpuid)
+        optimizer.step()
+        torch.cuda.synchronize(device=args.gpuid)
+
+        # measure elapsed time
+        batch_time.update(time.time() - end)
+        end = time.time()
+
+        if i % print_freq == 0 and args.rank == 0:
+            logger.info(
+                'Epoch [{0}][{1}/{2}(source)][{1}/{3}(target)]\t'
+                'Time {batch_time.val:.3f}\t'
+                '{elog}\t'
+                .format(epoch, i, len(train_loader_source),len(train_loader_target),
+                        batch_time=batch_time,
+                        elog=str(train_logger))
+                )
+            logger.info(f'{num_cycle_of_target}_th cycle of target data')
+            logger.info(f'filter_ratio: {filter_ratio}')
+            utils.get_GPU_usage()
+
+        wandb.log({
+            'epoch': epoch,
+            'batch_time': batch_time.val,
+        })
+        train_logger.wandb_log(epoch)
+        
+
 def validate(args, val_loader, model):
     print("")
     print("--------------------- Start validation on training set ---------------------")
@@ -751,6 +854,66 @@ def test(args, test_loader, model):
     print("--------------------- end test ---------------------")
     print("")
     return d
+
+
+def test_mine(args, test_loader, model):
+    print('')
+    print("--------------------- start test on training ---------------------")
+    model.eval()
+
+    val_logger = utils.LogCollector()
+    model.logger = val_logger
+
+    start = time.time()
+
+    input_visual = []
+    input_text = []
+    
+    
+    for idx, val_data in enumerate(tqdm(test_loader)):
+        images, cap_tokens = val_data
+        input_visual.append(images)
+        input_text.append(cap_tokens)
+      
+    input_visual = torch.cat(input_visual, dim=0)
+    input_text = torch.cat(input_text, dim=0)
+
+    logger.info('begin to compute distance')
+    d = utils.shard_dis_mine_finetune(
+                             args, 
+                             input_visual, 
+                             input_text, 
+                             model,
+                            )
+    end = time.time()
+    print("calculate similarity time: {:.2f} s".format(end - start))
+
+    (r1i, r5i, r10i, medri, meanri), _ = utils.acc_i2t_mine(d)
+    (r1t, r5t, r10t, medrt, meanrt), _ = utils.acc_i2t_mine(d.T)
+
+    currscore = (r1t + r5t + r10t + r1i + r5i + r10i) / 6.0
+
+    all_score = "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n" \
+                "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n" \
+                "mR:{:.2f}".format(r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore)
+
+    print("--------------------- end test on training ---------------------")
+    print('')
+    
+    wandb.log({
+        'test/r1i': r1i,
+        'test/r5i': r5i,
+        'test/r10i': r10i,
+        'test/medri': medri,
+        'test/meanri': meanri,
+        'test/r1t': r1t,
+        'test/r5t': r5t,
+        'test/r10t': r10t,
+        'test/medrt': medrt,
+        'test/meanrt': meanrt,
+        'test/rsum': currscore
+    })
+    return currscore, all_score
 
 
 def save(args, test_loader, model):

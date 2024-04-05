@@ -131,17 +131,14 @@ def main(args):
         raise NotImplementedError
     
     logger.info(args)
-    # Create dataset, model, criterion, and optimizer
-    train_loader_source, train_loader_target, train_dataset_source, train_dataset_target, val_loader_target, val_dataset_target = data.get_loaders_finetune(
-        args,
-    )
-    logger.info(f"len of train_set is {len(train_dataset_source)}(source)/{len(train_dataset_target)}(target)")
-    logger.info(f"len of val_set is {len(val_dataset_target)}(target)")
-    
+    test_loader, test_dataset = data.get_test_loader_zeroshot(args)
+    logger.info(f"len of test_set is {len(test_dataset)}")
+
     # Load pretrained model weights
-    model = models.factory_wo_seg(args, cuda=True, data_parallel=args.distributed)
+    model = models.factory_finetune(args, cuda=True, data_parallel=args.distributed)
     pretrained_weight = torch.load(args.load_path, map_location='cuda:{}'.format(args.gpuid))
     model.load_state_dict(pretrained_weight['model'], strict=False)
+    logger.info('load model from {}'.format(args.load_path))
 
     # Print and save model info
     if args.rank == 0:
@@ -153,68 +150,16 @@ def main(args):
         logger.info("Total Requires_grad Params: {:.2f} MB".format(total_requires_grad_params_mb))
         logger.info(model)
 
-    optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
+        rsum, all_scores = engine.test_mine(args, test_loader, model)
 
-    # Optionally resume from a checkpoint
-    start_epoch = 0
-    best_rsum = 0
-    best_rsum_ = 0
-    best_score = ""
-    best_score_ = ""
-    if args.resume:
-        if os.path.isfile(args.resume):
-            print("=> loading checkpoint '{}'".format(args.resume))
-            checkpoint = torch.load(args.resume, map_location='cuda:{}'.format(args.gpuid))
-            start_epoch = checkpoint['epoch']
-            best_rsum = checkpoint['best_rsum']
-            model.load_state_dict(checkpoint['model'], strict =False)
-            # Eiters is used to show logs as the continuation of another
-            model.Eiters = checkpoint['Eiters']
-            print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})".format(args.resume, start_epoch, best_rsum))
-            rsum, all_scores = engine.validate(args, val_loader, model)
-            print(all_scores)
-        else:
-            print("=> no checkpoint found at '{}'".format(args.resume))
-
-    # Train the Model
-    for epoch in range(start_epoch, args.epochs):
-        if args.distributed:
-            train_loader.sampler.set_epoch(epoch)
-
-        utils.adjust_learning_rate(args, optimizer, epoch)
-        
-        # Train for one epoch
-        # engine.train_finetune(args, train_loader_source, train_loader_target, model, optimizer, epoch)
-
-        # Evaluate on validation set
-        if (epoch + 1) % args.eval_step == 0:
-            rsum, all_scores = engine.validate_finetune(args, val_loader_target, model, epoch)
-            
-            is_best = rsum > best_rsum
-            if is_best:
-                best_score = all_scores
-            best_rsum = max(rsum, best_rsum)
-
-            if args.rank == 0:
-                logger.info("================ evaluate result on val set =====================")
-                logger.info("Current => [{}/{}] fold & [{}/{}] epochs".format(args.k_fold_current_num + 1, args.k_fold_nums, epoch + 1, args.epochs))
-                logger.info("Now val score:")
-                logger.info(all_scores)
-                logger.info("Best val score:")
-                logger.info(best_score)
-                logger.info("=================================================================")
-                
-                utils.save_checkpoint(
-                    {
-                        'epoch': epoch + 1,
-                        'model': model.state_dict(),
-                        'best_rsum': best_rsum,
-                        'args': args,
-                    },
-                    filename=f'ckpt_{args.model_name}_{epoch}_{best_rsum:.2f}.pth',
-                    prefix=args.ckpt_save_path,
-                    model_name=args.model_name
-                )
+        if args.rank == 0:
+            logger.info("================ evaluate result on test set =====================")
+            logger.info("Now val score:")
+            logger.info(all_scores)
+            logger.info("rsum:")
+            logger.info(rsum)
+            logger.info("Best val score:")
+            logger.info("=================================================================")
 
     if args.distributed:
         # destroy process
