@@ -1,7 +1,9 @@
 datename=$(date +%Y%m%d-%H%M%S)
 data_name=rsicd
-epochs=15
+epochs=20
 num_seg=6
+
+cd ../../
 
 python train_urbancross.py \
        --gpuid 0 \

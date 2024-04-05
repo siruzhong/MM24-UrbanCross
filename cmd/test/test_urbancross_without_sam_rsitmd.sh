@@ -1,7 +1,9 @@
 datename=$(date +%Y%m%d-%H%M%S)
 data_name=rsitmd
 
-python test_urbancross.py \
+cd ../../
+
+python test_urbancross_without_sam.py \
        --gpuid 0 \
        --model_name ours \
        --experiment_name urbancross \
@@ -10,5 +12,5 @@ python test_urbancross.py \
        --batch_size 40 \
        --workers 0 \
        --data_name $data_name \
-       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_rsitmd/checkpoints/seg6_new/rsitmd_with_sam_ours_epoch10_bestRsum0.6228.pth \
+       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_rsitmd/checkpoints/rsitmd_without_sam_ours_epoch5_bestRsum0.6200.pth \
        2>&1 | tee -a outputs/logs_${datename}_${data_name}_test.txt

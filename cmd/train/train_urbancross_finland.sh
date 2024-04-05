@@ -1,9 +1,12 @@
 datename=$(date +%Y%m%d-%H%M%S)
-data_name=integration
-country=Integration
-epochs=45
+data_name=finland
+country=Finland
+epochs=20
+num_seg=5
 
-python train_urbancross_without_sam.py \
+cd ../../
+
+python train_urbancross.py \
        --gpuid 0 \
        --model_name ours \
        --experiment_name urbancross \
@@ -11,9 +14,10 @@ python train_urbancross_without_sam.py \
        --epochs $epochs \
        --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
        --country $country \
-       --batch_size 45 \
+       --batch_size 40 \
+       --num_seg $num_seg \
        --lr 0.00001 \
        --workers 0 \
        --data_name $data_name \
        --test_step $epochs \
-       2>&1 | tee -a outputs/logs_${datename}_${data_name}_epochs${epochs}_without_sam.txt
+       2>&1 | tee -a outputs/logs_${datename}_${data_name}_epochs${epochs}_seg${num_seg}_with_sam.txt

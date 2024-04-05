@@ -1,8 +1,10 @@
 datename=$(date +%Y%m%d-%H%M%S)
-data_name=finland
-country=Finland
+data_name=spain
+country=Spain
 epochs=20
 num_seg=5
+
+cd ../../
 
 python train_urbancross.py \
        --gpuid 0 \

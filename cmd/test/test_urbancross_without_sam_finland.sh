@@ -1,6 +1,8 @@
 datename=$(date +%Y%m%d-%H%M%S)
-data_name=spain
-country=Spain
+data_name=finland
+country=Finland
+
+cd ../../
 
 python test_urbancross_without_sam.py \
        --gpuid 0 \
@@ -12,5 +14,5 @@ python test_urbancross_without_sam.py \
        --workers 0 \
        --country $country \
        --data_name $data_name \
-       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_spain/checkpoints/spain_without_sam_ours_epoch14_bestRsum0.6906.pth \
+       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_finland/checkpoints/finland_without_sam_ours_epoch11_bestRsum0.7661.pth \
        2>&1 | tee -a outputs/logs_${datename}_${data_name}_test.txt
