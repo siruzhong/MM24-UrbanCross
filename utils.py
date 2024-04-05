@@ -502,7 +502,13 @@ def shard_dis_mine_finetune(args, images, captions, model):
 
                 # Compute similarity between image and caption shards
                 t1 = time.time()
-                sim_img2text = model(img, img, texts, texts, val=True)
+                sim_img2text = model(
+                    img_source = img,
+                    img_target = img,
+                    text_source = texts,
+                    text_target = texts,
+                    val=True,
+                )
                 sim = sim_img2text
                 t2 = time.time()
                 all.append(t2 - t1)

@@ -4,7 +4,8 @@ import numpy as np
 import itertools
 from torch.autograd import Variable
 import utils
-
+import os
+import shutil
 # import tensorboard_logger as tb_logger
 import wandb
 
@@ -323,7 +324,13 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
             clip_grad_norm(params, grad_clip)
 
         # Log the loss to Weights and Biases
-        wandb.log({"loss": loss.cpu().data.numpy(),})
+        wandb.log(
+            {
+                'loss': loss.cpu().data.numpy(),
+                'loss_clip': clip_loss.cpu().data.numpy(),
+                'loss_adv': adv_loss.cpu().data.numpy(),
+            }
+        )        
         
         # Zero the parameter gradients
         optimizer.zero_grad()
@@ -868,12 +875,16 @@ def test_mine(args, test_loader, model):
 
     input_visual = []
     input_text = []
+    img_paths = []
+    captions = []
     
-    
-    for idx, val_data in enumerate(tqdm(test_loader)):
-        images, cap_tokens = val_data
+    for idx, val_data in enumerate(tqdm(itertools.islice(test_loader, 20))):
+    # for idx, val_data in enumerate(tqdm(test_loader)):
+        images, cap_tokens, img_path, caption = val_data
         input_visual.append(images)
         input_text.append(cap_tokens)
+        img_paths.extend(img_path)
+        captions.extend(caption)
       
     input_visual = torch.cat(input_visual, dim=0)
     input_text = torch.cat(input_text, dim=0)
@@ -885,6 +896,24 @@ def test_mine(args, test_loader, model):
                              input_text, 
                              model,
                             )
+    # Normalize d to [0, 1]
+    d_normalized = (d - np.min(d)) / (np.max(d) - np.min(d))
+
+    for i in tqdm(range(len(img_paths))):
+        top10_indices = np.argsort(-d_normalized[i])[:10]
+        top10_captions = [captions[idx] for idx in top10_indices]
+        top10_values = [d_normalized[i][idx] for idx in top10_indices]
+        
+        savepath = os.path.join(args.ckpt_save_path, img_paths[i].split('/')[-1])
+        os.makedirs(savepath, exist_ok=True)
+        shutil.copy(img_paths[i], savepath)
+        # import ipdb;ipdb.set_trace()
+        with open(os.path.join(savepath, 'top10_captions.txt'), 'w') as f:
+            for j in range(10):
+                f.write(f'{top10_captions[j]}\n')
+                f.write(f'{top10_values[j]}\n')
+                f.write('\n')
+    
     end = time.time()
     print("calculate similarity time: {:.2f} s".format(end - start))
 

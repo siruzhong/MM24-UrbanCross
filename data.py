@@ -504,7 +504,7 @@ class PrecompDataset_mine_zeroshot(data.Dataset):
                 ).convert('RGB')
         image = self.transform(image)  # torch.Size([3, 256, 256])
         
-        return image, caption, index, img_id, cap_tokens
+        return image, caption, index, img_id, cap_tokens, os.path.join(self.img_path, self.images[img_id])
 
 
     def __len__(self):
@@ -592,6 +592,19 @@ def collate_fn_mine_finetune(data):
 
     # Return the necessary components
     return images, cap_tokens
+
+
+def collate_fn_mine_zeroshot(data):
+    
+    images, caption, ids, img_ids, cap_tokens, img_path = zip(*data)
+
+    # Merge images (convert tuple of 3D tensor to 4D tensor)
+    images = torch.stack(images, 0)
+    cap_tokens = torch.cat(cap_tokens, dim=0)
+    img_path = list(img_path)
+    caption = list(caption)
+    
+    return images, cap_tokens, img_path, caption
 
 
 def get_precomp_loader(args, data_split, vocab, batch_size=100, shuffle=False, num_workers=0):
@@ -959,7 +972,7 @@ def get_test_loader_zeroshot(args):
                         batch_size=args.batch_size_test,
                         shuffle=False,
                         pin_memory=True,
-                        collate_fn=collate_fn_mine_finetune,
+                        collate_fn=collate_fn_mine_zeroshot,
                         num_workers=args.workers,
                         drop_last=True,
     )
