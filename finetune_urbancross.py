@@ -68,10 +68,6 @@ def parser_options():
     parser.add_argument('--lr_update_epoch', default=20, type=int, help="the update epoch of learning rate")
     parser.add_argument('--lr_decay_param', default=0.7, type=float, help="the decay_param of learning rate")
 
-    # SWAN contrastive experiment variables
-    parser.add_argument('--sk_1', default=2, type=int)
-    parser.add_argument('--sk_2', default=3, type=int)
-
     # SCAN hyperparameters
     parser.add_argument('--cross_attn', default="t2i", help='t2i|i2t')
     parser.add_argument('--agg_func', default="LogSumExp", help='LogSumExp|Mean|Max|Sum')
@@ -105,11 +101,16 @@ def parser_options():
 
 
 def main(args):
-    # Set up Weights and Biases logging directory
+    # Set WANDB_DIR environment variable
     os.environ["WANDB_DIR"] = args.wandb_logging_dir
+    
+    # Generate WANDB_ID if not provided
     if not args.wandb_id:
         args.wandb_id = wandb.util.generate_id()
-    logger.info(f"wandb id: {args.wandb_id}")
+    
+    # Login to W&B
+    wandb.login(key='d7ec29907ca115fe6d605741c40d09cf563aa0db')
+    logger.info(f"W&B ID: {args.wandb_id}")
     
     # Initialize Weights and Biases run
     wandb.init(
@@ -128,8 +129,8 @@ def main(args):
         dist.init_process_group(backend='nccl', init_method=args.init_method, rank=args.rank, world_size=args.world_size)
 
     # Choose the model
-    if args.model_name == "urbancross" or args.model_name == "urbancross_finetune":
-        from layers import urbancross as models
+    if args.model_name == "ours" or args.model_name == "urbancross_finetune":
+        from layers import Ours as models
     else:
         raise NotImplementedError
     

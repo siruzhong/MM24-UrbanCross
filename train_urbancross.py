@@ -22,7 +22,7 @@ def parser_options():
 
     # Training path settings
     parser.add_argument('-e', '--experiment_name', default='test', type=str, help="File name for saving checkpoints")
-    parser.add_argument('-m', '--model_name', default='SWAN', type=str, help="Model Name")
+    parser.add_argument('-m', '--model_name', default='ours', type=str, help="Model Name")
     parser.add_argument('--data_name', default='rsitmd', type=str, help="Dataset Name (e.g., rsitmd or rsicd)")
     parser.add_argument('--data_path', default='./data/', type=str, help="Preprocessed data file path")
     parser.add_argument('--image_path', default='./rs_data/', type=str, help="Remote images data path")
@@ -70,10 +70,6 @@ def parser_options():
     parser.add_argument('--lr', default=0.0002, type=float, help="Learning rate")
     parser.add_argument('--lr_update_epoch', default=20, type=int, help="Epochs after which learning rate is updated")
     parser.add_argument('--lr_decay_param', default=0.7, type=float, help="Decay parameter for learning rate")
-
-    # SWAN experiment parameters
-    parser.add_argument('--sk_1', default=2, type=int, help="Parameter 1 for SWAN experiment")
-    parser.add_argument('--sk_2', default=3, type=int, help="Parameter 2 for SWAN experiment")
 
     # SCAN hyperparameters
     parser.add_argument('--cross_attn', default="t2i", help='t2i|i2t')

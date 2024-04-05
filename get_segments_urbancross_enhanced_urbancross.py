@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     img_lists = df["image_name"]
     # for idx, row in tqdm(reversed(list(df.iterrows())[10000:]), total=df.shape[0]):
-    for idx, row in tqdm(list(df.iterrows())[20000:], total=df.shape[0]):
+    for idx, row in tqdm(list(df.iterrows())[14966:], total=df.shape[0]):
         image_name = row['image_name']
         description = row['description']  # 确保CSV中有描述的列
         image_path = os.path.join(img_path, image_name)

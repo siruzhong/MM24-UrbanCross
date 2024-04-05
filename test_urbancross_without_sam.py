@@ -70,10 +70,6 @@ def parser_options():
     parser.add_argument('--lr_update_epoch', default=20, type=int, help="Epochs after which learning rate is updated")
     parser.add_argument('--lr_decay_param', default=0.7, type=float, help="Decay parameter for learning rate")
 
-    # SWAN experiment parameters
-    parser.add_argument('--sk_1', default=2, type=int, help="Parameter 1 for SWAN experiment")
-    parser.add_argument('--sk_2', default=3, type=int, help="Parameter 2 for SWAN experiment")
-
     # SCAN hyperparameters
     parser.add_argument('--cross_attn', default="t2i", help='t2i|i2t')
     parser.add_argument('--agg_func', default="LogSumExp", help='LogSumExp|Mean|Max|Sum')

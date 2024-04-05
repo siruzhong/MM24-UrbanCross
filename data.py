@@ -392,16 +392,16 @@ class PrecompDataset_mine_finetune(data.Dataset):
         self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
         self.captions = []
 
-        df = pd.read_csv(f"urbancross_data/instructblip_generation_with_tag/instructblip_generation_{country.lower()}_refine.csv")
+        df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_{country.lower()}_refine.csv")
         split_list = []
 
         if source:
-            path_ = f"urbancross_data/images_target/{country}/{data_split}_list.txt"
+            path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/{data_split}_list.txt"
         else:
             if data_split == "train":
-                path_ = f"urbancross_data/images_target/{country}/finetune_list.txt"
+                path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/finetune_list.txt"
             else:
-                path_ = f"urbancross_data/images_target/{country}/finetune_val_list.txt"
+                path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/finetune_val_list.txt"
 
         with open(path_, "r") as f:
             for line in f:
