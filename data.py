@@ -222,10 +222,11 @@ class PrecompDataset_mine(data.Dataset):
 
         seg_list = []
         # Iterate over each image segment, load and apply transformations
+        img_list = os.listdir(os.path.join(seg_path))
         for i in range(current_num_seg):
             seg_list.append(
                 self.transform_segment(
-                    Image.open(os.path.join(seg_path, img_name + f"_{i}" + ".jpg")).convert("RGB")
+                    Image.open(os.path.join(seg_path + "/" + img_list[i])).convert("RGB")
                 )
             )
         # If the current number of image segments is less than the specified number, fill with zero tensors

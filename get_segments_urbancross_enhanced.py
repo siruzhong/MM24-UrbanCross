@@ -44,12 +44,33 @@ def compute_similarity(image_path, text, device=device, clip_model=clip_model, p
     return similarity
 
 
+def all_segments_exist(seg_path, num_segments_expected=10):
+    """
+    检查是否所有的图像分割都已经存在。
+    
+    Args:
+        seg_path (str): 分割图像的目录路径。
+        num_segments_expected (int): 预期的分割图像数量。
+    
+    Returns:
+        bool: 如果所有分割图像都存在，则返回True，否则返回False。
+    """
+    # 检查存在的分割图像数量是否等于预期的数量
+    existing_segments = [f for f in os.listdir(seg_path) if os.path.isfile(os.path.join(seg_path, f))]
+    return len(existing_segments) >= num_segments_expected
+
+
 def show_masks_mine(anns, ori_img, img_path, description):
     """
     修改后的函数，计算分割图像与文本描述的相似度，并只保存相似度最高的前10个分割。
     """
     img_name = img_path.split("/")[-1].split(".")[0]
     seg_path = img_path.replace("/images/", "/image_segments_new/").split(".")[0]
+    
+    # 如果分割图像已经存在，跳过当前图像
+    if all_segments_exist(seg_path):
+        print(f"All segments for {img_name} already exist. Skipping.")
+        return
     
     # 确保目标目录存在
     if not os.path.exists(seg_path):
@@ -83,8 +104,8 @@ def show_masks_mine(anns, ori_img, img_path, description):
         os.remove(path)
 
 if __name__ == "__main__":
-    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/images"
-    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/dataset_rsitmd.csv")
+    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/RSICD/images"
+    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/RSICD/dataset_rsicd.csv")
 
     sam_checkpoint = "sam_vit_h_4b8939.pth"
     model_type = "vit_h"

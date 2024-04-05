@@ -1,13 +1,13 @@
 import numpy as np
 import torch
 import clip
+import re
 from PIL import Image
 import matplotlib.pyplot as plt
 import cv2
 import os
 import pandas as pd
 import sys
-import re
 from tqdm import tqdm
 
 sys.path.append("..")
@@ -21,7 +21,7 @@ def compute_similarity(image_path, text, device=device, clip_model=clip_model, p
     """
     计算图像与文本描述的相似度，对长文本进行分割处理。
     """
-    # 使用正则表达式分割文本，支持分号、逗号、句号
+    # 使用正则表达式分割文本
     text_parts = re.split(r'[;,.]', text)
     text_parts = [part.strip() for part in text_parts if part.strip()]
     text_features_list = []
@@ -107,10 +107,10 @@ def show_masks_mine(anns, ori_img, img_path, description):
         os.remove(path)
 
 if __name__ == "__main__":
-    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/images"
-    # img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/images"
-    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/instructblip_generation_finland_refine.csv")
-    # df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/instructblip_generation_germany_refine.csv")
+    # img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/images"
+    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/images"
+    # df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/instructblip_generation_finland_refine.csv")
+    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/instructblip_generation_germany_refine.csv")
 
     sam_checkpoint = "sam_vit_h_4b8939.pth"
     model_type = "vit_h"
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     mask_generator = SamAutomaticMaskGenerator(sam)
 
     img_lists = df["image_name"]
-    for idx, row in tqdm(df.iterrows(), total=df.shape[0]):
+    for idx, row in tqdm(reversed(list(df.iterrows())), total=df.shape[0]):
         image_name = row['image_name']
         description = row['description']  # 确保CSV中有描述的列
         image_path = os.path.join(img_path, image_name)
