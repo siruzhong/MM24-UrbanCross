@@ -21,7 +21,7 @@ def compute_similarity(image_path, text, device=device, clip_model=clip_model, p
     """
     计算图像与文本描述的相似度，对长文本进行分割处理。
     """
-    # 使用正则表达式分割文本
+    # 使用正则表达式分割文本，支持分号、逗号、句号
     text_parts = re.split(r'[;,.]', text)
     text_parts = [part.strip() for part in text_parts if part.strip()]
     text_features_list = []
