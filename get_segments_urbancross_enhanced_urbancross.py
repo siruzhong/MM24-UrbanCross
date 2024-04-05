@@ -109,10 +109,10 @@ def show_masks_mine(anns, ori_img, img_path, description):
 
 
 if __name__ == "__main__":
-    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/images"
-    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/instructblip_generation_finland_refine.csv")
-    # img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/images"
-    # df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/instructblip_generation_germany_refine.csv")
+    # img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/images"
+    # df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/instructblip_generation_finland_refine.csv")
+    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/images"
+    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/instructblip_generation_germany_refine.csv")
 
     sam_checkpoint = "sam_vit_h_4b8939.pth"
     model_type = "vit_h"
@@ -122,7 +122,7 @@ if __name__ == "__main__":
 
     img_lists = df["image_name"]
     # for idx, row in tqdm(reversed(list(df.iterrows())[10000:]), total=df.shape[0]):
-    for idx, row in tqdm(list(df.iterrows())[14966:], total=df.shape[0]):
+    for idx, row in tqdm(list(df.iterrows())[5475:], total=df.shape[0]):
         image_name = row['image_name']
         description = row['description']  # 确保CSV中有描述的列
         image_path = os.path.join(img_path, image_name)

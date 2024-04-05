@@ -259,16 +259,16 @@ def train_without_sam(args, train_loader, model, optimizer, epoch):
 
 
 def train_finetune(args, train_loader_source, train_loader_target, model, optimizer, epoch):
-
-    # extract value
+    # Extract values from arguments
     grad_clip = args.grad_clip
     max_violation = args.max_violation
     margin = args.margin
-    # loss_name = args.model_name + "_" + args.data_name
     print_freq = args.print_freq
+    
     if args.distributed:
         mean_loss = torch.zeros(1).to(args.gpuid)
-    # switch to train mode
+        
+    # Switch to train mode
     model.train()
     batch_time = utils.AverageMeter()
     data_time = utils.AverageMeter()
@@ -276,11 +276,12 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
 
     end = time.time()
     params = list(model.parameters())
-    # 创建 B_loader 的循环迭代器
+    
+    # Create an iterator for the target loader
     target_loader_cycle = itertools.cycle(train_loader_target)
     num_cycle_of_target = -1
+    
     for i, source_data in enumerate(train_loader_source):
-        
         images_source, cap_tokens_source = source_data
         images_target, cap_tokens_target = next(target_loader_cycle)
    
@@ -289,7 +290,8 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
 
         batch_size = images_source.size(0)
         margin = float(margin)
-        # measure data loading time
+        
+        # Measure data loading time
         data_time.update(time.time() - end)
         model.logger = train_logger
 
@@ -306,37 +308,40 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
 
         torch.cuda.synchronize(device=args.gpuid)
 
+        # Calculate clip_loss, adv_loss, and filter_ratio
         clip_loss, adv_loss, filter_ratio  = model(
-                       input_visuals_source,
-                       input_visuals_target, 
-                       input_text_source,
-                       input_text_target,
-                       num_cycle_of_target = num_cycle_of_target,)
+            input_visuals_source,
+            input_visuals_target, 
+            input_text_source,
+            input_text_target,
+            num_cycle_of_target = num_cycle_of_target,
+        )
         loss = clip_loss + adv_loss
 
+        # Clip gradients if grad_clip is positive
         if grad_clip > 0:
             clip_grad_norm(params, grad_clip)
 
+        # Log the loss to Weights and Biases
         wandb.log({"loss": loss.cpu().data.numpy(),})
         
+        # Zero the parameter gradients
         optimizer.zero_grad()
         loss.backward()
 
-        if args.distributed:  # no this way
+        if args.distributed:
             loss = utils.reduce_value(args, loss, average=True)
             mean_loss = (mean_loss * i + loss.detach()) / (i + 1)  # update mean losses
-
             train_logger.update("Loss", round(mean_loss.item(), 3))
-        else:  # go this way
-            if args.il_measure:  # no this way
+        else:
+            if args.il_measure:
                 train_logger.update('Loss_avg', loss.cpu().data.numpy())
-
 
         torch.cuda.synchronize(device=args.gpuid)
         optimizer.step()
         torch.cuda.synchronize(device=args.gpuid)
 
-        # measure elapsed time
+        # Measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
         
@@ -353,6 +358,7 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
             logger.info(f'filter_ratio: {filter_ratio}')
             utils.get_GPU_usage()
 
+        # Log the batch time to Weights and Biases
         wandb.log({
                 "batch_time": batch_time.val,
             })
