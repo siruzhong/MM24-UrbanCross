@@ -278,14 +278,16 @@ def train_finetune(
 
     end = time.time()
     params = list(model.parameters())
-    iter_target = iter(train_loader_target)
-    for i, train_data in enumerate(train_loader_source):
-        # images, ids, cap_tokens, segment_imgs, tag_tokens = train_data
-        # images, ids, cap_tokens, segment_imgs = train_data
-        images_source, ids, cap_tokens_source = train_data
-        images_target, ids, cap_tokens_target = next(iter_target)
-        # import ipdb; ipdb.set_trace()
-        # images, ids, cap_tokens, segment_img, tag_tokens
+    # 创建 B_loader 的循环迭代器
+    target_loader_cycle = itertools.cycle(train_loader_target)
+    num_cycle_of_target = -1
+    for i, source_data in enumerate(train_loader_source):
+        
+        images_source, cap_tokens_source = source_data
+        images_target, cap_tokens_target = next(target_loader_cycle)
+   
+        if i % len(train_loader_target) == 0:
+            num_cycle_of_target += 1
 
         batch_size = images_source.size(0)
         margin = float(margin)
@@ -295,13 +297,8 @@ def train_finetune(
 
         input_visuals_source = images_source
         input_visuals_target = images_target
-        # import ipdb; ipdb.set_trace()
-        # segment_imgs = Variable(segment_imgs)
-        # input_text = Variable(captions)
         input_text_source = cap_tokens_source
         input_text_target = cap_tokens_target
-        # input_tags = Variable(tag_tokens)
-        # import ipdb;ipdb.set_trace()
 
         if torch.cuda.is_available():
             input_visuals_source = input_visuals_source.cuda(args.gpuid)
@@ -309,88 +306,24 @@ def train_finetune(
             input_text_source = input_text_source.cuda(args.gpuid)
             input_text_target = input_text_target.cuda(args.gpuid)
 
-            # segment_imgs = segment_imgs.cuda(args.gpuid)
-            # input_tags = input_tags.cuda(args.gpuid)
-
         torch.cuda.synchronize(device=args.gpuid)
 
-        if not args.il_measure:  # go this way
-            # ONE
-            scores_img2text, scores_seg2text = model(
-                input_visuals_source,
-                input_visuals_target,
-                input_text_source,
-                input_text_target,
-                #    input_tags,
-                #  lengths,
-                #    segment_imgs,
-            )
-            # scores_img2text, scores_img2tag, scores_seg2text, scores_seg2tag
-            # import ipdb;ipdb.set_trace()
-            loss_img2text = utils.calcul_contraloss(
-                args,
-                scores_img2text,
-                input_visual.size(0),  # bs
-                margin,  # 0.2
-                max_violation=max_violation,  # False
-            )
-            # loss_img2tag = utils.calcul_contraloss(
-            #         args,
-            #         scores_img2tag,
-            #         input_visual.size(0), #bs
-            #         margin, #0.2
-            #         max_violation=max_violation  #False
-            # )
-            loss_seg2text = utils.calcul_contraloss(
-                args,
-                scores_seg2text,
-                input_visual.size(0),  # bs
-                margin,  # 0.2
-                max_violation=max_violation,  # False
-            )
-            # loss_seg2tag = utils.calcul_contraloss(
-            #             args,
-            #             scores_seg2tag,
-            #             input_visual.size(0), #bs
-            #             margin, #0.2
-            #             max_violation=max_violation  #False
-            #     )
-            # loss = loss_img2text + loss_img2tag + loss_seg2text + loss_seg2tag
-            loss = loss_img2text + loss_seg2text
-
-        else:
-            scores, scores_intra_img, scores_intra_cap = model(
-                input_visual, input_text, lengths
-            )
-            intra_loss = utils.calcul_intraloss(
-                args, scores_intra_img
-            ) + utils.calcul_intraloss(args, scores_intra_cap)
-            loss = (
-                utils.calcul_contraloss(
-                    args,
-                    scores,
-                    input_visual.size(0),
-                    margin,
-                    max_violation=max_violation,
-                )
-                + intra_loss
-            )
+        clip_loss, adv_loss, filter_ratio  = model(
+                       input_visuals_source,
+                       input_visuals_target, 
+                       input_text_source,
+                       input_text_target,
+                       num_cycle_of_target = num_cycle_of_target,)
+        loss = clip_loss + adv_loss
 
         if grad_clip > 0:
             clip_grad_norm(params, grad_clip)
 
-        wandb.log(
-            {
-                "loss": loss.cpu().data.numpy(),
-                "loss_img2text": loss_img2text.cpu().data.numpy(),
-                # 'loss_img2tag': loss_img2tag.cpu().data.numpy(),
-                "loss_seg2text": loss_seg2text.cpu().data.numpy(),
-                # 'loss_seg2tag': loss_seg2tag.cpu().data.numpy(),
-            }
-        )
+        wandb.log({"loss": loss.cpu().data.numpy(),})
+        
         optimizer.zero_grad()
         loss.backward()
-        # import ipdb;ipdb.set_trace()
+
         if args.distributed:  # no this way
             loss = utils.reduce_value(args, loss, average=True)
             mean_loss = (mean_loss * i + loss.detach()) / (i + 1)  # update mean losses
@@ -398,13 +331,8 @@ def train_finetune(
             train_logger.update("Loss", round(mean_loss.item(), 3))
         else:  # go this way
             if args.il_measure:  # no this way
-                train_logger.update("IntraLoss", intra_loss.cpu().data.numpy())
+                train_logger.update('Loss_avg', loss.cpu().data.numpy())
 
-            train_logger.update("Loss", loss.cpu().data.numpy())
-            train_logger.update("Loss_img2text", loss_img2text.cpu().data.numpy())
-            # train_logger.update('Loss_img2tag', loss_img2tag.cpu().data.numpy())
-            train_logger.update("Loss_seg2text", loss_seg2text.cpu().data.numpy())
-            # train_logger.update('Loss_seg2tag', loss_seg2tag.cpu().data.numpy())
 
         torch.cuda.synchronize(device=args.gpuid)
         optimizer.step()
@@ -413,44 +341,24 @@ def train_finetune(
         # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
-
+        
         if i % print_freq == 0 and args.rank == 0:
             logger.info(
-                "Epoch [{0}][{1}/{2}]\t"
-                "Time {batch_time.val:.3f}\t"
-                "{elog}\t".format(
-                    epoch,
-                    i,
-                    len(train_loader),
-                    batch_time=batch_time,
-                    elog=str(train_logger),
+                'Epoch [{0}][{1}/{2}(source)][{1}/{3}(target)]\t'
+                'Time {batch_time.val:.3f}\t'
+                '{elog}\t'
+                .format(epoch, i, len(train_loader_source),len(train_loader_target),
+                        batch_time=batch_time,
+                        elog=str(train_logger))
                 )
-            )
+            logger.info(f'{num_cycle_of_target}_th cycle of target data')
+            logger.info(f'filter_ratio: {filter_ratio}')
+            utils.get_GPU_usage()
 
-            utils.log_to_txt(
-                "Epoch [{0}][{1}/{2}]\t"
-                "Time {batch_time.val:.3f}\t"
-                "{elog}\t".format(
-                    epoch,
-                    i,
-                    len(train_loader),
-                    batch_time=batch_time,
-                    elog=str(train_logger),
-                ),
-                args.ckpt_save_path + args.model_name + "_" + args.data_name + ".txt",
-            )
-        # import ipdb;ipdb.set_trace()
-        # tb_logger.log_value('epoch', epoch, step=model.Eiters)
-        # tb_logger.log_value('step', i, step=model.Eiters)
-        # tb_logger.log_value('batch_time', batch_time.val, step=model.Eiters)
-        # train_logger.tb_log(tb_logger, step=model.Eiters)
-
-        wandb.log(
-            {
+        wandb.log({
                 "epoch": epoch,
                 "batch_time": batch_time.val,
-            }
-        )
+            })
         train_logger.wandb_log()
 
 
@@ -596,6 +504,62 @@ def validate_without_sam(args, val_loader, model):
         }
     )
 
+    return currscore, all_score
+
+
+def validate_finetune(args, val_loader, model):
+    logger.info("--------------------- start val on training ---------------------")
+    model.eval()
+
+    val_logger = utils.LogCollector()
+    model.logger = val_logger
+
+    start = time.time()
+
+    input_visual = []
+    input_text = []
+    for idx, val_data in enumerate(val_loader):
+        images, cap_tokens = val_data
+        input_visual.append(images)
+        input_text.append(cap_tokens)
+    input_visual = torch.cat(input_visual, dim=0)
+    input_text = torch.cat(input_text, dim=0)
+
+    d = utils.shard_dis_mine_finetune(args, 
+                             input_visual, 
+                             input_text, 
+                             model,
+                            )
+    end = time.time()
+    print("calculate similarity time: {:.2f} s".format(end - start))
+
+    #image to text
+    (r1i, r5i, r10i, medri, meanri), _ = utils.acc_i2t_mine(d)
+    #text to image
+    (r1t, r5t, r10t, medrt, meanrt), _ = utils.acc_i2t_mine(d.T)
+
+    # import ipdb; ipdb.set_trace()
+    currscore = (r1t + r5t + r10t + r1i + r5i + r10i) / 6.0
+
+    all_score = "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n" \
+                "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n" \
+                "mR:{:.2f}".format(r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore)
+
+    logger.info("--------------------- end val on training ---------------------")
+    wandb.log({
+        'val/r1i': r1i,
+        'val/r5i': r5i,
+        'val/r10i': r10i,
+        'val/medri': medri,
+        'val/meanri': meanri,
+        'val/r1t': r1t,
+        'val/r5t': r5t,
+        'val/r10t': r10t,
+        'val/medrt': medrt,
+        'val/meanrt': meanrt,
+        'val/rsum': currscore
+    })
+    
     return currscore, all_score
 
 
