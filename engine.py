@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import itertools
 from torch.autograd import Variable
-import utils
+import utils.utils as utils
 import os
 import shutil
 # import tensorboard_logger as tb_logger

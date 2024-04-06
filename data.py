@@ -6,7 +6,7 @@ import nltk
 import numpy as np
 import pandas as pd
 import argparse
-import utils
+import utils.utils as utils
 from utils.vocab import deserialize_vocab
 from PIL import Image
 import open_clip

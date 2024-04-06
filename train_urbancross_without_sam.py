@@ -6,7 +6,7 @@ import argparse
 import wandb
 from loguru import logger
 import torch.distributed as dist
-import utils
+import utils.utils as utils
 import data
 import engine
 import time

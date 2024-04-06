@@ -5,7 +5,7 @@ import argparse
 import wandb
 from loguru import logger
 import torch.distributed as dist
-import utils
+import utils.utils as utils
 import data
 import engine
 from utils.vocab import deserialize_vocab
