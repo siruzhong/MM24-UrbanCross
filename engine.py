@@ -570,7 +570,7 @@ def validate(args, val_loader, model):
     end = time.time()  # Record end time
 
     print(
-        "Calculate similarity time: {:.2f} s".format(end - start)
+        "Calculate similarity time: {:.4f} s".format(end - start)
     )  # Print time spent on calculating similarity
 
     # Calculate accuracy metrics for image-to-text and text-to-image
@@ -582,9 +582,9 @@ def validate(args, val_loader, model):
 
     # Build string representation of all scores
     all_score = (
-        "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n"
-        "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n"
-        "mR:{:.2f}".format(
+        "i2t => r1i:{:.4f} r5i:{:.4f} r10i:{:.4f} medri:{:.4f} meanri:{:.4f}\n"
+        "t2i => r1t:{:.4f} r5t:{:.4f} r10t:{:.4f} medrt:{:.4f} meanrt:{:.4f}\n"
+        "mR:{:.4f}".format(
             r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore
         )
     )
@@ -643,7 +643,7 @@ def validate_without_sam(args, val_loader, model):
     end = time.time()  # Record end time
 
     print(
-        "Calculate similarity time: {:.2f} s".format(end - start)
+        "Calculate similarity time: {:.4f} s".format(end - start)
     )  # Print time spent on calculating similarity
 
     # Calculate accuracy metrics for image-to-text and text-to-image
@@ -655,9 +655,9 @@ def validate_without_sam(args, val_loader, model):
 
     # Build string representation of all scores
     all_score = (
-        "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n"
-        "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n"
-        "mR:{:.2f}".format(
+        "i2t => r1i:{:.4f} r5i:{:.4f} r10i:{:.4f} medri:{:.4f} meanri:{:.4f}\n"
+        "t2i => r1t:{:.4f} r5t:{:.4f} r10t:{:.4f} medrt:{:.4f} meanrt:{:.4f}\n"
+        "mR:{:.4f}".format(
             r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore
         )
     )
@@ -710,7 +710,7 @@ def validate_finetune(args, val_loader, model):
         model,
     )
     end = time.time()
-    print("calculate similarity time: {:.2f} s".format(end - start))
+    print("calculate similarity time: {:.4f} s".format(end - start))
 
     # image to text
     (r1i, r5i, r10i, medri, meanri), _ = utils.acc_i2t_mine(d)
@@ -721,9 +721,9 @@ def validate_finetune(args, val_loader, model):
     currscore = (r1t + r5t + r10t + r1i + r5i + r10i) / 6.0
 
     all_score = (
-        "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n"
-        "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n"
-        "mR:{:.2f}".format(
+        "i2t => r1i:{:.4f} r5i:{:.4f} r10i:{:.4f} medri:{:.4f} meanri:{:.4f}\n"
+        "t2i => r1t:{:.4f} r5t:{:.4f} r10t:{:.4f} medrt:{:.4f} meanrt:{:.4f}\n"
+        "mR:{:.4f}".format(
             r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore
         )
     )
@@ -780,7 +780,7 @@ def validate_test(args, test_loader, model):
     end = time.time()  # Record end time
 
     print(
-        "Calculate similarity time: {:.2f} s".format(end - start)
+        "Calculate similarity time: {:.4f} s".format(end - start)
     )  # Print time spent on calculating similarity
 
     # Calculate accuracy metrics for image-to-text and text-to-image
@@ -792,9 +792,9 @@ def validate_test(args, test_loader, model):
 
     # Build string representation of all scores
     all_score = (
-        "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n"
-        "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n"
-        "mR:{:.2f}".format(
+        "i2t => r1i:{:.4f} r5i:{:.4f} r10i:{:.4f} medri:{:.4f} meanri:{:.4f}\n"
+        "t2i => r1t:{:.4f} r5t:{:.4f} r10t:{:.4f} medrt:{:.4f} meanrt:{:.4f}\n"
+        "mR:{:.4f}".format(
             r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore
         )
     )
@@ -851,7 +851,7 @@ def validate_test_without_sam(args, test_loader, model):
     end = time.time()  # Record end time
 
     print(
-        "Calculate similarity time: {:.2f} s".format(end - start)
+        "Calculate similarity time: {:.4f} s".format(end - start)
     )  # Print time spent on calculating similarity
 
     # Calculate accuracy metrics for image-to-text and text-to-image
@@ -863,9 +863,9 @@ def validate_test_without_sam(args, test_loader, model):
 
     # Build string representation of all scores
     all_score = (
-        "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n"
-        "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n"
-        "mR:{:.2f}".format(
+        "i2t => r1i:{:.4f} r5i:{:.4f} r10i:{:.4f} medri:{:.4f} meanri:{:.4f}\n"
+        "t2i => r1t:{:.4f} r5t:{:.4f} r10t:{:.4f} medrt:{:.4f} meanrt:{:.4f}\n"
+        "mR:{:.4f}".format(
             r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore
         )
     )
@@ -922,14 +922,14 @@ def test(args, test_loader, model):
     input_visual = np.array([input_visual[i] for i in range(0, len(input_visual), 5)])
 
     embed_end = time.time()
-    print("## embedding time: {:.2f} s".format(embed_end - embed_start))
+    print("## embedding time: {:.4f} s".format(embed_end - embed_start))
 
     d = utils.shard_dis_SWAN(
         args, input_visual, input_text, model, lengths=input_text_length
     )
 
     end = time.time()
-    print("calculate similarity time: {:.2f} s".format(end - start))
+    print("calculate similarity time: {:.4f} s".format(end - start))
     print("--------------------- end test ---------------------")
     print("")
     return d
@@ -986,7 +986,7 @@ def test_mine(args, test_loader, model):
                 f.write("\n")
 
     end = time.time()
-    print("calculate similarity time: {:.2f} s".format(end - start))
+    print("calculate similarity time: {:.4f} s".format(end - start))
 
     (r1i, r5i, r10i, medri, meanri), _ = utils.acc_i2t_mine(d)
     (r1t, r5t, r10t, medrt, meanrt), _ = utils.acc_i2t_mine(d.T)
@@ -994,9 +994,9 @@ def test_mine(args, test_loader, model):
     currscore = (r1t + r5t + r10t + r1i + r5i + r10i) / 6.0
 
     all_score = (
-        "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n"
-        "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n"
-        "mR:{:.2f}".format(
+        "i2t => r1i:{:.4f} r5i:{:.4f} r10i:{:.4f} medri:{:.4f} meanri:{:.4f}\n"
+        "t2i => r1t:{:.4f} r5t:{:.4f} r10t:{:.4f} medrt:{:.4f} meanrt:{:.4f}\n"
+        "mR:{:.4f}".format(
             r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore
         )
     )

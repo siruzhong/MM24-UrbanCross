@@ -151,6 +151,15 @@ def main(args):
         logger.info(model)
 
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
+    
+    # Evaluate on validation set before fine-tuning
+    if args.rank == 0:
+        rsum, all_scores = engine.validate_finetune(args, val_loader_target, model)
+        logger.info("================ evaluate result on val set before fine-tuning =====================")
+        logger.info("Before fine-tuning =>[{}/{}] epochs".format(0, args.epochs))
+        logger.info("Now val score:")
+        logger.info(all_scores)
+        logger.info("=================================================================")
 
     start_epoch = 0
     best_rsum = 0

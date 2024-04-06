@@ -1,9 +1,9 @@
 datename=$(date +%Y%m%d-%H%M%S)
 country_source=Finland
 country_target=Spain
-name=urbancross_finetune-curriculum_$country_source\_2_$country_target\_lr$lr
-lr=0.00001
-logging_dir=outputs/finetune_curriculum/$country_source\_2_$country_target/$name/$datename
+lr=0.000001
+name=urbancross_finetune_curriculum_$country_source\_2_$country_target\_lr$lr
+logging_dir=outputs/finetune_curriculum/$country_source\_2_$country_target/$datename
 
 cd ../../
 
@@ -24,7 +24,7 @@ python finetune_urbancross_curriculum.py \
        --batch_size_target 16 \
        --country_source $country_source \
        --country_target $country_target \
-       --load_path /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_finland/checkpoints/finland_with_sam_ours_epoch15_bestRsum0.7644.pth \
+       --load_path /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_finland/checkpoints/finland_with_sam_ours_epoch13_bestRsum0.7644.pth \
        2>&1 | tee -a $logging_dir/logs_$datename.txt
        # --k_fold_nums 1 \
        # --workers 0 \
