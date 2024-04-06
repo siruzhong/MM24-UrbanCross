@@ -10,7 +10,7 @@ import utils
 import data
 import engine
 import time
-from vocab import deserialize_vocab
+from utils.vocab import deserialize_vocab
 
 def parser_options():
     """

@@ -5,6 +5,9 @@ country=Finland
 # lr=5e-7
 name=urbancross_zeroshot_$country
 logging_dir=outputs/zeroshot/$country/$name/$datename
+
+cd ../../
+
 mkdir -p $logging_dir
 pip list > $logging_dir/environment.txt
 cp $0 $logging_dir/$(basename $0 .sh).sh

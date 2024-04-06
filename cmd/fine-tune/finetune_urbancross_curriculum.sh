@@ -4,9 +4,13 @@ country_target=Spain
 lr=5e-7
 name=urbancross_finetune-curriculum_$country_source\_2_$country_target\_lr$lr
 logging_dir=outputs/finetune_curriculum/$country_source\_2_$country_target/$name/$datename
+
+cd ../../
+
 mkdir -p $logging_dir
 pip list > $logging_dir/environment.txt
 cp $0 $logging_dir/$(basename $0 .sh).sh
+
 python finetune_urbancross_curriculum.py \
        --gpuid 0 \
        --model_name $name \

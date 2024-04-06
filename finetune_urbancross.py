@@ -8,7 +8,7 @@ import torch.distributed as dist
 import utils
 import data
 import engine
-from vocab import deserialize_vocab
+from utils.vocab import deserialize_vocab
 
 
 def parser_options():

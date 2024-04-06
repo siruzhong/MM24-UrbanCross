@@ -4,6 +4,8 @@ country_source=Finland
 country_target=Spain
 logging_dir=outputs/finetune/$country_source\_2_$country_target/$datename
 
+cd ../../
+
 mkdir -p $logging_dir
 pip list > $logging_dir/environment.txt
 cp $0 $logging_dir/$(basename $0 .sh).sh
