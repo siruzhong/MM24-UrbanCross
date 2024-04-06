@@ -6,7 +6,7 @@ cd ../../
 
 python test_urbancross.py \
        --gpuid 0 \
-       --model_name ours \
+       --model_name urbancross \
        --experiment_name urbancross \
        --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
        --country "" \

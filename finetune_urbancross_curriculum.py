@@ -18,7 +18,7 @@ def parser_options():
 
     # Training path settings
     parser.add_argument('-e', '--experiment_name', default='test', type=str, help="the file name of ckpt save")
-    parser.add_argument('-m', '--model_name', default='ours', type=str, help="Model Name")
+    parser.add_argument('-m', '--model_name', default='urbancross', type=str, help="Model Name")
     parser.add_argument('--data_name', default='rsitmd', type=str, help="Dataset Name.(eg.rsitmd or rsicd)")
     parser.add_argument('--data_path', default='./data/', type=str, help="Preprocessed data file path")
     parser.add_argument('--image_path', default='./rs_data/', type=str, help="remote images data path")
@@ -135,7 +135,7 @@ def main(args):
                                 world_size=args.world_size
                                 )
 
-    from layers import Ours as models
+    from layers import urbancross as models
 
     logger.info(args)
 

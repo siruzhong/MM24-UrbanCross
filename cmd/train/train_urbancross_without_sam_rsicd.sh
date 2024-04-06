@@ -6,7 +6,7 @@ cd ../../
 
 python train_urbancross_without_sam.py \
        --gpuid 0 \
-       --model_name ours \
+       --model_name urbancross \
        --experiment_name urbancross \
        --ckpt_save_path outputs/checkpoints/ \
        --epochs $epochs \

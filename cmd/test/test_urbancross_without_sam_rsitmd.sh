@@ -5,7 +5,7 @@ cd ../../
 
 python test_urbancross_without_sam.py \
        --gpuid 0 \
-       --model_name ours \
+       --model_name urbancross \
        --experiment_name urbancross \
        --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/images \
        --country "" \
