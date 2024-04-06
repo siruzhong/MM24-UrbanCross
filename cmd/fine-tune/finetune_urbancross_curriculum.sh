@@ -1,7 +1,7 @@
 datename=$(date +%Y%m%d-%H%M%S)
-name=urbancross_finetune-curriculum_$country_source\_2_$country_target\_lr$lr
 country_source=Finland
 country_target=Spain
+name=urbancross_finetune-curriculum_$country_source\_2_$country_target\_lr$lr
 lr=0.00001
 logging_dir=outputs/finetune_curriculum/$country_source\_2_$country_target/$name/$datename
 

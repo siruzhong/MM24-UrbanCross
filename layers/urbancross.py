@@ -490,6 +490,24 @@ def factory_with_finetune(args, cuda=True, data_parallel=False):
     return model_without_ddp
 
 
+def factory_finetune(args, cuda=True, data_parallel=False):
+    args_new = copy.copy(args)
+
+    model_without_ddp = UrbanCross_finetune(args_new)
+
+    if cuda:
+        model_without_ddp.cuda(args_new.gpuid)
+
+    if data_parallel:
+        model = nn.SyncBatchNorm.convert_sync_batchnorm(model_without_ddp)
+        model = DistributedDataParallel(model, device_ids=[args.gpuid],find_unused_parameters=False)
+        model_without_ddp = model.module
+        if not cuda:
+            raise ValueError
+
+    return model_without_ddp
+
+
 def factory_finetune_curriculum(args, cuda=True, data_parallel=False):
     args_new = copy.copy(args)
 

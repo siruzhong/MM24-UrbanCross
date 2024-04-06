@@ -127,14 +127,9 @@ def main(args):
     # create random seed
     utils.setup_seed(args.seed)
 
-    # init_process_group
+    # Initialize distributed training if enabled
     if args.distributed:
-        # tcp model
-        dist.init_process_group(backend='nccl', 
-                                init_method=args.init_method,
-                                rank=args.rank, 
-                                world_size=args.world_size
-                                )
+        dist.init_process_group(backend='nccl', init_method=args.init_method, rank=args.rank, world_size=args.world_size)
         
     train_loader_source, train_loader_target, train_dataset_source, train_dataset_target, val_loader_target, val_dataset_target = data.get_loaders_finetune(args)
     logger.info(f"len of train_set is {len(train_dataset_source)}(source)/{len(train_dataset_target)}(target)")

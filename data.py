@@ -475,67 +475,49 @@ class PrecompDataset_mine_zeroshot(data.Dataset):
         self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
         self.captions = []
 
-        df = pd.read_csv(
-            f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_with_tag/instructblip_generation_{country.lower()}_refine.csv"
-        )
+        df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_{country.lower()}_refine.csv")
         split_list = []
         path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/zeroshot_list.txt"
 
         with open(path_, "r") as f:
             for line in tqdm(f):
-                # Remove newlines at the end of lines and add to list
                 split_list.append(line.strip())
+        
         df = df[df["image_name"].isin(split_list)]
         self.captions = df["description"].values.tolist()
         self.images = df["image_name"].values.tolist()
         self.length = len(self.captions)
 
         if data_split == "train":
-            self.transform = transforms.Compose(
-                [
-                    transforms.Resize((278, 278)),
-                    transforms.RandomRotation(degrees=(0, 90)),
-                    transforms.RandomCrop(224),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-            self.transform_segment = transforms.Compose(
-                [
-                    transforms.Resize((224, 224)),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
+            self.transform = transforms.Compose([
+                transforms.Resize((278, 278)),
+                transforms.RandomRotation(degrees=(0, 90)),
+                transforms.RandomCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            ])
+            self.transform_segment = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            ])
         else:
-            self.transform = transforms.Compose(
-                [
-                    transforms.Resize((224, 224)),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
+            self.transform = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            ])
             self.transform_segment = self.transform
 
     def __getitem__(self, index):
         img_id = index
         caption = self.captions[index]
+        cap_tokens = self.clip_tokenizer(caption)
 
-        cap_tokens = self.clip_tokenizer(caption)  # [1, 77]
-
-        image = Image.open(os.path.join(self.img_path, self.images[img_id])).convert(
-            "RGB"
-        )
+        image = Image.open(os.path.join(self.img_path, self.images[img_id])).convert("RGB")
         image = self.transform(image)  # torch.Size([3, 256, 256])
 
-        return (
-            image,
-            caption,
-            index,
-            img_id,
-            cap_tokens,
-            os.path.join(self.img_path, self.images[img_id]),
-        )
+        return (image, caption, index, img_id, cap_tokens, os.path.join(self.img_path, self.images[img_id]))
 
     def __len__(self):
         return self.length

@@ -10,6 +10,7 @@ import torch.distributed as dist
 import utils.utils as utils
 import data
 import engine
+from layers import urbancross as models
 from utils.vocab import deserialize_vocab
 
 def parser_options():
@@ -30,6 +31,7 @@ def parser_options():
     parser.add_argument('--eval_step', default=1, type=int, help="the epochs of eval")
     parser.add_argument('--test_step', default=0, type=int, help="the epochs of test")
     parser.add_argument('--batch_size', default=100, type=int, help="Batch train size")
+    parser.add_argument('--batch_size_test', default=80, type=int, help="Batch train size")
     parser.add_argument('--batch_size_source', default=100, type=int, help="Batch train size")
     parser.add_argument('--batch_size_target', default=100, type=int, help="Batch train size")
     parser.add_argument('--batch_size_val_source', default=100, type=int, help="Batch val size")
@@ -102,11 +104,16 @@ def parser_options():
 
 
 def main(args):
-    # Set up Weights and Biases logging directory
+    # Set WANDB_DIR environment variable
     os.environ["WANDB_DIR"] = args.wandb_logging_dir
+    
+    # Generate WANDB_ID if not provided
     if not args.wandb_id:
         args.wandb_id = wandb.util.generate_id()
-    logger.info(f"wandb id: {args.wandb_id}")
+    
+    # Login to W&B
+    wandb.login(key='d7ec29907ca115fe6d605741c40d09cf563aa0db')
+    logger.info(f"W&B ID: {args.wandb_id}")
     
     # Initialize Weights and Biases run
     wandb.init(
@@ -123,12 +130,6 @@ def main(args):
     # Initialize distributed training if enabled
     if args.distributed:
         dist.init_process_group(backend='nccl', init_method=args.init_method, rank=args.rank, world_size=args.world_size)
-
-    # Choose the model
-    if args.model_name == "urbancross" or args.model_name == "urbancross_finetune":
-        from layers import urbancross as models
-    else:
-        raise NotImplementedError
     
     logger.info(args)
     test_loader, test_dataset = data.get_test_loader_zeroshot(args)

@@ -950,8 +950,8 @@ def test_mine(args, test_loader, model):
     img_paths = []
     captions = []
 
-    for idx, val_data in enumerate(tqdm(itertools.islice(test_loader, 20))):
-        # for idx, val_data in enumerate(tqdm(test_loader)):
+    # for idx, val_data in enumerate(tqdm(itertools.islice(test_loader, 20))):
+    for idx, val_data in enumerate(tqdm(test_loader)):
         images, cap_tokens, img_path, caption = val_data
         input_visual.append(images)
         input_text.append(cap_tokens)
@@ -968,7 +968,6 @@ def test_mine(args, test_loader, model):
         input_text,
         model,
     )
-    # Normalize d to [0, 1]
     d_normalized = (d - np.min(d)) / (np.max(d) - np.min(d))
 
     for i in tqdm(range(len(img_paths))):
