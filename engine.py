@@ -962,29 +962,35 @@ def test_mine(args, test_loader, model):
     input_text = torch.cat(input_text, dim=0)
 
     logger.info("begin to compute distance")
-    d = utils.shard_dis_mine_finetune(
-        args,
-        input_visual,
-        input_text,
-        model,
-    )
-    d_normalized = (d - np.min(d)) / (np.max(d) - np.min(d))
+    d = utils.shard_dis_mine_finetune(args, input_visual, input_text, model)
+    
+    # # Top 10 visualization
+    # # Normalize the distance values to be between 0 and 1
+    # d_normalized = (d - np.min(d)) / (np.max(d) - np.min(d))
+    
+    # # Iterate through each image path
+    # for i in tqdm(range(len(img_paths))):
+    #     # Find the indices of the top 10 captions with the highest distance values
+    #     top10_indices = np.argsort(-d_normalized[i])[:10]
+        
+    #     # Get the top 10 captions and their corresponding distance values
+    #     top10_captions = [captions[idx] for idx in top10_indices]
+    #     top10_values = [d_normalized[i][idx] for idx in top10_indices]
 
-    for i in tqdm(range(len(img_paths))):
-        top10_indices = np.argsort(-d_normalized[i])[:10]
-        top10_captions = [captions[idx] for idx in top10_indices]
-        top10_values = [d_normalized[i][idx] for idx in top10_indices]
-
-        savepath = os.path.join(args.ckpt_save_path, img_paths[i].split("/")[-1])
-        os.makedirs(savepath, exist_ok=True)
-        shutil.copy(img_paths[i], savepath)
-        # import ipdb;ipdb.set_trace()
-        with open(os.path.join(savepath, "top10_captions.txt"), "w") as f:
-            for j in range(10):
-                f.write(f"{top10_captions[j]}\n")
-                f.write(f"{top10_values[j]}\n")
-                f.write("\n")
-
+    #     # Create a save path for the current image and ensure the directory exists
+    #     savepath = os.path.join(args.ckpt_save_path, img_paths[i].split("/")[-1])
+    #     os.makedirs(savepath, exist_ok=True)
+        
+    #     # Copy the current image to the save path
+    #     shutil.copy(img_paths[i], savepath)
+        
+    #     # Write the top 10 captions and their corresponding distance values to a text file
+    #     with open(os.path.join(savepath, "top10_captions.txt"), "w") as f:
+    #         for j in range(10):
+    #             f.write(f"{top10_captions[j]}\n")
+    #             f.write(f"{top10_values[j]}\n")
+    #             f.write("\n")
+    
     end = time.time()
     print("calculate similarity time: {:.4f} s".format(end - start))
 

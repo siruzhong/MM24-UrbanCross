@@ -200,7 +200,7 @@ class UrbanCross_finetune(nn.Module):
         if val:
             return self.forward_val(img_target, text_target)
         
-        ratio = 0.5
+        ratio = 0.2
 
         with torch.cuda.amp.autocast():
             clip_model_out_source = self.clip_model(img_source, text_source)
