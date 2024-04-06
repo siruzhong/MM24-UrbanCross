@@ -1,7 +1,7 @@
 datename=$(date +%Y%m%d-%H%M%S)
 data_name=germany
 country=Germany
-epochs=30
+epochs=20
 num_seg=5
 
 cd ../../
