@@ -11,6 +11,7 @@ import utils.utils as utils
 import data
 import engine
 from utils.vocab import deserialize_vocab
+from layers import urbancross as models
 
 
 def parser_options():
@@ -134,23 +135,12 @@ def main(args):
                                 rank=args.rank, 
                                 world_size=args.world_size
                                 )
-
-    from layers import urbancross as models
-
-    logger.info(args)
-
-    train_loader_source, train_loader_target, train_dataset_source, train_dataset_target, val_loader_target, val_dataset_target = data.get_loaders_finetune(
-                                args, 
-                                # vocab
-    )
-
+        
+    train_loader_source, train_loader_target, train_dataset_source, train_dataset_target, val_loader_target, val_dataset_target = data.get_loaders_finetune(args)
     logger.info(f"len of train_set is {len(train_dataset_source)}(source)/{len(train_dataset_target)}(target)")
     logger.info(f"len of val_set is {len(val_dataset_target)}(target)")
 
-    model = models.factory_finetune_curriculum(args,
-                           cuda=True, 
-                           data_parallel=args.distributed
-                           )
+    model = models.factory_finetune_curriculum(args, cuda=True, data_parallel=args.distributed)
     pretrained_weight = torch.load(args.load_path, map_location='cuda:{}'.format(args.gpuid))
     model.load_state_dict(pretrained_weight['model'], strict=False)
 
@@ -165,54 +155,19 @@ def main(args):
 
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
-    # optionally resume from a checkpoint
     start_epoch = 0
     best_rsum = 0
-    best_rsum_ = 0
     best_score = ""
-    best_score_ = ""
-    if args.resume:
-        if os.path.isfile(args.resume):
-            print("=> loading checkpoint '{}'".format(args.resume))
-            checkpoint = torch.load(args.resume, map_location='cuda:{}'.format(args.gpuid))
-            start_epoch = checkpoint['epoch']
-            best_rsum = checkpoint['best_rsum']
-            model.load_state_dict(checkpoint['model'], strict =False)
-   
-            print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})"
-                  .format(args.resume, start_epoch, best_rsum))
-            rsum, all_scores = engine.validate(args, val_loader, model)
-            print(all_scores)
-        else:
-            print("=> no checkpoint found at '{}'".format(args.resume))
-
     # Train the Model
     for epoch in range(start_epoch, args.epochs):
-
-        if args.distributed:
-            train_loader.sampler.set_epoch(epoch)
-
         utils.adjust_learning_rate(args, optimizer, epoch)
-
-        # # test validate
-        # engine.validate(args, val_loader, model)
-
+        
         # train for one epoch
-        engine.train_finetune_curriculum(args, 
-                              train_loader_source,
-                              train_loader_target,
-                              model, 
-                              optimizer, 
-                              epoch
-                              )
+        engine.train_finetune_curriculum(args, train_loader_source, train_loader_target, model, optimizer, epoch)
 
         # evaluate on validation set
         if (epoch + 1) % args.eval_step == 0:
-            rsum, all_scores = engine.validate_finetune(args, 
-                                               val_loader_target, 
-                                               model,
-                                               epoch,
-                                               )
+            rsum, all_scores = engine.validate_finetune(args, val_loader_target, model)
 
             is_best = rsum > best_rsum
             if is_best:
@@ -220,7 +175,6 @@ def main(args):
             best_rsum = max(rsum, best_rsum)
 
             if args.rank == 0:
-                # print('')
                 logger.info("================ evaluate result on val set =====================")
                 logger.info("Current =>[{}/{}] epochs".format(epoch + 1, args.epochs))
                 logger.info("Now val score:")
@@ -229,17 +183,12 @@ def main(args):
                 logger.info(best_score)
 
                 utils.save_checkpoint(
-                    {
-                        'epoch': epoch + 1,
-                        'model': model.state_dict(),
-                        'best_rsum': best_rsum,
-                        'args': args,
-                        # 'Eiters': model.Eiters,
-                    },
-                    # is_best,
+                    {'epoch': epoch + 1, 'model': model.state_dict(), 'best_rsum': best_rsum, 'args': args},
+                    epoch,
                     filename=f'ckpt_{args.model_name}_{epoch}_{best_rsum:.2f}.pth',
                     prefix=args.ckpt_save_path,
-                    model_name=args.model_name
+                    model_name=args.model_name,
+                    args=args,
                 )
 
     if args.distributed:

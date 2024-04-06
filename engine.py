@@ -306,9 +306,7 @@ def train_without_sam(args, train_loader, model, optimizer, epoch):
         train_logger.wandb_log()
 
 
-def train_finetune(
-    args, train_loader_source, train_loader_target, model, optimizer, epoch
-):
+def train_finetune(args, train_loader_source, train_loader_target, model, optimizer, epoch):
     # Extract values from arguments
     grad_clip = args.grad_clip
     max_violation = args.max_violation

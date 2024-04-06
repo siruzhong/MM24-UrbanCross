@@ -399,17 +399,16 @@ class PrecompDataset_mine_finetune(data.Dataset):
     """
     Load precomputed captions and image features for fine-tuning.
     """
-
     def __init__(self, args, data_split, country, source=True):
         self.img_path = os.path.join(args.image_path, country, "images")
         self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
         self.captions = []
 
-        df = pd.read_csv(
-            f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_{country.lower()}_refine.csv"
-        )
-        split_list = []
+        # Read captions from CSV file
+        df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_{country.lower()}_refine.csv")
+        split_list = []  # Initialize split list
 
+        # Determine the path of the split list file based on the source flag
         if source:
             path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/{data_split}_list.txt"
         else:
@@ -418,50 +417,46 @@ class PrecompDataset_mine_finetune(data.Dataset):
             else:
                 path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/finetune_val_list.txt"
 
+        # Read the split list file and update the split list
         with open(path_, "r") as f:
             for line in f:
                 split_list.append(line.strip())
 
+        # Filter the dataframe based on the split list
         df = df[df["image_name"].isin(split_list)]
         self.captions = df["description"].values.tolist()
         self.images = df["image_name"].values.tolist()
         self.length = len(self.captions)
 
+        # Set up image transformations based on the data split
         if data_split == "train":
-            self.transform = transforms.Compose(
-                [
-                    transforms.Resize((278, 278)),
-                    transforms.RandomRotation(degrees=(0, 90)),
-                    transforms.RandomCrop(224),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
-            self.transform_segment = transforms.Compose(
-                [
-                    transforms.Resize((224, 224)),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
+            self.transform = transforms.Compose([
+                transforms.Resize((278, 278)),
+                transforms.RandomRotation(degrees=(0, 90)),
+                transforms.RandomCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            ])
+            self.transform_segment = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+            ])
         else:
-            self.transform = transforms.Compose(
-                [
+            self.transform = transforms.Compose([
                     transforms.Resize((224, 224)),
                     transforms.ToTensor(),
                     transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
-                ]
-            )
+            ])
             self.transform_segment = self.transform
 
     def __getitem__(self, index):
-        img_id = index
-        caption = self.captions[index]
-        cap_tokens = self.clip_tokenizer(caption)  # [1, 77]
+        img_id = index  # Image ID
+        caption = self.captions[index]  # Caption for the given index
+        cap_tokens = self.clip_tokenizer(caption)   # Tokenize the caption
 
-        image = Image.open(os.path.join(self.img_path, self.images[img_id])).convert(
-            "RGB"
-        )
+        # Load and transform the image
+        image = Image.open(os.path.join(self.img_path, self.images[img_id])).convert("RGB")
         image = self.transform(image)  # torch.Size([3, 256, 256])
 
         return image, caption, index, img_id, cap_tokens
@@ -782,19 +777,17 @@ def get_precomp_loader_mine_finetune(
             dataset=dset,
             batch_size=batch_size,
             pin_memory=True,
-            # pin_memory=False,
             collate_fn=collate_fn_mine_finetune,
             num_workers=num_workers,
             sampler=sampler,
             drop_last=True,
         )
-    else:  # this way
+    else:
         data_loader = torch.utils.data.DataLoader(
             dataset=dset,
             batch_size=batch_size,
             shuffle=shuffle,
             pin_memory=True,
-            #   pin_memory=False,
             collate_fn=collate_fn_mine_finetune,
             num_workers=num_workers,
             drop_last=True,
@@ -918,6 +911,12 @@ def get_loaders_finetune(args):
         country=args.country_source,
         source=True,
     )
+    target_train_dataset = PrecompDataset_mine_finetune(
+        args,
+        data_split="train",
+        country=args.country_target,
+        source=False,
+    )
     source_train_loader = torch.utils.data.DataLoader(
         dataset=source_train_dataset,
         batch_size=args.batch_size_source,
@@ -926,12 +925,6 @@ def get_loaders_finetune(args):
         collate_fn=collate_fn_mine_finetune,
         num_workers=args.workers,
         drop_last=True,
-    )
-    target_train_dataset = PrecompDataset_mine_finetune(
-        args,
-        data_split="train",
-        country=args.country_target,
-        source=False,
     )
     target_train_loader = torch.utils.data.DataLoader(
         dataset=target_train_dataset,

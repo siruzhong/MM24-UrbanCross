@@ -1,5 +1,5 @@
 datename=$(date +%Y%m%d-%H%M%S)
-name=urbancross_finetune
+name=urbancross_finetune_$country_source\_2_$country_target\_lr$lr
 country_source=Finland
 country_target=Spain
 lr=0.00001

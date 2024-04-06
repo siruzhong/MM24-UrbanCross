@@ -9,6 +9,7 @@ import utils.utils as utils
 import data
 import engine
 from utils.vocab import deserialize_vocab
+from layers import urbancross as models
 
 
 def parser_options():
@@ -127,12 +128,6 @@ def main(args):
     # Initialize distributed training if enabled
     if args.distributed:
         dist.init_process_group(backend='nccl', init_method=args.init_method, rank=args.rank, world_size=args.world_size)
-
-    # Choose the model
-    if args.model_name == "urbancross" or args.model_name == "urbancross_finetune":
-        from layers import urbancross as models
-    else:
-        raise NotImplementedError
     
     logger.info(args)
     # Create dataset, model, criterion, and optimizer
@@ -157,34 +152,11 @@ def main(args):
 
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr)
 
-    # optionally resume from a checkpoint
     start_epoch = 0
     best_rsum = 0
-    best_rsum_ = 0
     best_score = ""
-    best_score_ = ""
-    if args.resume:
-        if os.path.isfile(args.resume):
-            print("=> loading checkpoint '{}'".format(args.resume))
-            checkpoint = torch.load(args.resume, map_location='cuda:{}'.format(args.gpuid))
-            start_epoch = checkpoint['epoch']
-            best_rsum = checkpoint['best_rsum']
-            model.load_state_dict(checkpoint['model'], strict =False)
-            # Eiters is used to show logs as the continuation of another
-            model.Eiters = checkpoint['Eiters']
-   
-            print("=> loaded checkpoint '{}' (epoch {}, best_rsum {})"
-                  .format(args.resume, start_epoch, best_rsum))
-            rsum, all_scores = engine.validate(args, val_loader, model)
-            print(all_scores)
-        else:
-            print("=> no checkpoint found at '{}'".format(args.resume))
-
     # Train the Model
     for epoch in range(start_epoch, args.epochs):
-        if args.distributed:
-            train_loader.sampler.set_epoch(epoch)
-
         utils.adjust_learning_rate(args, optimizer, epoch)
 
         # train for one epoch
