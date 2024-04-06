@@ -1,8 +1,8 @@
 datename=$(date +%Y%m%d-%H%M%S)
+name=urbancross_finetune-curriculum
 country_source=Finland
 country_target=Spain
-lr=5e-7
-name=urbancross_finetune-curriculum_$country_source\_2_$country_target\_lr$lr
+lr=0.00001
 logging_dir=outputs/finetune_curriculum/$country_source\_2_$country_target/$name/$datename
 
 cd ../../
@@ -17,17 +17,16 @@ python finetune_urbancross_curriculum.py \
        --experiment_name $name \
        --ckpt_save_path $logging_dir \
        --wandb_logging_dir $logging_dir \
-       --epochs 50 \
+       --epochs 5 \
        --lr $lr \
-       --image_path urbancross_data/images_target \
+       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
        --batch_size_source 80 \
        --batch_size_target 16 \
        --country_source $country_source \
        --country_target $country_target \
-       --load_path outputs/pretrain/Finland/20240329-160815/ckpt_urbancross_Finland_bs40_lr1e-5_numseg5_41_0.37.pth \
-       |& tee $logging_dir/logs_$datename.txt 2>&1
+       --load_path /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_finland/checkpoints/finland_with_sam_ours_epoch15_bestRsum0.7644.pth \
+       2>&1 | tee -a $logging_dir/logs_$datename.txt
        # --k_fold_nums 1 \
        # --workers 0 \
        # --batch_size_target 5 \
        # --batch_size_val 10\
-       # --data_name rsitmd  \

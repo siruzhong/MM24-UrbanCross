@@ -136,9 +136,7 @@ def main(args):
     
     logger.info(args)
     # Create dataset, model, criterion, and optimizer
-    train_loader_source, train_loader_target, train_dataset_source, train_dataset_target, val_loader_target, val_dataset_target = data.get_loaders_finetune(
-        args,
-    )
+    train_loader_source, train_loader_target, train_dataset_source, train_dataset_target, val_loader_target, val_dataset_target = data.get_loaders_finetune(args,)
     logger.info(f"len of train_set is {len(train_dataset_source)}(source)/{len(train_dataset_target)}(target)")
     logger.info(f"len of val_set is {len(val_dataset_target)}(target)")
 
@@ -211,15 +209,12 @@ def main(args):
                 logger.info("=================================================================")
  
                 utils.save_checkpoint(
-                    {
-                        'epoch': epoch + 1,
-                        'model': model.state_dict(),
-                        'best_rsum': best_rsum,
-                        'args': args,
-                    },
-                    filename=f'ckpt_{args.model_name}_{epoch}_{best_rsum:.2f}.pth',
+                    {'epoch': epoch + 1, 'model': model.state_dict(), 'best_rsum': best_rsum, 'args': args},
+                    epoch,
+                    filename=f'ckpt_{args.model_name}_{epoch}_{best_rsum:.4f}.pth',
                     prefix=args.ckpt_save_path,
-                    model_name=args.model_name
+                    model_name=args.model_name,
+                    args=args,
                 )
 
     if args.distributed:

@@ -6,6 +6,7 @@ from torch.autograd import Variable
 import utils.utils as utils
 import os
 import shutil
+
 # import tensorboard_logger as tb_logger
 import wandb
 
@@ -39,17 +40,17 @@ def train(args, train_loader, model, optimizer, epoch):
 
     # Set model to train mode
     model.train()
-    
+
     # Initialize average meters for tracking batch and data loading time
     batch_time = utils.AverageMeter()
     data_time = utils.AverageMeter()
-    
+
     # Initialize log collector
     train_logger = utils.LogCollector()
 
     # Initialize timer
     end = time.time()
-    
+
     # Get model parameters
     params = list(model.parameters())
 
@@ -73,15 +74,42 @@ def train(args, train_loader, model, optimizer, epoch):
         torch.cuda.synchronize(device=args.gpuid)
 
         if not args.il_measure:
-            scores_img2text, scores_seg2text = model(input_visual, input_text, segment_imgs)
-            loss_img2text = utils.calcul_contraloss(args, scores_img2text, input_visual.size(0), margin, max_violation=max_violation)
-            loss_seg2text = utils.calcul_contraloss(args, scores_seg2text, input_visual.size(0), margin, max_violation=max_violation)
+            scores_img2text, scores_seg2text = model(
+                input_visual, input_text, segment_imgs
+            )
+            loss_img2text = utils.calcul_contraloss(
+                args,
+                scores_img2text,
+                input_visual.size(0),
+                margin,
+                max_violation=max_violation,
+            )
+            loss_seg2text = utils.calcul_contraloss(
+                args,
+                scores_seg2text,
+                input_visual.size(0),
+                margin,
+                max_violation=max_violation,
+            )
             loss = loss_img2text + loss_seg2text
         else:
-            scores, scores_intra_img, scores_intra_cap = model(input_visual, input_text, lengths)
-            intra_loss = utils.calcul_intraloss(args, scores_intra_img) + utils.calcul_intraloss(args, scores_intra_cap)
-            loss = (utils.calcul_contraloss(args, scores, input_visual.size(0), margin, max_violation=max_violation,) + intra_loss)
-            
+            scores, scores_intra_img, scores_intra_cap = model(
+                input_visual, input_text, lengths
+            )
+            intra_loss = utils.calcul_intraloss(
+                args, scores_intra_img
+            ) + utils.calcul_intraloss(args, scores_intra_cap)
+            loss = (
+                utils.calcul_contraloss(
+                    args,
+                    scores,
+                    input_visual.size(0),
+                    margin,
+                    max_violation=max_violation,
+                )
+                + intra_loss
+            )
+
         if grad_clip > 0:
             clip_grad_norm(params, grad_clip)
 
@@ -93,7 +121,7 @@ def train(args, train_loader, model, optimizer, epoch):
                 "loss_seg2text": loss_seg2text.cpu().data.numpy(),
             }
         )
-        
+
         optimizer.zero_grad()
         loss.backward()
         if args.distributed:
@@ -127,7 +155,7 @@ def train(args, train_loader, model, optimizer, epoch):
                 )
             )
             utils.get_GPU_usage()
-        
+
         wandb.log(
             {
                 "epoch": epoch,
@@ -137,7 +165,7 @@ def train(args, train_loader, model, optimizer, epoch):
 
         # Log loss values to W&B
         train_logger.wandb_log()
-        
+
 
 def train_without_sam(args, train_loader, model, optimizer, epoch):
     """
@@ -163,17 +191,17 @@ def train_without_sam(args, train_loader, model, optimizer, epoch):
 
     # Set model to train mode
     model.train()
-    
+
     # Initialize average meters for tracking batch and data loading time
     batch_time = utils.AverageMeter()
     data_time = utils.AverageMeter()
-    
+
     # Initialize log collector
     train_logger = utils.LogCollector()
 
     # Initialize timer
     end = time.time()
-    
+
     # Get model parameters
     params = list(model.parameters())
 
@@ -197,13 +225,32 @@ def train_without_sam(args, train_loader, model, optimizer, epoch):
 
         if not args.il_measure:
             scores_img2text = model(input_visual, input_text)
-            loss_img2text = utils.calcul_contraloss(args, scores_img2text, input_visual.size(0), margin, max_violation=max_violation)
+            loss_img2text = utils.calcul_contraloss(
+                args,
+                scores_img2text,
+                input_visual.size(0),
+                margin,
+                max_violation=max_violation,
+            )
             loss = loss_img2text
         else:
-            scores, scores_intra_img, scores_intra_cap = model(input_visual, input_text, lengths)
-            intra_loss = utils.calcul_intraloss(args, scores_intra_img) + utils.calcul_intraloss(args, scores_intra_cap)
-            loss = (utils.calcul_contraloss(args, scores, input_visual.size(0), margin, max_violation=max_violation,) + intra_loss)
-            
+            scores, scores_intra_img, scores_intra_cap = model(
+                input_visual, input_text, lengths
+            )
+            intra_loss = utils.calcul_intraloss(
+                args, scores_intra_img
+            ) + utils.calcul_intraloss(args, scores_intra_cap)
+            loss = (
+                utils.calcul_contraloss(
+                    args,
+                    scores,
+                    input_visual.size(0),
+                    margin,
+                    max_violation=max_violation,
+                )
+                + intra_loss
+            )
+
         if grad_clip > 0:
             clip_grad_norm(params, grad_clip)
 
@@ -214,7 +261,7 @@ def train_without_sam(args, train_loader, model, optimizer, epoch):
                 "loss_img2text": loss_img2text.cpu().data.numpy(),
             }
         )
-        
+
         optimizer.zero_grad()
         loss.backward()
         if args.distributed:
@@ -247,7 +294,7 @@ def train_without_sam(args, train_loader, model, optimizer, epoch):
                 )
             )
             utils.get_GPU_usage()
-        
+
         wandb.log(
             {
                 "epoch": epoch,
@@ -259,16 +306,18 @@ def train_without_sam(args, train_loader, model, optimizer, epoch):
         train_logger.wandb_log()
 
 
-def train_finetune(args, train_loader_source, train_loader_target, model, optimizer, epoch):
+def train_finetune(
+    args, train_loader_source, train_loader_target, model, optimizer, epoch
+):
     # Extract values from arguments
     grad_clip = args.grad_clip
     max_violation = args.max_violation
     margin = args.margin
     print_freq = args.print_freq
-    
+
     if args.distributed:
         mean_loss = torch.zeros(1).to(args.gpuid)
-        
+
     # Switch to train mode
     model.train()
     batch_time = utils.AverageMeter()
@@ -277,21 +326,21 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
 
     end = time.time()
     params = list(model.parameters())
-    
+
     # Create an iterator for the target loader
     target_loader_cycle = itertools.cycle(train_loader_target)
     num_cycle_of_target = -1
-    
+
     for i, source_data in enumerate(train_loader_source):
         images_source, cap_tokens_source = source_data
         images_target, cap_tokens_target = next(target_loader_cycle)
-   
+
         if i % len(train_loader_target) == 0:
             num_cycle_of_target += 1
 
         batch_size = images_source.size(0)
         margin = float(margin)
-        
+
         # Measure data loading time
         data_time.update(time.time() - end)
         model.logger = train_logger
@@ -310,12 +359,12 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
         torch.cuda.synchronize(device=args.gpuid)
 
         # Calculate clip_loss, adv_loss, and filter_ratio
-        clip_loss, adv_loss, filter_ratio  = model(
+        clip_loss, adv_loss, filter_ratio = model(
             input_visuals_source,
-            input_visuals_target, 
+            input_visuals_target,
             input_text_source,
             input_text_target,
-            num_cycle_of_target = num_cycle_of_target,
+            num_cycle_of_target=num_cycle_of_target,
         )
         loss = clip_loss + adv_loss
 
@@ -326,12 +375,12 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
         # Log the loss to Weights and Biases
         wandb.log(
             {
-                'loss': loss.cpu().data.numpy(),
-                'loss_clip': clip_loss.cpu().data.numpy(),
-                'loss_adv': adv_loss.cpu().data.numpy(),
+                "loss": loss.cpu().data.numpy(),
+                "loss_clip": clip_loss.cpu().data.numpy(),
+                "loss_adv": adv_loss.cpu().data.numpy(),
             }
-        )        
-        
+        )
+
         # Zero the parameter gradients
         optimizer.zero_grad()
         loss.backward()
@@ -342,7 +391,7 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
             train_logger.update("Loss", round(mean_loss.item(), 3))
         else:
             if args.il_measure:
-                train_logger.update('Loss_avg', loss.cpu().data.numpy())
+                train_logger.update("Loss_avg", loss.cpu().data.numpy())
 
         torch.cuda.synchronize(device=args.gpuid)
         optimizer.step()
@@ -351,35 +400,43 @@ def train_finetune(args, train_loader_source, train_loader_target, model, optimi
         # Measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
-        
+
         if i % print_freq == 0 and args.rank == 0:
             logger.info(
-                'Epoch [{0}][{1}/{2}(source)][{1}/{3}(target)]\t'
-                'Time {batch_time.val:.3f}\t'
-                '{elog}\t'
-                .format(epoch, i, len(train_loader_source),len(train_loader_target),
-                        batch_time=batch_time,
-                        elog=str(train_logger))
+                "Epoch [{0}][{1}/{2}(source)][{1}/{3}(target)]\t"
+                "Time {batch_time.val:.3f}\t"
+                "{elog}\t".format(
+                    epoch,
+                    i,
+                    len(train_loader_source),
+                    len(train_loader_target),
+                    batch_time=batch_time,
+                    elog=str(train_logger),
                 )
-            logger.info(f'{num_cycle_of_target}_th cycle of target data')
-            logger.info(f'filter_ratio: {filter_ratio}')
+            )
+            logger.info(f"{num_cycle_of_target}_th cycle of target data")
+            logger.info(f"filter_ratio: {filter_ratio}")
             utils.get_GPU_usage()
 
         # Log the batch time to Weights and Biases
-        wandb.log({
+        wandb.log(
+            {
                 "batch_time": batch_time.val,
-            })
+            }
+        )
         train_logger.wandb_log()
 
 
-def train_finetune_curriculum(args, train_loader_source, train_loader_target, model, optimizer, epoch):
+def train_finetune_curriculum(
+    args, train_loader_source, train_loader_target, model, optimizer, epoch
+):
     grad_clip = args.grad_clip
     max_violation = args.max_violation
     margin = args.margin
     print_freq = args.print_freq
     if args.distributed:
         mean_loss = torch.zeros(1).to(args.gpuid)
-        
+
     # switch to train mode
     model.train()
     batch_time = utils.AverageMeter()
@@ -388,11 +445,11 @@ def train_finetune_curriculum(args, train_loader_source, train_loader_target, mo
 
     end = time.time()
     params = list(model.parameters())
-    
+
     # 创建 B_loader 的循环迭代器
     target_loader_cycle = itertools.cycle(train_loader_target)
     source_loader_cycle = itertools.cycle(train_loader_source)
-   
+
     num_cycle_of_target = 0
     i = 0
     while num_cycle_of_target <= 4:
@@ -402,7 +459,7 @@ def train_finetune_curriculum(args, train_loader_source, train_loader_target, mo
             num_cycle_of_target += 1
         if num_cycle_of_target > 4:
             break
-        
+
         i += 1
 
         batch_size = images_source.size(0)
@@ -421,32 +478,32 @@ def train_finetune_curriculum(args, train_loader_source, train_loader_target, mo
             input_visuals_target = input_visuals_target.cuda(args.gpuid)
             input_text_source = input_text_source.cuda(args.gpuid)
             input_text_target = input_text_target.cuda(args.gpuid)
-            
+
         torch.cuda.synchronize(device=args.gpuid)
 
-        clip_loss, adv_loss, filter_ratio  = model(
-                       input_visuals_source,
-                       input_visuals_target, 
-                       input_text_source,
-                       input_text_target,
-                       num_cycle_of_target = num_cycle_of_target,
-                       )
+        clip_loss, adv_loss, filter_ratio = model(
+            input_visuals_source,
+            input_visuals_target,
+            input_text_source,
+            input_text_target,
+            num_cycle_of_target=num_cycle_of_target,
+        )
         loss = clip_loss + adv_loss
-           
+
         if grad_clip > 0:
             clip_grad_norm(params, grad_clip)
 
-        wandb.log({'loss': loss.cpu().data.numpy()})
+        wandb.log({"loss": loss.cpu().data.numpy()})
         optimizer.zero_grad()
         loss.backward()
         if args.distributed:
             loss = utils.reduce_value(args, loss, average=True)
             mean_loss = (mean_loss * i + loss.detach()) / (i + 1)  # update mean losses
 
-            train_logger.update('Loss', round(mean_loss.item(),3))
-        else: 
-            train_logger.update('Loss_avg', loss.cpu().data.numpy())
-            
+            train_logger.update("Loss", round(mean_loss.item(), 3))
+        else:
+            train_logger.update("Loss_avg", loss.cpu().data.numpy())
+
         torch.cuda.synchronize(device=args.gpuid)
         optimizer.step()
         torch.cuda.synchronize(device=args.gpuid)
@@ -457,27 +514,35 @@ def train_finetune_curriculum(args, train_loader_source, train_loader_target, mo
 
         if i % print_freq == 0 and args.rank == 0:
             logger.info(
-                'Epoch [{0}][{1}/{2}(source)][{1}/{3}(target)]\t'
-                'Time {batch_time.val:.3f}\t'
-                '{elog}\t'
-                .format(epoch, i, len(train_loader_source),len(train_loader_target),
-                        batch_time=batch_time,
-                        elog=str(train_logger))
+                "Epoch [{0}][{1}/{2}(source)][{1}/{3}(target)]\t"
+                "Time {batch_time.val:.3f}\t"
+                "{elog}\t".format(
+                    epoch,
+                    i,
+                    len(train_loader_source),
+                    len(train_loader_target),
+                    batch_time=batch_time,
+                    elog=str(train_logger),
                 )
-            logger.info(f'{num_cycle_of_target}_th cycle of target data')
-            logger.info(f'filter_ratio: {filter_ratio}')
+            )
+            logger.info(f"{num_cycle_of_target}_th cycle of target data")
+            logger.info(f"filter_ratio: {filter_ratio}")
             utils.get_GPU_usage()
 
-        wandb.log({
-            'epoch': epoch,
-            'batch_time': batch_time.val,
-        })
-        train_logger.wandb_log(epoch)
-        
+        wandb.log(
+            {
+                "epoch": epoch,
+                "batch_time": batch_time.val,
+            }
+        )
+        train_logger.wandb_log()
+
 
 def validate(args, val_loader, model):
     print("")
-    print("--------------------- Start validation on training set ---------------------")
+    print(
+        "--------------------- Start validation on training set ---------------------"
+    )
     model.eval()  # Set the model to evaluation mode
 
     val_logger = utils.LogCollector()  # Create a logger to collect logs
@@ -551,7 +616,9 @@ def validate(args, val_loader, model):
 
 def validate_without_sam(args, val_loader, model):
     print("")
-    print("--------------------- Start validation on training set without sam---------------------")
+    print(
+        "--------------------- Start validation on training set without sam---------------------"
+    )
     model.eval()  # Set the model to evaluation mode
 
     val_logger = utils.LogCollector()  # Create a logger to collect logs
@@ -638,41 +705,48 @@ def validate_finetune(args, val_loader, model):
     input_visual = torch.cat(input_visual, dim=0)
     input_text = torch.cat(input_text, dim=0)
 
-    d = utils.shard_dis_mine_finetune(args, 
-                             input_visual, 
-                             input_text, 
-                             model,
-                            )
+    d = utils.shard_dis_mine_finetune(
+        args,
+        input_visual,
+        input_text,
+        model,
+    )
     end = time.time()
     print("calculate similarity time: {:.2f} s".format(end - start))
 
-    #image to text
+    # image to text
     (r1i, r5i, r10i, medri, meanri), _ = utils.acc_i2t_mine(d)
-    #text to image
+    # text to image
     (r1t, r5t, r10t, medrt, meanrt), _ = utils.acc_i2t_mine(d.T)
 
     # import ipdb; ipdb.set_trace()
     currscore = (r1t + r5t + r10t + r1i + r5i + r10i) / 6.0
 
-    all_score = "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n" \
-                "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n" \
-                "mR:{:.2f}".format(r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore)
+    all_score = (
+        "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n"
+        "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n"
+        "mR:{:.2f}".format(
+            r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore
+        )
+    )
 
     logger.info("--------------------- end val on training ---------------------")
-    wandb.log({
-        'val/r1i': r1i,
-        'val/r5i': r5i,
-        'val/r10i': r10i,
-        'val/medri': medri,
-        'val/meanri': meanri,
-        'val/r1t': r1t,
-        'val/r5t': r5t,
-        'val/r10t': r10t,
-        'val/medrt': medrt,
-        'val/meanrt': meanrt,
-        'val/rsum': currscore
-    })
-    
+    wandb.log(
+        {
+            "val/r1i": r1i,
+            "val/r5i": r5i,
+            "val/r10i": r10i,
+            "val/medri": medri,
+            "val/meanri": meanri,
+            "val/r1t": r1t,
+            "val/r5t": r5t,
+            "val/r10t": r10t,
+            "val/medrt": medrt,
+            "val/meanrt": meanrt,
+            "val/rsum": currscore,
+        }
+    )
+
     return currscore, all_score
 
 
@@ -706,7 +780,7 @@ def validate_test(args, test_loader, model):
     # Perform inference using the model
     d = utils.shard_dis_mine(args, input_visual, input_text, input_seg, model)
     end = time.time()  # Record end time
-    
+
     print(
         "Calculate similarity time: {:.2f} s".format(end - start)
     )  # Print time spent on calculating similarity
@@ -777,7 +851,7 @@ def validate_test_without_sam(args, test_loader, model):
     # Perform inference using the model
     d = utils.shard_dis_without_sam_mine(args, input_visual, input_text, model)
     end = time.time()  # Record end time
-    
+
     print(
         "Calculate similarity time: {:.2f} s".format(end - start)
     )  # Print time spent on calculating similarity
@@ -864,7 +938,7 @@ def test(args, test_loader, model):
 
 
 def test_mine(args, test_loader, model):
-    print('')
+    print("")
     print("--------------------- start test on training ---------------------")
     model.eval()
 
@@ -877,25 +951,25 @@ def test_mine(args, test_loader, model):
     input_text = []
     img_paths = []
     captions = []
-    
+
     for idx, val_data in enumerate(tqdm(itertools.islice(test_loader, 20))):
-    # for idx, val_data in enumerate(tqdm(test_loader)):
+        # for idx, val_data in enumerate(tqdm(test_loader)):
         images, cap_tokens, img_path, caption = val_data
         input_visual.append(images)
         input_text.append(cap_tokens)
         img_paths.extend(img_path)
         captions.extend(caption)
-      
+
     input_visual = torch.cat(input_visual, dim=0)
     input_text = torch.cat(input_text, dim=0)
 
-    logger.info('begin to compute distance')
+    logger.info("begin to compute distance")
     d = utils.shard_dis_mine_finetune(
-                             args, 
-                             input_visual, 
-                             input_text, 
-                             model,
-                            )
+        args,
+        input_visual,
+        input_text,
+        model,
+    )
     # Normalize d to [0, 1]
     d_normalized = (d - np.min(d)) / (np.max(d) - np.min(d))
 
@@ -903,17 +977,17 @@ def test_mine(args, test_loader, model):
         top10_indices = np.argsort(-d_normalized[i])[:10]
         top10_captions = [captions[idx] for idx in top10_indices]
         top10_values = [d_normalized[i][idx] for idx in top10_indices]
-        
-        savepath = os.path.join(args.ckpt_save_path, img_paths[i].split('/')[-1])
+
+        savepath = os.path.join(args.ckpt_save_path, img_paths[i].split("/")[-1])
         os.makedirs(savepath, exist_ok=True)
         shutil.copy(img_paths[i], savepath)
         # import ipdb;ipdb.set_trace()
-        with open(os.path.join(savepath, 'top10_captions.txt'), 'w') as f:
+        with open(os.path.join(savepath, "top10_captions.txt"), "w") as f:
             for j in range(10):
-                f.write(f'{top10_captions[j]}\n')
-                f.write(f'{top10_values[j]}\n')
-                f.write('\n')
-    
+                f.write(f"{top10_captions[j]}\n")
+                f.write(f"{top10_values[j]}\n")
+                f.write("\n")
+
     end = time.time()
     print("calculate similarity time: {:.2f} s".format(end - start))
 
@@ -922,26 +996,32 @@ def test_mine(args, test_loader, model):
 
     currscore = (r1t + r5t + r10t + r1i + r5i + r10i) / 6.0
 
-    all_score = "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n" \
-                "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n" \
-                "mR:{:.2f}".format(r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore)
+    all_score = (
+        "i2t => r1i:{:.2f} r5i:{:.2f} r10i:{:.2f} medri:{:.2f} meanri:{:.2f}\n"
+        "t2i => r1t:{:.2f} r5t:{:.2f} r10t:{:.2f} medrt:{:.2f} meanrt:{:.2f}\n"
+        "mR:{:.2f}".format(
+            r1i, r5i, r10i, medri, meanri, r1t, r5t, r10t, medrt, meanrt, currscore
+        )
+    )
 
     print("--------------------- end test on training ---------------------")
-    print('')
-    
-    wandb.log({
-        'test/r1i': r1i,
-        'test/r5i': r5i,
-        'test/r10i': r10i,
-        'test/medri': medri,
-        'test/meanri': meanri,
-        'test/r1t': r1t,
-        'test/r5t': r5t,
-        'test/r10t': r10t,
-        'test/medrt': medrt,
-        'test/meanrt': meanrt,
-        'test/rsum': currscore
-    })
+    print("")
+
+    wandb.log(
+        {
+            "test/r1i": r1i,
+            "test/r5i": r5i,
+            "test/r10i": r10i,
+            "test/medri": medri,
+            "test/meanri": meanri,
+            "test/r1t": r1t,
+            "test/r5t": r5t,
+            "test/r10t": r10t,
+            "test/medrt": medrt,
+            "test/meanrt": meanrt,
+            "test/rsum": currscore,
+        }
+    )
     return currscore, all_score
 
 

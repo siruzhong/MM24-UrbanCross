@@ -2,6 +2,7 @@ datename=$(date +%Y%m%d-%H%M%S)
 name=urbancross_finetune
 country_source=Finland
 country_target=Spain
+lr=0.00001
 logging_dir=outputs/finetune/$country_source\_2_$country_target/$datename
 
 cd ../../
@@ -18,7 +19,7 @@ python finetune_urbancross.py \
        --wandb_logging_dir $logging_dir \
        --epochs 5 \
        --k_fold_nums 1 \
-       --lr 0.00001 \
+       --lr $lr \
        --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
        --batch_size_source 80 \
        --batch_size_target 40 \
