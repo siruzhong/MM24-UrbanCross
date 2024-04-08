@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -158,3 +159,20 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+=======
+
+layers/aid_28-rsp-resnet-50-ckpt.pth 14.47.48
+layers/resnet50-19c8e357.pth 14.47.51
+layers/.DS_Store
+
+outputs/
+__pycache__/
+aid_28-rsp-resnet-50-ckpt.pth
+rs_data.zip
+rs_data
+.vector_cache
+outputs/*
+checkpoint/*
+urbancross_data/*
+sam_vit_h_4b8939.pth
+>>>>>>> zsr/dev
