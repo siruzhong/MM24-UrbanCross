@@ -4,7 +4,7 @@ country=Germany
 
 cd ../../
 
-python test_urbancross_without_sam.py \
+python test_urbancross.py \
        --gpuid 0 \
        --model_name urbancross \
        --experiment_name urbancross \
@@ -14,5 +14,5 @@ python test_urbancross_without_sam.py \
        --workers 0 \
        --country $country \
        --data_name $data_name \
-       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_germany/checkpoints/germany_without_sam_ours_epoch11_bestRsum0.7739.pth \
+       --resume /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_germany/checkpoints/germany_with_sam_ours_epoch14_bestRsum0.7628.pth \
        2>&1 | tee -a outputs/logs_${datename}_${data_name}_test.txt

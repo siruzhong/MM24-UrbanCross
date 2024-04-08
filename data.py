@@ -477,7 +477,7 @@ class PrecompDataset_mine_zeroshot(data.Dataset):
 
         df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_{country.lower()}_refine.csv")
         split_list = []
-        path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/zeroshot_list.txt"
+        path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/test_list.txt"
 
         with open(path_, "r") as f:
             for line in tqdm(f):
@@ -946,7 +946,7 @@ def get_test_loader(args, vocab):
 
 def get_test_loader_finetune(args):
     test_loader = get_precomp_loader_mine_finetune(
-        args, "test", args.batch_size_val, False, args.workers
+        args, "test", args.country, args.batch_size_val, False, args.workers
     )
     return test_loader
 
