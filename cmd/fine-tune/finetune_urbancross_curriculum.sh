@@ -19,7 +19,7 @@ python finetune_urbancross_curriculum.py \
        --wandb_logging_dir $logging_dir \
        --epochs 5 \
        --lr $lr \
-       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
+       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross \
        --batch_size_source 80 \
        --batch_size_target 16 \
        --country_source $country_source \

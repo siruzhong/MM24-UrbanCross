@@ -5,7 +5,7 @@ import random
 # country = "Finland"
 # country = 'Spain'
 country = 'Germany'
-df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_{country.lower()}_refine.csv")
+df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/instructblip_generation_{country.lower()}_refine.csv")
 
 img_name_list = df["image_name"].tolist()
 random.shuffle(img_name_list)
@@ -36,11 +36,11 @@ stage2list = {
 }
 
 for st in stage:
-    if not os.path.exists(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/{st}_list.txt"):
-        file = open(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/{st}_list.txt", "w")
+    if not os.path.exists(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/{st}_list.txt"):
+        file = open(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/{st}_list.txt", "w")
         file.close()
 
-    with open(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/{st}_list.txt", "w") as f:
+    with open(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/{st}_list.txt", "w") as f:
         for i in stage2list[st]:
             f.write(i)
             f.write("\n")

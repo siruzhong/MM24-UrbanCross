@@ -12,6 +12,8 @@ from PIL import Image
 import open_clip
 from tqdm import tqdm
 
+# MODEL_NAME = "ViT-L-14"
+MODEL_NAME = "ViT-B-16"
 
 class PrecompDataset(data.Dataset):
     """
@@ -30,9 +32,7 @@ class PrecompDataset(data.Dataset):
         self.vocab = vocab
         self.loc = args.data_path
         self.img_path = args.image_path  # ./rs_data/rsitmd/images/
-        self.clip_tokenizer = open_clip.get_tokenizer(
-            "ViT-L-14"
-        )  # Use CLIP's tokenizer
+        self.clip_tokenizer = open_clip.get_tokenizer(MODEL_NAME)  # Use CLIP's tokenizer
 
         # Load captions and image filenames
         if data_split != "test":
@@ -173,9 +173,9 @@ class PrecompDataset_mine(data.Dataset):
                     )
 
             df = pd.read_csv(
-                f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{args.country}/instructblip_generation_{args.country.lower()}_refine.csv"
+                f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{args.country}/instructblip_generation_{args.country.lower()}_refine.csv"
             )
-            data_split_txt = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{args.country}/{data_split}_list.txt"
+            data_split_txt = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{args.country}/{data_split}_list.txt"
         else:
             # If country is not specified, set image path and data split text file path based on the data split
             if args.data_name == "rsicd":
@@ -192,7 +192,7 @@ class PrecompDataset_mine(data.Dataset):
                 data_split_txt = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/{data_split}_list.txt"
 
         # Initialize OpenAI's CLIP tokenizer
-        self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
+        self.clip_tokenizer = open_clip.get_tokenizer(MODEL_NAME)
 
         split_list = []
         # Open and read the content of the data split text file into a list
@@ -328,7 +328,7 @@ class PrecompDataset_without_sam_mine(data.Dataset):
                 data_split_txt = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/RSITMD/{data_split}_list.txt"
 
         # Initialize OpenAI's CLIP tokenizer
-        self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
+        self.clip_tokenizer = open_clip.get_tokenizer(MODEL_NAME)
 
         split_list = []
         # Open and read the content of the data split text file into a list
@@ -401,21 +401,21 @@ class PrecompDataset_mine_finetune(data.Dataset):
     """
     def __init__(self, args, data_split, country, source=True):
         self.img_path = os.path.join(args.image_path, country, "images")
-        self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
+        self.clip_tokenizer = open_clip.get_tokenizer(MODEL_NAME)
         self.captions = []
 
         # Read captions from CSV file
-        df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_{country.lower()}_refine.csv")
+        df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/instructblip_generation_{country.lower()}_refine.csv")
         split_list = []  # Initialize split list
 
         # Determine the path of the split list file based on the source flag
         if source:
-            path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/{data_split}_list.txt"
+            path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/{data_split}_list.txt"
         else:
             if data_split == "train":
-                path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/finetune_list.txt"
+                path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/finetune_list.txt"
             else:
-                path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/finetune_val_list.txt"
+                path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/finetune_val_list.txt"
 
         # Read the split list file and update the split list
         with open(path_, "r") as f:
@@ -472,12 +472,12 @@ class PrecompDataset_mine_zeroshot(data.Dataset):
 
     def __init__(self, args, data_split, country):
         self.img_path = os.path.join(args.image_path, country, "images")
-        self.clip_tokenizer = open_clip.get_tokenizer("ViT-L-14")
+        self.clip_tokenizer = open_clip.get_tokenizer(MODEL_NAME)
         self.captions = []
 
-        df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/instructblip_generation_{country.lower()}_refine.csv")
+        df = pd.read_csv(f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/instructblip_generation_{country.lower()}_refine.csv")
         split_list = []
-        path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/{country}/test_list.txt"
+        path_ = f"/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/{country}/test_list.txt"
 
         with open(path_, "r") as f:
             for line in tqdm(f):

@@ -109,10 +109,10 @@ def show_masks_mine(anns, ori_img, img_path, description):
 
 
 if __name__ == "__main__":
-    # img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/images"
-    # df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Finland/instructblip_generation_finland_refine.csv")
-    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/images"
-    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target/Germany/instructblip_generation_germany_refine.csv")
+    # img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Finland/images"
+    # df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Finland/instructblip_generation_finland_refine.csv")
+    img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Germany/images"
+    df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Germany/instructblip_generation_germany_refine.csv")
 
     sam_checkpoint = "/hpc2hdd/home/szhong691/zsr/projects/segment-anything/segment_anything/checkpoint/sam_vit_h_4b8939.pth"
     model_type = "vit_h"

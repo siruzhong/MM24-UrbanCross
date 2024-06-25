@@ -15,7 +15,7 @@ python zeroshot_urbancross.py \
        --experiment_name $name \
        --ckpt_save_path $logging_dir \
        --wandb_logging_dir $logging_dir \
-       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
+       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross \
        --batch_size_test 80 \
        --country $country \
        --load_path /hpc2hdd/home/szhong691/zsr/projects/UrbanCross/outputs/new_00_finland/checkpoints/finland_with_sam_ours_epoch15_bestRsum0.7644.pth \

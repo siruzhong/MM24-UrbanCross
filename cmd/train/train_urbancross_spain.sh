@@ -12,7 +12,7 @@ python train_urbancross.py \
        --experiment_name urbancross \
        --ckpt_save_path outputs/checkpoints/ \
        --epochs $epochs \
-       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
+       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross \
        --country $country \
        --batch_size 40 \
        --num_seg $num_seg \

@@ -20,7 +20,7 @@ python finetune_urbancross.py \
        --epochs 5 \
        --k_fold_nums 1 \
        --lr $lr \
-       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
+       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross \
        --batch_size_source 80 \
        --batch_size_target 16 \
        --country_source $country_source \

@@ -11,7 +11,7 @@ python train_urbancross_without_sam.py \
        --experiment_name urbancross \
        --ckpt_save_path outputs/checkpoints/ \
        --epochs $epochs \
-       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/image_target \
+       --image_path /hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross \
        --country $country \
        --batch_size 45 \
        --lr 0.00001 \

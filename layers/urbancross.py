@@ -16,6 +16,10 @@ import sys
 sys.path.append("..")
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
+# MODEL_NAME = "ViT-L-14"
+# PRETRAINED = "laion2B-s32B-b82K"
+MODEL_NAME = "ViT-B-16"
+PRETRAINED = "laion2B-s34B-b88K"
 
 class UrbanCross(nn.Module):
     def __init__(self, args):
@@ -28,8 +32,8 @@ class UrbanCross(nn.Module):
         super().__init__()
         # Create OpenCLIP model and transforms
         self.clip_model, _, transform = open_clip.create_model_and_transforms(
-            model_name="ViT-L-14",  # coca_ViT-L-14
-            pretrained="laion2B-s32B-b82K",  # mscoco_finetuned_laion2B-s13B-b90k
+            model_name=MODEL_NAME,  
+            pretrained=PRETRAINED,
             output_dict=True,
         )
         # Create a copy of the OpenCLIP model for segmented images
@@ -89,8 +93,8 @@ class UrbanCross_without_sam(nn.Module):
         super().__init__()
         # Create OpenCLIP model and transforms
         self.clip_model, _, transform = open_clip.create_model_and_transforms(
-            model_name="ViT-L-14",  # coca_ViT-L-14
-            pretrained="laion2B-s32B-b82K",  # mscoco_finetuned_laion2B-s13B-b90k
+            model_name=MODEL_NAME,
+            pretrained=PRETRAINED,  # mscoco_finetuned_laion2B-s13B-b90k
             output_dict=True,
         )
 
@@ -172,8 +176,8 @@ class UrbanCross_finetune(nn.Module):
         super().__init__()
         # Create OpenCLIP model and transforms
         self.clip_model, _, transform = open_clip.create_model_and_transforms(
-            model_name="ViT-L-14",  # CLIP model name
-            pretrained="laion2B-s32B-b82K",  # Pretrained weights
+            model_name=MODEL_NAME,
+            pretrained=PRETRAINED,
             output_dict=True,
         )
         # Create a copy of the OpenCLIP model for segmented images
@@ -277,9 +281,8 @@ class UrbanCross_finetune_curriculum(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.clip_model, _, transform = open_clip.create_model_and_transforms(
-            # model_name="coca_ViT-L-14", 
-            model_name="ViT-L-14",
-            pretrained='laion2B-s32B-b82K',  #mscoco_finetuned_laion2B-s13B-b90k
+            model_name=MODEL_NAME,
+            pretrained=PRETRAINED,
             output_dict=True,
         )
 
@@ -369,9 +372,8 @@ class UrbanCross_zeroshot(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.clip_model, _, transform = open_clip.create_model_and_transforms(
-            # model_name="coca_ViT-L-14", 
-            model_name="ViT-L-14",
-            pretrained='laion2B-s32B-b82K',  #mscoco_finetuned_laion2B-s13B-b90k
+            model_name=MODEL_NAME,
+            pretrained=PRETRAINED,
             output_dict=True,
         )
         self.clip_img_seg = copy.deepcopy(self.clip_model)
