@@ -1,6 +1,6 @@
 # UrbanCross: Enhancing Satellite Image-Text # UrbanCross: Enhancing Satellite Image-Text Retrieval with Cross-Domain Adaptation [MM 2024]
 
-This repository contains the implementation of our manuscript titled "UrbanCross: Enhancing Satellite Image-Text Retrieval with Cross-Domain Adaptation," which has been accepted for publication at the ACM Multimedia Conference 2024.
+This repository contains the implementation of our manuscript titled "[UrbanCross: Enhancing Satellite Image-Text Retrieval with Cross-Domain Adaptation](https://arxiv.org/pdf/2404.14241.pdf)", which has been accepted for publication at the ACM Multimedia Conference 2024.
 
 As the codebase is extensive and complex, this repository will be actively maintained and updated. The dataset is currently being refined due to its large size and will be released on Hugging Face shortly.
 
