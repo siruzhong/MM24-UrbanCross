@@ -109,8 +109,6 @@ def show_masks_mine(anns, ori_img, img_path, description):
 
 
 if __name__ == "__main__":
-    # img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Finland/images"
-    # df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Finland/instructblip_generation_finland_refine.csv")
     img_path = "/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Germany/images"
     df = pd.read_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Germany/instructblip_generation_germany_refine.csv")
 
@@ -121,8 +119,7 @@ if __name__ == "__main__":
     mask_generator = SamAutomaticMaskGenerator(sam)
 
     img_lists = df["image_name"]
-    # for idx, row in tqdm(reversed(list(df.iterrows())[10000:]), total=df.shape[0]):
-    for idx, row in tqdm(list(df.iterrows())[61000:], total=df.shape[0]):
+    for idx, row in tqdm(list(df.iterrows())[151468:], total=df.shape[0]):
         image_name = row['image_name']
         description = row['description']  # 确保CSV中有描述的列
         image_path = os.path.join(img_path, image_name)
