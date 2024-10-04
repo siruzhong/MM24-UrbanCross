@@ -4,8 +4,8 @@ This repository contains the implementation of our manuscript titled "[UrbanCros
 
 ## Table of Contents
 - [Overview](#overview)
-- [Usage](#usage)
 - [Dataset](#dataset)
+- [Usage](#usage)
 - [Citation](#citation)
 - [Contact](#contact)
 
@@ -20,6 +20,15 @@ UrbanCross aims to enhance the performance of satellite image-text retrieval tas
 - Adaptive curriculum-based sampling and weighted adversarial fine-tuning modules.
 
 As the codebase is extensive and complex, this repository will be actively maintained and updated. The dataset is currently being refined due to its large size and will be released on Hugging Face shortly.
+
+## Dataset
+The dataset used in UrbanCross is currently being refined and will be released on Hugging Face soon. It includes:
+
+- High-resolution satellite images from multiple countries.
+- Geo-tags to enhance retrieval performance
+- Text descriptions generated through a multimodal model.
+
+![dataset](/figs/dataset.png)
 
 ## Usage
 
@@ -77,15 +86,6 @@ For instructions on how to run the code, please refer to the `cmd` directory for
     ├── train_urbancross_without_sam_rsitmd.sh
     └── train_urbancross_without_sam_spain.sh
 ```
-
-## Dataset
-The dataset used in UrbanCross is currently being refined and will be released on Hugging Face soon. It includes:
-
-- High-resolution satellite images from multiple countries.
-- Geo-tags to enhance retrieval performance
-- Text descriptions generated through a multimodal model.
-
-![dataset](/figs/dataset.png)
 
 
 ## Citation
