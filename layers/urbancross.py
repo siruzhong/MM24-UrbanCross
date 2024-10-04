@@ -158,6 +158,45 @@ class AdversarialLoss(nn.Module):
         return loss
 
 
+class TripletLoss(nn.Module):
+    def __init__(self, initial_margin=0.5, margin_increase_per_cycle=0.2, max_margin=1.5):
+        """
+        Initialize the TripletLoss module with dynamic margin adjustment.
+        
+        Args:
+            initial_margin (float): Initial margin value for triplet loss.
+            margin_increase_per_cycle (float): The increase in margin per cycle.
+            max_margin (float): Maximum allowable margin value.
+        """
+        super(TripletLoss, self).__init__()
+        self.initial_margin = initial_margin
+        self.margin_increase_per_cycle = margin_increase_per_cycle
+        self.max_margin = max_margin
+
+    def forward(self, anchor, positive, negatives, num_cycle_of_target):
+        """
+        Forward pass for calculating triplet loss with dynamic margin.
+        
+        Args:
+            anchor (torch.Tensor): Anchor embeddings (source).
+            positive (torch.Tensor): Positive embeddings (text/source pair).
+            negatives (torch.Tensor): Negative embeddings (target).
+            num_cycle_of_target (int): The current cycle number in curriculum learning.
+
+        Returns:
+            torch.Tensor: Computed triplet loss.
+        """
+        # Dynamically adjust the margin based on the curriculum learning cycle
+        current_margin = min(self.initial_margin + self.margin_increase_per_cycle * num_cycle_of_target, self.max_margin)
+        
+        # Create the Triplet Margin Loss with the current margin
+        triplet_loss_fn = nn.TripletMarginLoss(margin=current_margin)
+        
+        # Calculate triplet loss
+        loss = triplet_loss_fn(anchor, positive, negatives)
+        return loss
+
+
 class UrbanCross_finetune(nn.Module):
     def __init__(self, args):
         """
@@ -287,8 +326,10 @@ class UrbanCross_finetune_curriculum(nn.Module):
             nn.Linear(768, 2),
         )
         
+        # Initialize custom loss functions
         self.adv_loss = AdversarialLoss()
         self.clip_loss = open_clip.ClipLoss()
+        self.triplet_loss = TripletLoss(initial_margin=0.5, margin_increase_per_cycle=0.2, max_margin=1.5)
 
     def forward(self, img_source, img_target, text_source, text_target, num_cycle_of_target=0, val=False):
         if val:
@@ -336,23 +377,33 @@ class UrbanCross_finetune_curriculum(nn.Module):
             # Normalize W_2 to sum to 1
             W2 = W2 / torch.sum(W2)
             
-            # Calculate triplet loss
-            # triplet_loss = nn.TripletMarginLoss()
-            # loss = triplet_loss(img_emb_source, text_emb_source, topk_W1)
-
+            # Select hard negatives based on cosine similarity
+            negatives = img_emb_target  # target domain embeddings as candidates for negatives
+            similarity_matrix = cosine_sim(img_emb_source_filtered, negatives)
+            # Find the most similar (hard) negatives
+            hard_negatives_idx = torch.argmax(similarity_matrix, dim=1)
+            hard_negatives = negatives[hard_negatives_idx]
+            
+            # Calculate triplet loss using the custom TripletLoss class
+            triplet_loss = self.triplet_loss(anchor=img_emb_source_filtered, 
+                                            positive=text_emb_source_filtered, 
+                                            negatives=hard_negatives, 
+                                            num_cycle_of_target=num_cycle_of_target)
+          
             # Compute adversarial loss (encourage domain alignment)
             adv_loss = self.adv_loss(self.discriminator, 
                                     img_emb_source_filtered, 
                                     img_emb_target, 
                                     W2
                                     )
+
             # Compute CLIP loss (multimodal alignment between filtered source samples)
-            clip_loss = self.clip_loss(img_emb_source_filtered, 
-                                    text_emb_source_filtered,
-                                    logit_scale=1.0
-                                    )
+            # clip_loss = self.clip_loss(img_emb_source_filtered, 
+            #                         text_emb_source_filtered,
+            #                         logit_scale=1.0
+            #                         )
             
-        return clip_loss, adv_loss, ratio
+        return triplet_loss, adv_loss, ratio
        
     def forward_val(self, img_target, text_target):
         with torch.cuda.amp.autocast():
