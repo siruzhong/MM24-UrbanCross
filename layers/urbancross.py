@@ -16,10 +16,9 @@ import sys
 sys.path.append("..")
 from segment_anything import sam_model_registry, SamAutomaticMaskGenerator, SamPredictor
 
-# MODEL_NAME = "ViT-L-14"
-# PRETRAINED = "laion2B-s32B-b82K"
-MODEL_NAME = "ViT-B-16"
-PRETRAINED = "laion2B-s34B-b88K"
+# MODEL_NAME and PRETRAINED weights configuration
+MODEL_NAME = "ViT-B-16" # "ViT-L-14"
+PRETRAINED = "laion2B-s34B-b88K" # "laion2B-s32B-b82K"
 
 class UrbanCross(nn.Module):
     def __init__(self, args):
@@ -32,13 +31,13 @@ class UrbanCross(nn.Module):
         super().__init__()
         # Create OpenCLIP model and transforms
         self.clip_model, _, transform = open_clip.create_model_and_transforms(
-            model_name=MODEL_NAME,  
-            pretrained=PRETRAINED,
-            output_dict=True,
+            model_name=MODEL_NAME,  # Model name, e.g., "ViT-B-16"
+            pretrained=PRETRAINED,  # Pre-trained weights
+            output_dict=True,  # Return output as a dictionary
         )
         # Create a copy of the OpenCLIP model for segmented images
         self.clip_img_seg = copy.deepcopy(self.clip_model)
-        # Remove the transformer layer from the copied model
+        # Remove the transformer layer from the copied model for image segmentation
         del self.clip_img_seg.transformer
 
     def forward(self, img, text, segment_imgs):
@@ -60,23 +59,19 @@ class UrbanCross(nn.Module):
             img_emb = clip_model_out["image_features"]
             text_emb = clip_model_out["text_features"]
 
-            # Get the number of segments
-            num_seg = segment_imgs.shape[0]
-            seg_emb_list = []
-            
-            # Flatten the segment_imgs tensor
+            # Flatten the segment_imgs tensor for batch processing
             bs, num_seg, _, _, _ = segment_imgs.shape
             segment_imgs_reshaped = segment_imgs.view(bs * num_seg, 3, 224, 224)
             
-            # Encode segmented images
+            # Encode segmented images to get their embeddings
             img_seg_emb = self.clip_img_seg.encode_image(segment_imgs_reshaped)
             img_seg_emb = img_seg_emb.view(bs, num_seg, -1)
             # Calculate the feature mean of each batch
             img_seg_emb = img_seg_emb.mean(dim=1)
 
-            # Calculate cosine similarity between image and text
+            # Calculate cosine similarity between image and text embeddings
             sim_img2text = cosine_sim(img_emb, text_emb)
-            # Calculate cosine similarity between segmented images and text
+            # Calculate cosine similarity between segmented images and text embeddings
             sim_seg2text = cosine_sim(img_seg_emb, text_emb)
 
         return sim_img2text, sim_seg2text
@@ -85,7 +80,7 @@ class UrbanCross(nn.Module):
 class UrbanCross_without_sam(nn.Module):
     def __init__(self, args):
         """
-        Initialize the UrbanCross model.
+        Initialize the UrbanCross model without the segment-anything model (SAM).
 
         Args:
             args: Model configuration arguments.
@@ -94,7 +89,7 @@ class UrbanCross_without_sam(nn.Module):
         # Create OpenCLIP model and transforms
         self.clip_model, _, transform = open_clip.create_model_and_transforms(
             model_name=MODEL_NAME,
-            pretrained=PRETRAINED,  # mscoco_finetuned_laion2B-s13B-b90k
+            pretrained=PRETRAINED,
             output_dict=True,
         )
 
@@ -108,7 +103,6 @@ class UrbanCross_without_sam(nn.Module):
 
         Returns:
             torch.Tensor: Similarity scores between image and text.
-            torch.Tensor: Similarity scores between segmented images and text.
         """
         with torch.cuda.amp.autocast():
             # Get features for the input image and text
@@ -116,7 +110,7 @@ class UrbanCross_without_sam(nn.Module):
             img_emb = clip_model_out["image_features"]
             text_emb = clip_model_out["text_features"]
 
-            # Calculate cosine similarity between image and text
+            # Calculate cosine similarity between image and text embeddings
             sim_img2text = cosine_sim(img_emb, text_emb)
 
         return sim_img2text
@@ -125,10 +119,9 @@ class UrbanCross_without_sam(nn.Module):
 class AdversarialLoss(nn.Module):
     def __init__(self):
         """
-        Initialize the AdversarialLoss module.
+        Initialize the AdversarialLoss module used in adversarial training.
         """
         super(AdversarialLoss, self).__init__()
-        # self.W_tilde_2 = 1.0
 
     def forward(self, model, source, target, W2):
         """
@@ -136,32 +129,32 @@ class AdversarialLoss(nn.Module):
 
         Args:
             model (nn.Module): Discriminator model.
-            F_s_tilde (torch.Tensor): Source features tensor.
-            F_t_tilde (torch.Tensor): Target features tensor.
+            source (torch.Tensor): Source features tensor.
+            target (torch.Tensor): Target features tensor.
             W2 (torch.Tensor): Weight tensor.
 
         Returns:
             torch.Tensor: Adversarial loss value.
         """
-        # Calculate the discriminator's probability on source features
+        # Calculate the discriminator's probability output for source features
         prob_source = model(source)
-        # Calculate the discriminator's probability on target features
+        # Calculate the discriminator's probability output for target features
         prob_target = model(target)
 
         # Ensure the discriminator output is in the range [0, 1] by applying sigmoid
         prob_source = torch.sigmoid(prob_source)
         prob_target = torch.sigmoid(prob_target)
 
-        # Expand the weight tensor to match the shape of probability tensors
+        # Expand the weight tensor to match the shape of the probability tensors
         W2 = W2.unsqueeze(dim=1)
         
-        # Calculate the adversarial loss using weighted cross-entropy loss
+        # Calculate the adversarial loss using a weighted cross-entropy approach
         loss = -(
             torch.mean(W2 * torch.log(prob_source)) +
             torch.mean(W2 * torch.log(1 - prob_target))
         )
         
-        # Note: Negative sign is used because we typically minimize the loss, and the original equation is for maximization
+        # Note: Negative sign is used because the original objective is to maximize the adversarial term
         return loss
 
 
@@ -257,8 +250,6 @@ class UrbanCross_finetune(nn.Module):
             clip_loss = self.clip_loss(img_emb_source_filtered, 
                                     text_emb_source_filtered,
                                     logit_scale=1.0
-                                    #    img_emb_target, 
-                                    #    text_emb_target
                                     )
         return clip_loss, adv_loss, ratio
     
@@ -391,26 +382,50 @@ class UrbanCross_zeroshot(nn.Module):
         return sim_img2text
 
 
-#====================
-# Some Reuse Function
-#====================
 def l2norm(X, dim, eps=1e-8):
-    """L2-normalize columns of X
+    """
+    L2-normalize columns of tensor X.
+
+    Args:
+        X (torch.Tensor): Input tensor to normalize.
+        dim (int): Dimension over which to perform normalization.
+        eps (float, optional): Small epsilon value for numerical stability.
+
+    Returns:
+        torch.Tensor: L2-normalized tensor.
     """
     norm = torch.pow(X, 2).sum(dim=dim, keepdim=True).sqrt() + eps
     X = torch.div(X, norm)
     return X
 
+
 def cosine_sim(im, s):
-    """Cosine similarity between all the image and sentence pairs
+    """
+    Calculate cosine similarity between all image and sentence pairs.
+
+    Args:
+        im (torch.Tensor): Image feature tensor.
+        s (torch.Tensor): Sentence feature tensor.
+
+    Returns:
+        torch.Tensor: Cosine similarity scores.
     """
     im = l2norm(im, dim=-1)
     s = l2norm(s, dim=-1)
     w12 = im.mm(s.t())
     return w12
 
+
 def clones(module, N):
-    """Produce N identical layers.
+    """
+    Produce N identical layers.
+
+    Args:
+        module (nn.Module): Module to replicate.
+        N (int): Number of copies.
+
+    Returns:
+        nn.ModuleList: List containing N replicated modules.
     """
     return nn.ModuleList([copy.deepcopy(module) for _ in range(N)])
 
@@ -434,7 +449,7 @@ def factory(args, cuda=True, data_parallel=False):
 
 def factory_without_sam(args, cuda=True, data_parallel=False):
     """
-    Factory function to create and initialize the model.
+    Factory function to create and initialize the UrbanCross model.
 
     Args:
         args: Namespace containing model configuration and parameters.
@@ -444,7 +459,6 @@ def factory_without_sam(args, cuda=True, data_parallel=False):
     Returns:
         nn.Module: Initialized model instance.
     """
-    # Create a copy of args to avoid modifying the original object
     args_new = copy.copy(args)
 
     # Initialize the model without DistributedDataParallel (DDP)
@@ -483,7 +497,7 @@ def factory_with_finetune(args, cuda=True, data_parallel=False):
 
     if data_parallel:
         model = nn.SyncBatchNorm.convert_sync_batchnorm(model_without_ddp)
-        model = DistributedDataParallel(model, device_ids=[args.gpuid],find_unused_parameters=False)
+        model = DistributedDataParallel(model, device_ids=[args.gpuid], find_unused_parameters=False)
         model_without_ddp = model.module
         if not cuda:
             raise ValueError

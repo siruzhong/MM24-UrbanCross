@@ -21,62 +21,69 @@ def train(args, train_loader, model, optimizer, epoch):
     Train function to train the model using the provided training data.
 
     Args:
-        args (argparse.Namespace): Parsed arguments.
+        args (argparse.Namespace): Parsed arguments containing training configuration.
         train_loader (torch.utils.data.DataLoader): DataLoader for training data.
         model (torch.nn.Module): Model to be trained.
-        optimizer (torch.optim.Optimizer): Optimizer for training.
+        optimizer (torch.optim.Optimizer): Optimizer for updating model parameters.
         epoch (int): Current epoch number.
 
     Returns:
         None
     """
-    # Extract values from args
-    grad_clip = args.grad_clip
-    max_violation = args.max_violation
-    margin = args.margin
-    print_freq = args.print_freq
+    # Extract configuration values from args
+    grad_clip = args.grad_clip  # Gradient clipping value
+    max_violation = args.max_violation  # Whether to allow max violation in contrastive loss
+    margin = args.margin  # Margin value for contrastive loss
+    print_freq = args.print_freq  # Frequency of printing training progress
+
+    # If distributed training, initialize mean loss tracking on the GPU
     if args.distributed:
         mean_loss = torch.zeros(1).to(args.gpuid)
 
-    # Set model to train mode
+    # Set the model to training mode
     model.train()
 
-    # Initialize average meters for tracking batch and data loading time
+    # Initialize average meters to track batch time and data loading time
     batch_time = utils.AverageMeter()
     data_time = utils.AverageMeter()
-
-    # Initialize log collector
+    
+    # Initialize a log collector to collect and log training metrics
     train_logger = utils.LogCollector()
 
-    # Initialize timer
+    # Record the start time for measuring data loading time
     end = time.time()
 
-    # Get model parameters
+    # Get model parameters for gradient clipping
     params = list(model.parameters())
 
-    # Iterate over batches in the training data
+    # Iterate over the training data in batches
     for i, train_data in enumerate(train_loader):
-        # Unpack training data
+        # Unpack the training data into visual input, text input, and segment images
         input_visual, ids, input_text, segment_imgs = train_data
 
+        # Convert margin to a floating-point value
         margin = float(margin)
-        # Measure data loading time
+        
+        # Measure the data loading time
         data_time.update(time.time() - end)
+        
+        # Set the model's logger to the training logger
         model.logger = train_logger
-
-        # Move tensors to GPU if available
+        
+        # Move input tensors to GPU if CUDA is available
         if torch.cuda.is_available():
             input_visual = input_visual.cuda(args.gpuid)
             input_text = input_text.cuda(args.gpuid)
             segment_imgs = segment_imgs.cuda(args.gpuid)
 
-        # Synchronize CUDA streams
+        # Synchronize CUDA streams to ensure accurate timing
         torch.cuda.synchronize(device=args.gpuid)
 
+        # Calculate the loss based on whether intra-level loss is used or not
         if not args.il_measure:
-            scores_img2text, scores_seg2text = model(
-                input_visual, input_text, segment_imgs
-            )
+            # Calculate scores for image-to-text and segment-to-text matching
+            scores_img2text, scores_seg2text = model(input_visual, input_text, segment_imgs)
+            # Calculate contrastive loss for image-to-text and segment-to-text scores
             loss_img2text = utils.calcul_contraloss(
                 args,
                 scores_img2text,
@@ -91,14 +98,14 @@ def train(args, train_loader, model, optimizer, epoch):
                 margin,
                 max_violation=max_violation,
             )
+            # Total loss is the sum of both losses
             loss = loss_img2text + loss_seg2text
         else:
-            scores, scores_intra_img, scores_intra_cap = model(
-                input_visual, input_text, lengths
-            )
-            intra_loss = utils.calcul_intraloss(
-                args, scores_intra_img
-            ) + utils.calcul_intraloss(args, scores_intra_cap)
+            # Calculate scores for inter- and intra-level matching
+            scores, scores_intra_img, scores_intra_cap = model(input_visual, input_text, lengths)
+            # Calculate intra-level loss for image and caption
+            intra_loss = utils.calcul_intraloss(args, scores_intra_img) + utils.calcul_intraloss(args, scores_intra_cap)
+            # Total loss is the sum of contrastive loss and intra-level loss
             loss = (
                 utils.calcul_contraloss(
                     args,
@@ -110,10 +117,11 @@ def train(args, train_loader, model, optimizer, epoch):
                 + intra_loss
             )
 
+        # Apply gradient clipping if specified
         if grad_clip > 0:
             clip_grad_norm(params, grad_clip)
 
-        # Log loss values
+        # Log the loss values to Weights & Biases for monitoring
         wandb.log(
             {
                 "loss": loss.cpu().data.numpy(),
@@ -122,26 +130,35 @@ def train(args, train_loader, model, optimizer, epoch):
             }
         )
 
+        # Clear gradients from the previous step
         optimizer.zero_grad()
+        # Backpropagate to compute gradients
         loss.backward()
+        
+        # Reduce loss across processes if in distributed training mode
         if args.distributed:
             loss = utils.reduce_value(args, loss, average=True)
-            mean_loss = (mean_loss * i + loss.detach()) / (i + 1)  # update mean losses
+            # Update the mean loss value
+            mean_loss = (mean_loss * i + loss.detach()) / (i + 1)
             train_logger.update("Loss", round(mean_loss.item(), 3))
         else:
+            # Log individual loss components to the logger
             train_logger.update("Loss", loss.cpu().data.numpy())
             train_logger.update("Loss_img2text", loss_img2text.cpu().data.numpy())
             train_logger.update("Loss_seg2text", loss_seg2text.cpu().data.numpy())
 
+        # Synchronize CUDA streams before optimizer step
         torch.cuda.synchronize(device=args.gpuid)
+        # Update model parameters
         optimizer.step()
+        # Synchronize CUDA streams again after step
         torch.cuda.synchronize(device=args.gpuid)
 
-        # Update average meters
+        # Update batch time to include the time taken for the current iteration
         batch_time.update(time.time() - end)
         end = time.time()
 
-        # Print training progress
+        # Print training progress at the specified frequency, only on the main process (rank 0)
         if i % print_freq == 0 and args.rank == 0:
             logger.info(
                 "Epoch [{0}][{1}/{2}]\t"
@@ -154,8 +171,10 @@ def train(args, train_loader, model, optimizer, epoch):
                     elog=str(train_logger),
                 )
             )
+            # Print GPU usage for monitoring purposes
             utils.get_GPU_usage()
 
+        # Log epoch and batch time to Weights & Biases
         wandb.log(
             {
                 "epoch": epoch,
@@ -163,7 +182,7 @@ def train(args, train_loader, model, optimizer, epoch):
             }
         )
 
-        # Log loss values to W&B
+        # Log training metrics to Weights & Biases using the logger
         train_logger.wandb_log()
 
 
