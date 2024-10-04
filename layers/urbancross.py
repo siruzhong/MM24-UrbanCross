@@ -294,6 +294,9 @@ class UrbanCross_finetune_curriculum(nn.Module):
         if val:
             return self.forward_val(img_target, text_target)
         ratio = 0.2
+    
+        # Progressive ratio increase per cycle (start with 20%, increase by 20% each cycle)
+        ratio = min(0.2 + 0.2 * num_cycle_of_target, 1.0)
 
         with torch.cuda.amp.autocast():
             clip_model_out_source = self.clip_model(img_source, text_source)
@@ -312,38 +315,43 @@ class UrbanCross_finetune_curriculum(nn.Module):
             batchsize = img_emb_source.shape[0]
             selected_batchsize = int(batchsize * ratio)
    
-            # Sort W1 along each row, from large to small
+            # Sort W1 along each row, from large to small (select more similar samples)
             sorted_W1, _ = torch.sort(W1, dim=1, descending=True)
           
-            W2 = sorted_W1[:, selected_batchsize * num_cycle_of_target : selected_batchsize * (num_cycle_of_target+1)]
+            # Progressive source sampling: expand selected samples as num_cycle_of_target increases
+            W2 = sorted_W1[:, :selected_batchsize]
             _, sorted_W1_mean_index = torch.sort(W1_mean, descending=True)
 
             img_emb_source_filtered = img_emb_source[sorted_W1_mean_index[:selected_batchsize]]
             text_emb_source_filtered = text_emb_source[sorted_W1_mean_index[:selected_batchsize]]
 
-            # Sum W_2 over the second dimension to get a vector
+            # Sum W_2 over the second dimension to get a vector for weighting
             W2 = torch.sum(W2, dim=1)
 
-            # Scale W_tilde_2 to range [0, 1]
+            # Scale W_2 to range [0, 1]
             W2_min = torch.min(W2)
             W2_max = torch.max(W2)
             W2 = (W2 - W2_min) / (W2_max - W2_min)
 
-            # Normalize W_tilde_2 to sum to 1
+            # Normalize W_2 to sum to 1
             W2 = W2 / torch.sum(W2)
+            
             # Calculate triplet loss
             # triplet_loss = nn.TripletMarginLoss()
             # loss = triplet_loss(img_emb_source, text_emb_source, topk_W1)
 
+            # Compute adversarial loss (encourage domain alignment)
             adv_loss = self.adv_loss(self.discriminator, 
                                     img_emb_source_filtered, 
                                     img_emb_target, 
                                     W2
                                     )
+            # Compute CLIP loss (multimodal alignment between filtered source samples)
             clip_loss = self.clip_loss(img_emb_source_filtered, 
                                     text_emb_source_filtered,
                                     logit_scale=1.0
                                     )
+            
         return clip_loss, adv_loss, ratio
        
     def forward_val(self, img_target, text_target):

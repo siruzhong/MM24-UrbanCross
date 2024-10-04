@@ -472,8 +472,9 @@ def train_finetune_curriculum(
     while num_cycle_of_target <= 4:
         images_source, cap_tokens_source = next(source_loader_cycle)
         images_target, cap_tokens_target = next(target_loader_cycle)
+        
         if i % len(train_loader_target) == 0 and i != 0:
-            num_cycle_of_target += 1
+            num_cycle_of_target += 1  # 每个 epoch 递增
         if num_cycle_of_target > 4:
             break
 
@@ -498,12 +499,15 @@ def train_finetune_curriculum(
 
         torch.cuda.synchronize(device=args.gpuid)
 
+        # 动态调整 filter_ratio 以反映课程学习
+        filter_ratio = min(0.2 + 0.2 * num_cycle_of_target, 1.0)
+
         clip_loss, adv_loss, filter_ratio = model(
             input_visuals_source,
             input_visuals_target,
             input_text_source,
             input_text_target,
-            num_cycle_of_target=num_cycle_of_target,
+            num_cycle_of_target=num_cycle_of_target,  # 传入课程学习阶段
         )
         loss = clip_loss + adv_loss
 
