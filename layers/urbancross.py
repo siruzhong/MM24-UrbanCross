@@ -294,7 +294,6 @@ class UrbanCross_finetune_curriculum(nn.Module):
             nn.Linear(768, 768),
             nn.ReLU(),
             nn.Linear(768, 2),
-            # nn.Sigmoid()
         )
         
         self.adv_loss = AdversarialLoss()
