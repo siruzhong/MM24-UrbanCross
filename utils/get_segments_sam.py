@@ -28,12 +28,18 @@ def compute_similarity(image_path, text, device=device, clip_model=clip_model, p
     
     # 对每个部分单独进行编码
     for part in text_parts:
-        text_inputs = clip.tokenize([part]).to(device)
-        with torch.no_grad():
-            text_features_part = clip_model.encode_text(text_inputs)
-            text_features_list.append(text_features_part)
+        try:
+            text_inputs = clip.tokenize([part]).to(device)
+            with torch.no_grad():
+                text_features_part = clip_model.encode_text(text_inputs)
+                text_features_list.append(text_features_part)
+        except RuntimeError as e:
+            print(f"Error processing text: {part}. Error: {e}")
+            return None
     
     # 计算所有部分编码的平均值
+    if not text_features_list:
+        return None
     text_features_avg = torch.mean(torch.stack(text_features_list), dim=0)
     
     # 加载并处理图像
@@ -96,16 +102,19 @@ def show_masks_mine(anns, ori_img, img_path, description):
         plt.imsave(segment_img_path, masked_img)
 
         similarity = compute_similarity(segment_img_path, description)
-        similarities.append((similarity, segment_img_path))
+        if similarity is not None:
+            similarities.append((similarity, segment_img_path))
     
     # 保留相似度最高的前10个分割
-    for similarity, path in sorted(similarities, key=lambda x: x[0], reverse=True)[:10]:
+    top_similarities = sorted(similarities, key=lambda x: x[0], reverse=True)[:10]
+    for similarity, path in top_similarities:
         print(f"Kept {path} with similarity {similarity}")
 
     # 删除其他分割
-    for similarity, path in sorted(similarities, key=lambda x: x[0], reverse=True)[10:]:
-        if os.path.exists(path):
-            os.remove(path)
+    for similarity, path in similarities:
+        if path not in [x[1] for x in top_similarities]:
+            if os.path.exists(path):
+                os.remove(path)
 
 
 if __name__ == "__main__":
@@ -119,7 +128,9 @@ if __name__ == "__main__":
     mask_generator = SamAutomaticMaskGenerator(sam)
 
     img_lists = df["image_name"]
-    for idx, row in tqdm(list(df.iterrows())[151468:], total=df.shape[0]):
+    failed_rows = []
+
+    for idx, row in tqdm(list(df.iterrows())[101468:], total=df.shape[0]):
         image_name = row['image_name']
         description = row['description']  # 确保CSV中有描述的列
         image_path = os.path.join(img_path, image_name)
@@ -131,5 +142,15 @@ if __name__ == "__main__":
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         masks = mask_generator.generate(image)
         
-        # 直接在这里调用修改后的函数
-        show_masks_mine(masks, image, image_path, description)
+        try:
+            show_masks_mine(masks, image, image_path, description)
+        except Exception as e:
+            print(f"Error processing image {image_name}: {e}")
+            failed_rows.append(idx)
+    
+    # 删除失败的行
+    for idx in sorted(failed_rows, reverse=True):
+        df.drop(idx, inplace=True)
+    
+    # 保存更新后的CSV文件
+    df.to_csv("/hpc2hdd/home/szhong691/zsr/projects/dataset/UrbanCross/Germany/instructblip_generation_germany_refine_fixed.csv", index=False)
