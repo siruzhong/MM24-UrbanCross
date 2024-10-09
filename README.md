@@ -22,15 +22,7 @@ UrbanCross aims to enhance the performance of satellite image-text retrieval tas
 As the codebase is extensive and complex, this repository will be actively maintained and updated. The dataset is currently being refined due to its large size and will be released on Hugging Face shortly.
 
 ## Dataset
-The dataset used in UrbanCross is currently being refined and will be released on Hugging Face soon. It includes:
-
-- High-resolution satellite images from multiple countries.
-- Geo-tags to enhance retrieval performance
-- Text descriptions generated through a multimodal model.
-
-![dataset](/figs/dataset.png)
-
-You can download from https://drive.google.com/drive/folders/1_MUFl3xfWwBZv5wJkRCa8Xl-cwYQYZHc?usp=sharing
+The UrbanCross dataset is available on [Google Drive](https://drive.google.com/drive/folders/1_MUFl3xfWwBZv5wJkRCa8Xl-cwYQYZHc?usp=sharing). The dataset includes:
 
 ```shell                 
 .UrbanCross-Dataset
@@ -47,6 +39,10 @@ You can download from https://drive.google.com/drive/folders/1_MUFl3xfWwBZv5wJkR
 │   ├── images.zip
 │   └── instructblip_generation_spain_refine.csv
 ```
+
+The dataset features high-resolution satellite images from three countries, segmented using the SAM (Segment Anything Model), with each image having ten segments. Text descriptions were generated using the InstructBLIP model.
+
+![dataset](/figs/dataset.png)
 
 ## Usage
 
