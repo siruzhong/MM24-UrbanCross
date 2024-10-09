@@ -30,6 +30,24 @@ The dataset used in UrbanCross is currently being refined and will be released o
 
 ![dataset](/figs/dataset.png)
 
+You can download from https://drive.google.com/drive/folders/1_MUFl3xfWwBZv5wJkRCa8Xl-cwYQYZHc?usp=sharing
+
+```shell                 
+.UrbanCross-Dataset
+├── Finland
+│   ├── image_segments.zip
+│   ├── images.zip
+│   └── instructblip_generation_finland_refine.csv
+├── Germany
+│   ├── image_segments.zip
+│   ├── images.zip
+│   └── instructblip_generation_germany_refine.csv
+├── Spain
+│   ├── image_segments.zip
+│   ├── images.zip
+│   └── instructblip_generation_spain_refine.csv
+```
+
 ## Usage
 
 ### Prerequisites
