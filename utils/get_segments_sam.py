@@ -157,10 +157,10 @@ if __name__ == "__main__":
     img_lists = df["image_name"]
     failed_rows = []
 
-    # Iterate over the dataset to process each image and description pair
-    for idx, row in tqdm(list(df.iterrows())[101468:], total=df.shape[0]):
-        image_name = row['image_name']
-        description = row['description']  # Ensure that there is a description column in the CSV
+    # Iterate over the dataset in reverse order to process each image and description pair
+    for row in tqdm(df.iloc[::-1].itertuples(index=True, name='Pandas'), total=df.shape[0]):
+        image_name = row.image_name
+        description = row.description  # Ensure that there is a description column in the CSV
         image_path = os.path.join(img_path, image_name)
         
         # If the image does not exist, skip to the next iteration
@@ -169,15 +169,19 @@ if __name__ == "__main__":
         
         # Load the image and convert it to RGB
         image = cv2.imread(image_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        masks = mask_generator.generate(image)
-        
-        # Try to generate masks and compute similarities
-        try:
-            show_masks_mine(masks, image, image_path, description)
-        except Exception as e:
-            print(f"Error processing image {image_name}: {e}")
-            failed_rows.append(idx)
+        if image is not None:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            masks = mask_generator.generate(image)
+            
+            # Try to generate masks and compute similarities
+            try:
+                show_masks_mine(masks, image, image_path, description)
+            except Exception as e:
+                print(f"Error processing image {image_name}: {e}")
+                failed_rows.append(row.Index)  # Use .Index to get the original index
+        else:
+            print(f"Image not found: {image_path}")
+            failed_rows.append(row.Index)  # Use .Index to get the original index)
     
     # Remove the rows that failed processing from the dataframe
     for idx in sorted(failed_rows, reverse=True):
